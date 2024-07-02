@@ -14,7 +14,9 @@ set(CPACK_PKGBUILD_IDENTITY_NAME "3rd Party Mac Developer Installer: David Dubbe
 set(CPACK_RESOURCE_FILE_WELCOME ${CMAKE_SOURCE_DIR}/packaging/welcome.txt)
 set(CPACK_RESOURCE_FILE_README ${CMAKE_SOURCE_DIR}/packaging/readme.txt)
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/packaging/license.txt)
+set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
 set(CPACK_STRIP_FILES ON)
+set(CPACK_COMPONENTS_ALL app examples-basic forcefields molecules python)
 
 include(CPack)
 
