@@ -30,7 +30,7 @@
 # authors
 
 Drs. Youri Ran, University of Amsterdam<br>
-Drs. Shrinjay Shoarma, Delft University of Technology<br>
+Drs. Shrinjay Sharma, Delft University of Technology<br>
 Drs. Zhao Li, Northwestern University<br>
 Dr. David Dubbeldam, University of Amsterdam<br>
 Prof. Sofia Calero,  Eindhoven University of Technology<br>
@@ -40,7 +40,7 @@ Prof. Randall Q. Snurr, Northwestern University
 # contributors
 
 Alvaro Vazquez Mayagoitia, Argonne National Lab, contribution to openmp-implementation discussion<br>
-Anserme, better README.md
+Anserme, better README.md and packaging
 
 # running
 
