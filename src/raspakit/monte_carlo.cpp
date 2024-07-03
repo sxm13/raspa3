@@ -683,9 +683,12 @@ void MonteCarlo::output()
     outputJsons[system.systemId]["output"]["cpuTimings"]["production"] = totalProductionSimulationTime.count();
     outputJsons[system.systemId]["output"]["cpuTimings"]["total"] = totalSimulationTime.count();
     outputJsons[system.systemId]["output"]["cpuTimings"]["system"] = system.mc_moves_cputime.jsonSystemMCMoveCPUTimeStatistics();
-    outputJsons[system.systemId]["output"]["averageEnergies"] = system.averageEnergies.jsonAveragesStatistics(
+
+    outputJsons[system.systemId]["properties"]["averageEnergies"] = system.averageEnergies.jsonAveragesStatistics(
         system.hasExternalField, system.frameworkComponents, system.components);
-    outputJsons[system.systemId]["output"]["averagePressure"] = system.averagePressure.jsonAveragesStatistics();
+    outputJsons[system.systemId]["properties"]["averagePressure"] = system.averagePressure.jsonAveragesStatistics();
+    outputJsons[system.systemId]["properties"]["averageEnthalpy"] =
+        system.averageEnthalpiesOfAdsorption.jsonAveragesStatistics(system.swappableComponents, system.components);
 
     for (const Component& component : system.components)
     {
@@ -694,10 +697,7 @@ void MonteCarlo::output()
       outputJsons[system.systemId]["output"]["cpuTimings"][component.name] =
           component.mc_moves_cputime.jsonComponentMCMoveCPUTimeStatistics();
     }
-  }
 
-  for (System& system : systems)
-  {
     std::ofstream json(outputJsonFileNames[system.systemId]);
     json << outputJsons[system.systemId].dump(4);
   }

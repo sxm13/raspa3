@@ -2016,7 +2016,7 @@ nlohmann::json System::jsonMCMoveStatistics() const
   nlohmann::json status;
 
   status["system"] = mc_moves_statistics.jsonMCMoveStatistics();
-  for (size_t componentId = 0; const Component& component : components)
+  for (const Component& component : components)
   {
     status[component.name] = component.mc_moves_statistics.jsonMCMoveStatistics();
 
@@ -2042,7 +2042,6 @@ nlohmann::json System::jsonMCMoveStatistics() const
     imposedFugacity));
     }
     */
-    ++componentId;
   }
 
   return status;

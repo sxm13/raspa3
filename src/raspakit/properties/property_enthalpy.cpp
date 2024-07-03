@@ -44,6 +44,8 @@ import component;
 import units;
 import enthalpy_of_adsorption;
 import averages;
+import json;
+import averages;
 
 std::string PropertyEnthalpy::writeAveragesStatistics(std::vector<size_t> &swappableComponents,
                                                       std::vector<Component> &components) const
@@ -138,6 +140,61 @@ std::string PropertyEnthalpy::writeAveragesStatistics(std::vector<size_t> &swapp
   std::print(stream, "\n");
 
   return stream.str();
+}
+
+nlohmann::json PropertyEnthalpy::jsonAveragesStatistics(std::vector<size_t> &swappableComponents,
+                                                        std::vector<Component> &components) const
+{
+  nlohmann::json status;
+
+  if (!swappableComponents.empty())
+  {
+    std::pair<EnthalpyOfAdsorption, EnthalpyOfAdsorption> enthalpy = averageEnthalpy();
+    for (size_t k = 0; k < swappableComponents.size(); k++)
+    {
+      size_t index = swappableComponents[k];
+      double idealGasTerm = components[index].idealGasEnergy.value_or(0.0);
+
+      std::vector<double> blockEnthalpy = blockEnthalpies(k, idealGasTerm);
+      status[components[index].name]["block"] = blockEnthalpy;
+      status[components[index].name]["mean"]["[K]"] = Units::EnergyToKelvin * (enthalpy.first.values[k] - idealGasTerm);
+      status[components[index].name]["confidence"]["[K]"] = Units::EnergyToKelvin * enthalpy.second.values[k];
+      status[components[index].name]["mean"]["[kJ/mol]"] =
+          Units::EnergyToKJPerMol * (enthalpy.first.values[k] - idealGasTerm);
+      status[components[index].name]["confidence"]["[kJ/mol]"] = Units::EnergyToKJPerMol * enthalpy.second.values[k];
+
+      if (!components[index].idealGasEnergy)
+      {
+        status[components[index].name]["warning"] =
+            "Warning: Recompute value of the total enthalpy of adsorption by hand. Need to subtract the ideal-gas "
+            "energy";
+      }
+    }
+    if (swappableComponents.size() > 1)
+    {
+      std::vector<double> blockTotalEnthalpy(numberOfBlocks);
+
+      for (size_t k = 0; k < swappableComponents.size(); k++)
+      {
+        size_t index = swappableComponents[k];
+        double idealGasTerm = components[index].idealGasEnergy.value_or(0.0);
+        std::vector<double> blockEnthalpy = blockEnthalpies(k, idealGasTerm);
+        for (size_t i = 0; i < numberOfBlocks; i++)
+        {
+          blockTotalEnthalpy[i] += components[index].molFraction * blockEnthalpy[i];
+        }
+      }
+
+      std::pair<double, double> totalEnthalpy = meanConfidence(blockTotalEnthalpy);
+      status["total"]["block"] = blockTotalEnthalpy;
+      status["total"]["mean"]["[K]"] = totalEnthalpy.first;
+      status["total"]["confidence"]["[K]"] = totalEnthalpy.second;
+      status["total"]["mean"]["[kJ/mol]"] = totalEnthalpy.first;
+      status["total"]["confidence"]["[kJ/mol]"] = totalEnthalpy.second;
+    }
+  }
+
+  return status;
 }
 
 Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const PropertyEnthalpy &p)

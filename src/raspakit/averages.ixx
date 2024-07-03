@@ -56,6 +56,18 @@ export const int chosenConfidenceLevel = int(confidenceLevel::percent_95);
 
 constexpr double standardNormalDeviate = standardNormalDeviates[numberOfBins - 1][chosenConfidenceLevel];
 
+export inline std::pair<double, double> meanConfidence(std::vector<double> &data)
+{
+  double size = static_cast<double>(data.size());
+  double mean = std::accumulate(data.begin(), data.end(), 0.0) / size;
+  double sumOfSquaresDiff = std::accumulate(data.begin(), data.end(), 0.0,
+                                            [mean](double acc, double x) { return acc + (x - mean) * (x - mean); });
+
+  double standardError = std::sqrt(sumOfSquaresDiff / (size * (size - 1.0)));
+
+  return {mean, standardError * standardNormalDeviate};
+}
+
 export struct BlockErrorEstimation
 {
   size_t numberOfBins;

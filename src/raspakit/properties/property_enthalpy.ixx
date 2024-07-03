@@ -35,6 +35,8 @@ import averages;
 import loadings;
 import enthalpy_of_adsorption;
 import component;
+import json;
+import units;
 
 inline std::pair<double, double> pair_sum(const std::pair<double, double> &lhs, const std::pair<double, double> &rhs)
 {
@@ -126,8 +128,22 @@ export struct PropertyEnthalpy
     return std::make_pair(average, confidenceIntervalError);
   }
 
+  std::vector<double> blockEnthalpies(size_t &k, double &idealGasTerm) const
+  {
+    std::vector<double> enthalpy(numberOfBlocks);
+
+    std::transform(
+        bookKeepingEnthalpyOfAdsorptionTerms.begin(), bookKeepingEnthalpyOfAdsorptionTerms.end(), enthalpy.begin(),
+        [&](const std::pair<EnthalpyOfAdsorptionTerms, double> &block) {
+          return Units::EnergyToKelvin * ((block.first / block.second).compositeProperty().values[k] - idealGasTerm);
+        });
+    return enthalpy;
+  }
+
   std::string writeAveragesStatistics(std::vector<size_t> &swappableComponents,
                                       std::vector<Component> &components) const;
+  nlohmann::json jsonAveragesStatistics(std::vector<size_t> &swappableComponents,
+                                        std::vector<Component> &components) const;
 
   friend Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const PropertyEnthalpy &p);
   friend Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, PropertyEnthalpy &p);
