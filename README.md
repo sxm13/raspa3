@@ -48,38 +48,51 @@ apt-get install -y --no-install-recommends liblapack64-dev libblas64-dev<br>
 cmake -B build --preset=linux-ubuntu-24<br>
 ninja -C build<br>
 ninja -C build install<br>
-ctest --test-dir build/tests/raspakit-tests --verbose<br>
+ctest --test-dir build/tests/raspakit-tests --verbose
+
+Fedora 40
+=========
+dnf install -y wget git rpm-build<br>
+dnf install -y llvm lld cmake clang clang-tools-extra ninja-build<br>
+dnf install -y libomp-devel libcxx libcxxabi libcxx-devel libcxxabi-devel libcxx-static libcxxabi-static<br>
+dnf install -y lapack-devel lapack64 blas64<br>
+dnf install -y python3 python3-devel python3-pybind11<br>
+dnf install -y pybind11-devel<br>
+cmake -B --preset linux-fedora-40<br>
+ninja -C build<br>
+ninja -C build install<br>
+ctest --test-dir build/tests/raspakit-tests --verbose
 
 Presets
 =======
 cmake --list-presets<br>
 Available configure presets:<br>
-  "macos-intel"<br>
-  "macos-intel-debug"<br>
-  "macos-apple-silicon"<br>
-  "macos-apple-silicon-debug"<br>
-  "linux"<br>
-  "linux-carbon"<br>
-  "linux-opensuse-leap-15.2"<br>
-  "linux-opensuse-leap-15.3"<br>
-  "linux-opensuse-leap-15.4"<br>
-  "linux-opensuse-leap-15.5"<br>
-  "linux-opensuse-tumbleweed"<br>
-  "linux-archlinux"<br>
-  "linux-redhat-6"<br>
-  "linux-redhat-7"<br>
-  "linux-redhat-8"<br>
-  "linux-redhat-9"<br>
-  "linux-debian-12"<br>
-  "linux-debian-11"<br>
-  "linux-debian-10"<br>
-  "linux-ubuntu-24"<br>
-  "linux-ubuntu-22"<br>
-  "linux-ubuntu-20"<br>
-  "linux-fedora-35"<br>
-  "linux-fedora-36"<br>
-  "linux-fedora-37"<br>
-  "linux-fedora-38"<br>
-  "linux-fedora-39"<br>
-  "linux-fedora-40"
+> "macos-intel"<br>
+> "macos-intel-debug"<br>
+> "macos-apple-silicon"<br>
+> "macos-apple-silicon-debug"<br>
+> "linux"<br>
+> "linux-carbon"<br>
+> "linux-opensuse-leap-15.2"<br>
+> "linux-opensuse-leap-15.3"<br>
+> "linux-opensuse-leap-15.4"<br>
+> "linux-opensuse-leap-15.5"<br>
+> "linux-opensuse-tumbleweed"<br>
+> "linux-archlinux"<br>
+> "linux-redhat-6"<br>
+> "linux-redhat-7"<br>
+> "linux-redhat-8"<br>
+> "linux-redhat-9"<br>
+> "linux-debian-12"<br>
+> "linux-debian-11"<br>
+> "linux-debian-10"<br>
+> "linux-ubuntu-24"<br>
+> "linux-ubuntu-22"<br>
+> "linux-ubuntu-20"<br>
+> "linux-fedora-35"<br>
+> "linux-fedora-36"<br>
+> "linux-fedora-37"<br>
+> "linux-fedora-38"<br>
+> "linux-fedora-39"<br>
+> "linux-fedora-40"
 
