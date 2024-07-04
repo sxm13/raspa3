@@ -51,20 +51,22 @@ elseif (Win32)
 )
 elseif (APPLE)
   target_link_libraries(${PROJECT_NAME}
-        PUBLIC
-        pybind11::module
-        libs::raspakit
-        -nostdlib++
-        ${LLVM_LIBS}/c++/libc++experimental.a
-        ${LLVM_LIBS}/c++/libc++.a
-        ${LLVM_LIBS}/c++/libc++abi.a
-        ${LLVM_LIBS}/libunwind.a
-        ${LLVM_LIBS}/../../../libomp/${LLVM_VERSION}/lib/libomp.a
-        -lpthread
-)
+    PUBLIC
+    libs::raspakit
+    pybind11::module
+    ${BLAS_LIBRARIES}
+    ${LAPACK_LIBRARIES}
+    -nostdlib++
+    ${LLVM_LIBS}/c++/libc++experimental.a
+    ${LLVM_LIBS}/c++/libc++.a
+    ${LLVM_LIBS}/c++/libc++abi.a
+    ${LLVM_LIBS}/libunwind.a
+    ${LLVM_LIBS}/../../../libomp/${LLVM_VERSION}/lib/libomp.a
+    -lpthread
+  )
 endif()
 
 target_compile_options(${PROJECT_NAME} PUBLIC -stdlib=libc++ $<$<COMPILE_LANGUAGE:CXX>:${PROJECT_WARNINGS_CXX}>)
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION share/raspa3/lib COMPONENT python)
+install(TARGETS ${PROJECT_NAME} DESTINATION  ${SKBUILD_PROJECT_NAME})
