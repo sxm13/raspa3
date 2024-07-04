@@ -3,8 +3,25 @@ requires = ["scikit-build-core"]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "raspa3"
+name = "raspa"
 version = "3.0.0"
+description = "A general purpose classical simulation package"
+authors = [
+    { name = "Drs. Youri Ran, University of Amsterdam" },
+    { name = "Drs. Shrinjay Sharma, Delft University of Technology" },
+    { name = "Drs. Zhao Li, Northwestern University" },
+    { name = "Prof. Sofia Calero, Eindhoven University of Technology" },
+    { name = "Prof. Thijs Vlugt, Delft University of Technology" },
+    { name = "Prof. Randall Q. Snurr, Northwestern University" },
+    { name = "Dr. David Dubbeldam, University of Amsterdam", email = "d.dubbeldam@uva.nl" },
+]
+dependencies = ["pybind11"]
+requires-python = ">=3.8"
+license = { file = "LICENSE.md" }
+readme = "README.md"
+
+[project.urls]
+Documentation = "iraspa.github.io/raspa3"
 
 [tool.scikit-build]
 cmake.version = ">=3.28"
