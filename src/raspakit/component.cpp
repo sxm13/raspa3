@@ -606,73 +606,6 @@ nlohmann::json Component::jsonStatus() const
   return status;
 }
 
-std::vector<Atom> Component::rotateRandomlyAroundCenterOfMass([[maybe_unused]] const simd_quatd &q)
-{
-  double3 com{};
-
-  double total_mass{};
-  for (auto &[atom, mass] : definedAtoms)
-  {
-    com += mass * atom.position;
-    totalMass += mass;
-  }
-  com = com / total_mass;
-
-  // TODO
-  return {};
-}
-
-std::vector<double3> Component::randomlyRotatedPositionsAroundStartingBead(RandomNumber &random) const
-{
-  double3x3 randomRotationMatrix = random.randomRotationMatrix();
-  std::vector<double3> randomPositions{};
-  std::transform(std::begin(atoms), std::end(atoms), std::back_inserter(randomPositions), [&](const Atom &atom)
-                 { return randomRotationMatrix * (atom.position - atoms[startingBead].position); });
-  return randomPositions;
-}
-
-std::vector<Atom> Component::recenteredCopy(double scaling, size_t moleculeId) const
-{
-  std::vector<Atom> new_atoms(atoms.size());
-
-  for (size_t i = 0; i != atoms.size(); ++i)
-  {
-    new_atoms[i] = Atom(atoms[i].position - atoms[startingBead].position, atoms[i].charge, scaling,
-                        static_cast<uint32_t>(moleculeId), static_cast<uint16_t>(atoms[i].type),
-                        static_cast<uint8_t>(componentId), static_cast<uint8_t>(atoms[i].groupId));
-  }
-
-  return new_atoms;
-}
-
-std::vector<Atom> Component::copyAtoms(std::span<Atom> molecule, double scaling, size_t moleculeId) const
-{
-  std::vector<Atom> copied_atoms(molecule.begin(), molecule.end());
-  for (size_t i = 0; i != atoms.size(); ++i)
-  {
-    copied_atoms[i].setScaling(scaling);
-    copied_atoms[i].position = molecule[i].position - molecule[startingBead].position;
-    copied_atoms[i].moleculeId = static_cast<uint32_t>(moleculeId);
-  }
-  return copied_atoms;
-}
-
-std::vector<Atom> Component::copyAtomsRandomlyRotatedAt(RandomNumber &random, double3 position,
-                                                        std::span<Atom> molecule, double scaling,
-                                                        size_t moleculeId) const
-{
-  double3x3 randomRotationMatrix = random.randomRotationMatrix();
-  std::vector<Atom> copied_atoms(molecule.begin(), molecule.end());
-  for (size_t i = 0; i != atoms.size(); ++i)
-  {
-    copied_atoms[i].setScaling(scaling);
-    copied_atoms[i].position =
-        position + randomRotationMatrix * (molecule[i].position - molecule[startingBead].position);
-    copied_atoms[i].moleculeId = static_cast<uint32_t>(moleculeId);
-  }
-  return copied_atoms;
-}
-
 std::vector<Atom> Component::copiedAtoms(std::span<Atom> molecule) const
 {
   std::vector<Atom> copied_atoms(molecule.begin(), molecule.end());
@@ -695,22 +628,6 @@ std::pair<Molecule, std::vector<Atom>> Component::equilibratedMoleculeRandomInBo
   {
     trial_atoms[i].position = com + M * atoms[i].position;
   }
-  /*
-  size_t startingBead = components[selectedComponent].startingBead;
-  double3 center = components[selectedComponent].atoms[startingBead].position;
-  std::vector<Atom> copied_atoms(components[selectedComponent].atoms.begin(),
-  components[selectedComponent].atoms.end());
-
-  double3x3 randomRotationMatrix = random.randomRotationMatrix();
-  double3 position = simulationBox.randomPosition(random);
-
-  for (size_t i = 0; i != copied_atoms.size(); ++i)
-  {
-    copied_atoms[i].setScaling(scaling);
-    copied_atoms[i].position = position + randomRotationMatrix * (components[selectedComponent].atoms[i].position -
-  center); copied_atoms[i].moleculeId = static_cast<uint32_t>(moleculeId);
-  }
-  */
   return {{com, q}, trial_atoms};
 }
 
