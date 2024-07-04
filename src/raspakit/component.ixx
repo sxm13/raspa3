@@ -197,12 +197,6 @@ export struct Component
   double3 computeCenterOfMass(std::vector<Atom> atom_list) const;
   std::vector<Atom> rotatePositions(const simd_quatd &q) const;
 
-  std::vector<Atom> rotateRandomlyAroundCenterOfMass(const simd_quatd &q);
-  std::vector<double3> randomlyRotatedPositionsAroundStartingBead(RandomNumber &random) const;
-  std::vector<Atom> recenteredCopy(double scaling, size_t moleculeId) const;
-  std::vector<Atom> copyAtoms(std::span<Atom> molecule, double scaling, size_t moleculeId) const;
-  std::vector<Atom> copyAtomsRandomlyRotatedAt(RandomNumber &random, double3 position, std::span<Atom> molecule,
-                                               double scaling, size_t moleculeId) const;
   std::vector<Atom> copiedAtoms(std::span<Atom> molecule) const;
 
   std::pair<Molecule, std::vector<Atom>> equilibratedMoleculeRandomInBox(RandomNumber &random,
