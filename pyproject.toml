@@ -26,11 +26,7 @@ Documentation = "iraspa.github.io/raspa3"
 [tool.scikit-build]
 cmake.version = ">=3.28"
 cmake.build-type = "Release"
-cmake.args = [
-    "--preset=macos-apple-silicon",
-    "-DBUILD_TESTING=0",
-    "-DBUILD_PYTHON=1",
-]
+cmake.args = ["--preset=python", "-DBUILD_TESTING=0", "-DBUILD_PYTHON=1"]
 wheel.cmake = true
 build-dir = "build/python"
 sdist.exclude = ["*.cpp", "*.ixx", "*.pcm", "CMakeLists.txt"]
