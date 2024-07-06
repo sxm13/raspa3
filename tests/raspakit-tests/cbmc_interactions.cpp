@@ -33,9 +33,9 @@ import cbmc_interactions_intermolecular;
 TEST(cbmc_interactions, framework_molecule_1)
 {
     ForceField forceField = ForceField(
-    { PseudoAtom("Si", 28.0855, 2.05, 14, false),
-      PseudoAtom("O", 15.999, -1.025, 8, false),
-      PseudoAtom("CH4", 16.04246, 0.0, 6, false)
+    { PseudoAtom("Si",  28.0855,   2.05,  0.0, 14, false),
+      PseudoAtom("O",   15.999,   -1.025, 0.0,  8, false),
+      PseudoAtom("CH4", 16.04246,  0.0,   0.0,  6, false)
     },
     { VDWParameters(22.0, 2.30),
       VDWParameters(53.0, 3.3),
@@ -78,9 +78,9 @@ TEST(cbmc_interactions, framework_molecule_1)
 TEST(cbmc_interactions, framework_molecule_2)
 {
     ForceField forceField = ForceField(
-    { PseudoAtom("Si", 28.0855, 2.05, 14, false),
-      PseudoAtom("O", 15.999, -1.025, 8, false),
-      PseudoAtom("CH4", 16.04246, 0.0, 6, false)
+    { PseudoAtom("Si",  28.0855,   2.05,  0.0, 14, false),
+      PseudoAtom("O",   15.999,   -1.025, 0.0,  8, false),
+      PseudoAtom("CH4", 16.04246,  0.0,   0.0,  6, false)
     },
     { VDWParameters(22.0, 2.30),
       VDWParameters(53.0, 3.3),

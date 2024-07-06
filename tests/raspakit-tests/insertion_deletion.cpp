@@ -25,7 +25,7 @@ import simulationbox;
 TEST(insertion_deletion, methane_number_of_molecules_per_component)
 {
   ForceField forceField = ForceField(
-    { PseudoAtom("CH4", 16.04246, 0.0, 6, false) },
+    { PseudoAtom("CH4", 16.04246, 0.0, 0.0, 6, false) },
     { VDWParameters(158.5, 3.72) },
     ForceField::MixingRule::Lorentz_Berthelot,
     12.0,
@@ -58,11 +58,11 @@ TEST(insertion_deletion, methane_number_of_molecules_per_component)
 TEST(insertion_deletion, CO2_number_of_molecules_per_component)
 {
   ForceField forceField = ForceField(
-  { PseudoAtom("Si",    28.0855,   2.05,  14, false),
-    PseudoAtom("O",     15.999,   -1.025,  8, false),
-    PseudoAtom("CH4",   16.04246,  0.0,    6, false),
-    PseudoAtom("C_co2", 12.0,      0.6512, 6, false),
-    PseudoAtom("O_co2", 15.9994,  -0.3256, 8, false),
+  { PseudoAtom("Si",    28.0855,   2.05,   0.0, 14, false),
+    PseudoAtom("O",     15.999,   -1.025,  0.0,  8, false),
+    PseudoAtom("CH4",   16.04246,  0.0,    0.0,  6, false),
+    PseudoAtom("C_co2", 12.0,      0.6512, 0.0,  6, false),
+    PseudoAtom("O_co2", 15.9994,  -0.3256, 0.0,  8, false),
   },
   { VDWParameters(22.0, 2.30),
     VDWParameters(53.0, 3.3),
@@ -118,11 +118,11 @@ TEST(insertion_deletion, CO2_number_of_molecules_per_component)
 TEST(insertion_deletion, CO2_Methane_number_of_molecules_per_component)
 {
   ForceField forceField = ForceField(
-  { PseudoAtom("Si",    28.0855,   2.05,  14, false),
-    PseudoAtom("O",     15.999,   -1.025,  8, false),
-    PseudoAtom("CH4",   16.04246,  0.0,    6, false),
-    PseudoAtom("C_co2", 12.0,      0.6512, 6, false),
-    PseudoAtom("O_co2", 15.9994,  -0.3256, 8, false),
+  { PseudoAtom("Si",    28.0855,   2.05,   0.0, 14, false),
+    PseudoAtom("O",     15.999,   -1.025,  0.0,  8, false),
+    PseudoAtom("CH4",   16.04246,  0.0,    0.0,  6, false),
+    PseudoAtom("C_co2", 12.0,      0.6512, 0.0,  6, false),
+    PseudoAtom("O_co2", 15.9994,  -0.3256, 0.0,  8, false),
   },
   { VDWParameters(22.0, 2.30),
     VDWParameters(53.0, 3.3),
@@ -268,11 +268,11 @@ TEST(insertion_deletion, CO2_Methane_number_of_molecules_per_component)
 TEST(insertion_deletion, Dynamic_CO2_Methane_number_of_molecules_per_component)
 {
   ForceField forceField = ForceField(
-  { PseudoAtom("Si",    28.0855,   2.05,  14, false),
-    PseudoAtom("O",     15.999,   -1.025,  8, false),
-    PseudoAtom("CH4",   16.04246,  0.0,    6, false),
-    PseudoAtom("C_co2", 12.0,      0.6512, 6, false),
-    PseudoAtom("O_co2", 15.9994,  -0.3256, 8, false),
+  { PseudoAtom("Si",    28.0855,   2.05,   0.0, 14, false),
+    PseudoAtom("O",     15.999,   -1.025,  0.0,  8, false),
+    PseudoAtom("CH4",   16.04246,  0.0,    0.0,  6, false),
+    PseudoAtom("C_co2", 12.0,      0.6512, 0.0,  6, false),
+    PseudoAtom("O_co2", 15.9994,  -0.3256, 0.0,  8, false),
   },
   { VDWParameters(22.0, 2.30),
     VDWParameters(53.0, 3.3),

@@ -26,11 +26,11 @@ import mc_moves_probabilities_system;
 TEST(MC, translation)
 {
   ForceField forceField = ForceField(
-  { PseudoAtom("Si",    28.0855,   2.05,  14, false),
-    PseudoAtom("O",     15.999,   -1.025,  8, false),
-    PseudoAtom("CH4",   16.04246,  0.0,    6, false),
-    PseudoAtom("C_co2", 12.0,      0.6512, 6, false),
-    PseudoAtom("O_co2", 15.9994,  -0.3256, 8, false),
+  { PseudoAtom("Si",    28.0855,   2.05,   0.0, 14, false),
+    PseudoAtom("O",     15.999,   -1.025,  0.0,  8, false),
+    PseudoAtom("CH4",   16.04246,  0.0,    0.0,  6, false),
+    PseudoAtom("C_co2", 12.0,      0.6512, 0.0,  6, false),
+    PseudoAtom("O_co2", 15.9994,  -0.3256, 0.0,  8, false),
   },
   { VDWParameters(22.0, 2.30),
     VDWParameters(53.0, 3.3),

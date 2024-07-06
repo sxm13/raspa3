@@ -203,6 +203,7 @@ std::optional<ForceField> ForceField::readForceField(std::optional<std::string> 
     double jsonMass = item["mass"].is_number() ? item["mass"].get<double>() : 0.0;
     std::string jsonElement = item["element"].is_string() ? item["element"].get<std::string>() : "C";
     double jsonCharge = item["charge"].is_number() ? item["charge"].get<double>() : 0.0;
+    double jsonPolarizibility = item["polarizibility"].is_number() ? item["polarizibility"].get<double>() : 0.0;
     size_t jsonPrintToOutput = item["print_to_output"].is_boolean() ? item["print_to_output"].get<bool>() : true;
     std::string jsonSource = item["source"].is_string() ? item["source"].get<std::string>() : std::string{};
 
@@ -213,7 +214,7 @@ std::optional<ForceField> ForceField::readForceField(std::optional<std::string> 
       atomicNumber = static_cast<size_t>(it->second);
     }
 
-    jsonPseudoAtoms.emplace_back(jsonName, jsonMass, jsonCharge, atomicNumber, jsonPrintToOutput, jsonSource);
+    jsonPseudoAtoms.emplace_back(jsonName, jsonMass, jsonCharge, jsonPolarizibility, atomicNumber, jsonPrintToOutput, jsonSource);
   }
 
   std::vector<VDWParameters> jsonSelfInteractions(numberOfPseudoAtoms);
