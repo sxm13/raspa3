@@ -204,6 +204,8 @@ void System::createFrameworks()
     for (const Atom& atom : atoms)
     {
       atomPositions.push_back(atom);
+      electricPotential.push_back(0.0);
+      electricField.push_back(double3(0.0, 0.0, 0.0));
     }
     numberOfFrameworkAtoms += atoms.size();
     numberOfRigidFrameworkAtoms += atoms.size();
@@ -234,6 +236,9 @@ void System::insertFractionalMolecule(size_t selectedComponent, [[maybe_unused]]
 
   std::vector<Molecule>::iterator moleculeIterator = indexForMolecule(selectedComponent, 0);
   moleculePositions.insert(moleculeIterator, molecule);
+
+  electricPotential.resize(electricPotential.size() + atoms.size());
+  electricField.resize(electricField.size() + atoms.size());
 
   numberOfMoleculesPerComponent[selectedComponent] += 1;
 
@@ -271,6 +276,9 @@ void System::insertMolecule(size_t selectedComponent, [[maybe_unused]] const Mol
   std::vector<Molecule>::iterator moleculeIterator =
       indexForMolecule(selectedComponent, numberOfMoleculesPerComponent[selectedComponent]);
   moleculePositions.insert(moleculeIterator, molecule);
+
+  electricPotential.resize(electricPotential.size() + atoms.size());
+  electricField.resize(electricField.size() + atoms.size());
 
   numberOfMoleculesPerComponent[selectedComponent] += 1;
   numberOfIntegerMoleculesPerComponent[selectedComponent] += 1;
@@ -315,6 +323,9 @@ void System::deleteMolecule(size_t selectedComponent, size_t selectedMolecule, c
 
   std::vector<Molecule>::iterator moleculeIterator = indexForMolecule(selectedComponent, selectedMolecule);
   moleculePositions.erase(moleculeIterator, moleculeIterator + 1);
+
+  electricPotential.resize(electricPotential.size() - molecule.size());
+  electricField.resize(electricField.size() - molecule.size());
 
   numberOfMoleculesPerComponent[selectedComponent] -= 1;
   numberOfIntegerMoleculesPerComponent[selectedComponent] -= 1;
@@ -509,6 +520,18 @@ std::span<Atom> System::spanOfMoleculeAtoms()
 {
   return std::span(atomPositions.begin() + static_cast<std::vector<Atom>::difference_type>(numberOfFrameworkAtoms),
                    atomPositions.end());
+}
+
+std::span<double> System::spanOfMoleculeElectricPotential()
+{
+  return std::span(electricPotential.begin() + static_cast<std::vector<double3>::difference_type>(numberOfFrameworkAtoms),
+                   electricPotential.end());
+}
+
+std::span<double3> System::spanOfMoleculeElectricField()
+{
+  return std::span(electricField.begin() + static_cast<std::vector<double3>::difference_type>(numberOfFrameworkAtoms),
+                   electricField.end());
 }
 
 std::span<Atom> System::spanOfMolecule(size_t selectedComponent, size_t selectedMolecule)
@@ -1459,6 +1482,37 @@ RunningEnergy System::computeTotalGradients() noexcept
 
   return frameworkMoleculeEnergy + intermolecularEnergy + ewaldEnergy;
 }
+
+void System::computeTotalElectricPotential() noexcept
+{
+  std::span<Atom> frameworkAtomPositions = spanOfFrameworkAtoms();
+  std::span<Atom> moleculeAtomPositions = spanOfMoleculeAtoms();
+  std::span<double> moleculeElectricPotential = spanOfMoleculeElectricPotential();
+
+  std::fill(moleculeElectricPotential.begin(), moleculeElectricPotential.end(), 0.0);
+
+  Interactions::computeInterMolecularElectricPotential(
+      forceField, simulationBox, moleculeElectricPotential, moleculeAtomPositions);
+
+  Interactions::computeFrameworkMoleculeElectricPotential(
+      forceField, simulationBox, moleculeElectricPotential, frameworkAtomPositions, moleculeAtomPositions);
+}
+
+void System::computeTotalElectricField() noexcept
+{
+  std::span<Atom> frameworkAtomPositions = spanOfFrameworkAtoms();
+  std::span<Atom> moleculeAtomPositions = spanOfMoleculeAtoms();
+  std::span<double3> moleculeElectricField = spanOfMoleculeElectricField();
+
+  Interactions::computeInterMolecularElectricField(
+      forceField, simulationBox, moleculeElectricField, moleculeAtomPositions);
+
+  Interactions::computeFrameworkMoleculeElectricField(
+      forceField, simulationBox, moleculeElectricField, frameworkAtomPositions, moleculeAtomPositions);
+}
+
+
+
 
 std::pair<EnergyStatus, double3x3> System::computeMolecularPressure() noexcept
 {

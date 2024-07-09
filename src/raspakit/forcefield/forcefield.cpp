@@ -214,7 +214,8 @@ std::optional<ForceField> ForceField::readForceField(std::optional<std::string> 
       atomicNumber = static_cast<size_t>(it->second);
     }
 
-    jsonPseudoAtoms.emplace_back(jsonName, jsonMass, jsonCharge, jsonPolarizibility, atomicNumber, jsonPrintToOutput, jsonSource);
+    jsonPseudoAtoms.emplace_back(jsonName, jsonMass, jsonCharge, jsonPolarizibility, 
+                                 atomicNumber, jsonPrintToOutput, jsonSource);
   }
 
   std::vector<VDWParameters> jsonSelfInteractions(numberOfPseudoAtoms);

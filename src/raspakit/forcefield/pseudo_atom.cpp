@@ -50,7 +50,7 @@ Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const Pseudo
   archive << a.name;
   archive << a.mass;
   archive << a.charge;
-  archive << a.polarizibility;
+  archive << a.polarizability;
   archive << a.atomicNumber;
   archive << a.printToPDB;
 
@@ -71,7 +71,7 @@ Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, PseudoAtom &
   archive >> a.name;
   archive >> a.mass;
   archive >> a.charge;
-  archive >> a.polarizibility;
+  archive >> a.polarizability;
   archive >> a.atomicNumber;
   archive >> a.printToPDB;
 

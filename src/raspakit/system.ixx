@@ -168,6 +168,8 @@ export struct System
   // Because the number of atoms is fixed per component it is easy to access the n-th molecule
   std::vector<Atom> atomPositions;
   std::vector<Molecule> moleculePositions;
+  std::vector<double> electricPotential;
+  std::vector<double3> electricField;
 
   double conservedEnergy{};
   double referenceEnergy{};
@@ -269,6 +271,8 @@ export struct System
   void precomputeTotalRigidEnergy() noexcept;
   RunningEnergy computeTotalEnergies() noexcept;
   RunningEnergy computeTotalGradients() noexcept;
+  void computeTotalElectricPotential() noexcept;
+  void computeTotalElectricField() noexcept;
 
   size_t randomFramework(RandomNumber &random)
   {
@@ -294,6 +298,8 @@ export struct System
   std::span<const Atom> spanOfFlexibleAtoms() const;
   std::span<const Atom> spanOfMoleculeAtoms() const;
   std::span<Atom> spanOfMoleculeAtoms();
+  std::span<double> spanOfMoleculeElectricPotential();
+  std::span<double3> spanOfMoleculeElectricField();
 
   size_t numberOfMolecules() const
   {
