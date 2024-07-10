@@ -1268,6 +1268,7 @@ void Interactions::computeEwaldFourierElectricPotential(
     for (size_t m = 0; m != numberOfMoleculesPerComponent[l]; ++m)
     {
       std::span<const Atom> span = std::span(&moleculeAtomPositions[index], size);
+      std::span<double> electricPotential = std::span(&electricPotentialMolecules[index], size);
       for (size_t i = 0; i != span.size(); i++)
       {
         double chargeA = span[i].charge;
@@ -1285,15 +1286,17 @@ void Interactions::computeEwaldFourierElectricPotential(
 
             double3 dr = posA - posB;
             dr = simulationBox.applyPeriodicBoundaryConditions(dr);
-            double r = std::sqrt(double3::dot(dr, dr));
+            double rr = double3::dot(dr, dr);
+            double r = std::sqrt(rr);
 
-            electricPotentialMolecules[i] -= 0.5 * Units::CoulombicConversionFactor * scalingB * chargeB * std::erf(alpha * r) / r;
+            electricPotential[i] -= 0.5 * Units::CoulombicConversionFactor * scalingB * chargeB * std::erf(alpha * r) / r;
           }
         }
       }
       index += size;
     }
   }
+
 
   // Handle net-charges
   // for(size_t i = 0; i != components.size(); ++i)
@@ -1446,6 +1449,7 @@ void Interactions::computeEwaldFourierElectricField(
     for (size_t m = 0; m != numberOfMoleculesPerComponent[l]; ++m)
     {
       std::span<Atom> span = std::span(&moleculeAtomPositions[index], size);
+      std::span<double3> electricField = std::span(&electricFieldMolecules[index], size);
       for (size_t i = 0; i != span.size(); i++)
       {
         double chargeA = span[i].charge;
@@ -1470,7 +1474,7 @@ void Interactions::computeEwaldFourierElectricField(
                    std::exp(-(alpha * alpha * r * r)) / rr;
             double Bt0 = -Units::CoulombicConversionFactor * std::erf(alpha * r) / r;
             double Bt1 = temp + Bt0 / rr;
-            electricFieldMolecules[i] += 0.25 * chargeB * Bt1 * dr;
+            electricField[i] += 0.5 * scalingB * chargeB * Bt1 * dr;
           }
         }
       }
