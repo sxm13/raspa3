@@ -77,4 +77,20 @@ std::pair<EnergyStatus, double3x3> computeEwaldFourierEnergyStrainDerivative(
 void acceptEwaldMove(const ForceField &forceField,
                      std::vector<std::pair<std::complex<double>, std::complex<double>>> &storedEik,
                      std::vector<std::pair<std::complex<double>, std::complex<double>>> &totalEik);
-}  // namespace Interactions
+
+void computeEwaldFourierElectricPotential(
+    std::vector<std::complex<double>> &eik_x, std::vector<std::complex<double>> &eik_y,
+    std::vector<std::complex<double>> &eik_z, std::vector<std::complex<double>> &eik_xy,
+    std::vector<std::pair<std::complex<double>, std::complex<double>>> &fixedFrameworkStoredEik,
+    std::span<double> electricPotentialMolecules, const ForceField &forceField,
+    const SimulationBox &simulationBox, const std::vector<Component> &components,
+    const std::vector<size_t> &numberOfMoleculesPerComponent, std::span<const Atom> moleculeAtomPositions);
+
+void computeEwaldFourierElectricField(
+    std::vector<std::complex<double>> &eik_x, std::vector<std::complex<double>> &eik_y,
+    std::vector<std::complex<double>> &eik_z, std::vector<std::complex<double>> &eik_xy,
+    std::vector<std::pair<std::complex<double>, std::complex<double>>> &fixedFrameworkStoredEik,
+    const ForceField &forceField, const SimulationBox &simulationBox, std::span<double3> electricFieldMolecules,
+    const std::vector<Component> &components, const std::vector<size_t> &numberOfMoleculesPerComponent,
+    std::span<Atom> atomPositions);
+}
