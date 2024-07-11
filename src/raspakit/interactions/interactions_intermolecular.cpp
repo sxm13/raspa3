@@ -33,7 +33,6 @@ import potential_energy_coulomb;
 import potential_gradient_coulomb;
 import potential_correction_vdw;
 import potential_electrostatics;
-import potential_energy_polarization;
 import simulationbox;
 import double3;
 import double3x3;
@@ -565,13 +564,10 @@ void Interactions::computeInterMolecularElectricPotential(const ForceField &forc
   for (std::span<const Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end(); ++it1)
   {
     posA = it1->position;
-    size_t typeA = static_cast<size_t>(it1->type);
-    bool groupIdA = static_cast<bool>(it1->groupId);
     size_t molA = static_cast<size_t>(it1->moleculeId);
     size_t compA = static_cast<size_t>(it1->componentId);
     double scalingCoulombA = it1->scalingCoulomb;
     double chargeA = it1->charge;
-    double polarizationA = forceField.pseudoAtoms[typeA].polarizability;
 
     for (std::span<const Atom>::iterator it2 = moleculeAtoms.begin(); it2 != moleculeAtoms.end(); ++it2)
     {
@@ -582,11 +578,6 @@ void Interactions::computeInterMolecularElectricPotential(const ForceField &forc
       if (!((compA == compB) && (molA == molB)))
       {
         posB = it2->position;
-        size_t typeB = static_cast<size_t>(it2->type);
-        bool groupIdB = static_cast<bool>(it2->groupId);
-        double scalingCoulombB = it2->scalingCoulomb;
-        double chargeB = it2->charge;
-        double polarizationB = forceField.pseudoAtoms[typeB].polarizability;
 
         dr = posA - posB;
         dr = box.applyPeriodicBoundaryConditions(dr);
@@ -596,26 +587,28 @@ void Interactions::computeInterMolecularElectricPotential(const ForceField &forc
         {
           double r = std::sqrt(rr);
 
-          size_t index = std::distance(moleculeAtoms.begin(), it2);
+          size_t index = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it2));
           electricPotentialMolecules[index] += 0.5 * potentialElectrostatics(forceField, scalingCoulombA, r, chargeA);
         }
       }
     }
   }
 }
-
-void Interactions::computeInterMolecularElectricField(const ForceField &forceField, const SimulationBox &box,
-                                                      std::span<double3> electricFieldMolecules,
-                                                      std::span<const Atom> moleculeAtoms) noexcept
+RunningEnergy Interactions::computeInterMolecularElectricField(const ForceField &forceField, const SimulationBox &box,
+                                                               std::span<double3> electricFieldMolecules,
+                                                               std::span<const Atom> moleculeAtoms) noexcept
 {
   double3 dr, posA, posB, f;
   double rr;
 
+  RunningEnergy energySum{};
+
   bool noCharges = forceField.noCharges;
+  const double cutOffVDWSquared = forceField.cutOffVDW * forceField.cutOffVDW;
   const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
 
-  if (noCharges) return;
-  if (moleculeAtoms.empty()) return;
+  if (noCharges) return energySum;
+  if (moleculeAtoms.empty()) return energySum;
 
   for (std::span<const Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end(); ++it1)
   {
@@ -624,6 +617,7 @@ void Interactions::computeInterMolecularElectricField(const ForceField &forceFie
     bool groupIdA = static_cast<bool>(it1->groupId);
     size_t molA = static_cast<size_t>(it1->moleculeId);
     size_t compA = static_cast<size_t>(it1->componentId);
+    double scalingVDWA = it1->scalingVDW;
     double scalingCoulombA = it1->scalingCoulomb;
     double chargeA = it1->charge;
 
@@ -638,21 +632,37 @@ void Interactions::computeInterMolecularElectricField(const ForceField &forceFie
         posB = it2->position;
         size_t typeB = static_cast<size_t>(it2->type);
         bool groupIdB = static_cast<bool>(it2->groupId);
+        double scalingVDWB = it2->scalingVDW;
+        double scalingCoulombB = it2->scalingCoulomb;
+        double chargeB = it2->charge;
 
         dr = posA - posB;
         dr = box.applyPeriodicBoundaryConditions(dr);
         rr = double3::dot(dr, dr);
 
-        if (rr < cutOffChargeSquared)
+        if (rr < cutOffVDWSquared)
+        {
+          EnergyFactor energyFactor =
+              potentialVDWEnergy(forceField, groupIdA, groupIdB, scalingVDWA, scalingVDWB, rr, typeA, typeB);
+
+          energySum.moleculeMoleculeVDW += energyFactor.energy;
+          energySum.dudlambdaVDW += energyFactor.dUdlambda;
+        }
+        if (!noCharges && rr < cutOffChargeSquared)
         {
           double r = std::sqrt(rr);
+          EnergyFactor energyFactor = potentialCoulombEnergy(forceField, groupIdA, groupIdB, scalingCoulombA,
+                                                             scalingCoulombB, r, chargeA, chargeB);
+          energySum.moleculeMoleculeCharge += energyFactor.energy;
+          energySum.dudlambdaCharge += energyFactor.dUdlambda;
 
           ForceFactor forceFactor = scalingCoulombA * chargeA * potentialCoulombGradient(forceField, groupIdA, groupIdB, 1.0, 1.0, r, 1.0, 1.0);
-
-          size_t index = std::distance(moleculeAtoms.begin(), it2);
+          size_t index = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it2));
           electricFieldMolecules[index] += 0.5 * forceFactor.forceFactor * dr;
         }
       }
     }
   }
+
+  return energySum;
 }

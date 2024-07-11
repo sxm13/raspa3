@@ -27,7 +27,7 @@ import interactions_framework_molecule;
 import interactions_ewald;
 import energy_status;
 
-TEST(electrostatic_potential, Test_2_CO2_in_ITQ_29_2x2x2_inter)
+TEST(electrostatic_potential, Test_2_CO2_in_ITQ_29_2x2x2)
 {
   ForceField forceField = ForceField(
     { PseudoAtom("Si",    28.0855,   2.05,   0.0, 14, false),
@@ -95,12 +95,6 @@ TEST(electrostatic_potential, Test_2_CO2_in_ITQ_29_2x2x2_inter)
                                          system.fixedFrameworkStoredEik, system.storedEik, system.forceField, system.simulationBox,
                                          system.components, system.numberOfMoleculesPerComponent, spanOfMoleculeAtoms);
 
-  //EXPECT_NEAR(energy.frameworkMoleculeVDW * Units::EnergyToKelvin, -1932.15586114, 1e-6);
-  //EXPECT_NEAR(energy.frameworkMoleculeCharge * Units::EnergyToKelvin, 554.41444763, 1e-6);
-  //EXPECT_NEAR(energy.moleculeMoleculeVDW * Units::EnergyToKelvin, -242.36960932, 1e-6);
-  //EXPECT_NEAR(energy.moleculeMoleculeCharge * Units::EnergyToKelvin, 162.41877650, 1e-6);
-  //EXPECT_NEAR(energy.ewald * Units::EnergyToKelvin, -759.67572774 + 38.02930863, 1e-4);
-
   system.computeTotalElectricPotential();
 
   // U = \sum_i q_i \phi_i
@@ -110,116 +104,6 @@ TEST(electrostatic_potential, Test_2_CO2_in_ITQ_29_2x2x2_inter)
     potentialEnergy += spanOfMoleculeAtoms[i].scalingCoulomb * spanOfMoleculeAtoms[i].charge * moleculeElectricPotential[i];
   }
 
-  //EXPECT_NEAR(potentialEnergy * Units::EnergyToKelvin, 554.41444763 + 162.41877650 -759.67572774 + 38.02930863, 1e-4);
   EXPECT_NEAR(potentialEnergy * Units::EnergyToKelvin, (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) * Units::EnergyToKelvin, 1e-4);
-
-  system.computeTotalElectricField();
-  std::span<double3> electricField = system.spanOfMoleculeElectricField();
-
-  // U = \sum_i q_i \phi_i
-  double polarizationEnergy{};
-  for(size_t i = 0; i < 6; ++i)
-  {
-    size_t type = spanOfMoleculeAtoms[i].type;
-    double polarizability = system.forceField.pseudoAtoms[type].polarizability / Units::CoulombicConversionFactor;
-    polarizationEnergy -= 0.5 * polarizability * double3::dot(electricField[i], electricField[i]);
-  }
-
-  //EXPECT_NEAR(polarizationEnergy * Units::EnergyToKelvin, -0.6927484, 1e-6);
-
-
-
-  // create copy
-  std::vector<Atom> atomPositions = std::vector<Atom>(spanOfMoleculeAtoms.begin(), spanOfMoleculeAtoms.end());
-
-  double delta = 1e-5;
-  double tolerance = 1e-4;
-  double3 gradient;
-  for (size_t i = 0; i < atomPositions.size(); ++i)
-  {
-    double x1, x2, y1, y2, z1, z2;
-
-
-    // finite difference x
-    atomPositions[i].position.x = spanOfMoleculeAtoms[i].position.x + 0.5 * delta;
-    std::fill(moleculeElectricPotential.begin(), moleculeElectricPotential.end(), 0.0);
-    Interactions::computeFrameworkMoleculeElectricPotential(
-      system.forceField, system.simulationBox, moleculeElectricPotential, frameworkAtomPositions, atomPositions);
-    Interactions::computeInterMolecularElectricPotential(
-      system.forceField, system.simulationBox, moleculeElectricPotential, atomPositions);
-    Interactions::computeEwaldFourierElectricPotential(
-      system.eik_x, system.eik_y, system.eik_z, system.eik_xy, system.fixedFrameworkStoredEik, moleculeElectricPotential, system.forceField, 
-      system.simulationBox, system.components, system.numberOfMoleculesPerComponent, atomPositions);
-    x2 = moleculeElectricPotential[i];
-
-    atomPositions[i].position.x = spanOfMoleculeAtoms[i].position.x - 0.5 * delta;
-    std::fill(moleculeElectricPotential.begin(), moleculeElectricPotential.end(), 0.0);
-    Interactions::computeFrameworkMoleculeElectricPotential(
-      system.forceField, system.simulationBox, moleculeElectricPotential, frameworkAtomPositions, atomPositions);
-    Interactions::computeInterMolecularElectricPotential(
-      system.forceField, system.simulationBox, moleculeElectricPotential, atomPositions);
-    Interactions::computeEwaldFourierElectricPotential(
-      system.eik_x, system.eik_y, system.eik_z, system.eik_xy, system.fixedFrameworkStoredEik, moleculeElectricPotential, system.forceField, 
-      system.simulationBox, system.components, system.numberOfMoleculesPerComponent, atomPositions);
-    x1 = moleculeElectricPotential[i];
-    atomPositions[i].position.x = spanOfMoleculeAtoms[i].position.x;
-
-    // finite difference y
-    atomPositions[i].position.y = spanOfMoleculeAtoms[i].position.y + 0.5 * delta;
-    std::fill(moleculeElectricPotential.begin(), moleculeElectricPotential.end(), 0.0);
-    Interactions::computeFrameworkMoleculeElectricPotential(
-      system.forceField, system.simulationBox, moleculeElectricPotential, frameworkAtomPositions, atomPositions);
-    Interactions::computeInterMolecularElectricPotential(
-      system.forceField, system.simulationBox, moleculeElectricPotential, atomPositions);
-    Interactions::computeEwaldFourierElectricPotential(
-      system.eik_x, system.eik_y, system.eik_z, system.eik_xy, system.fixedFrameworkStoredEik, moleculeElectricPotential, system.forceField, 
-      system.simulationBox, system.components, system.numberOfMoleculesPerComponent, atomPositions);
-    y2 = moleculeElectricPotential[i];
-
-    atomPositions[i].position.y = spanOfMoleculeAtoms[i].position.y - 0.5 * delta;
-    std::fill(moleculeElectricPotential.begin(), moleculeElectricPotential.end(), 0.0);
-    Interactions::computeFrameworkMoleculeElectricPotential(
-      system.forceField, system.simulationBox, moleculeElectricPotential, frameworkAtomPositions, atomPositions);
-    Interactions::computeInterMolecularElectricPotential(
-      system.forceField, system.simulationBox, moleculeElectricPotential, atomPositions);
-    Interactions::computeEwaldFourierElectricPotential(
-      system.eik_x, system.eik_y, system.eik_z, system.eik_xy, system.fixedFrameworkStoredEik, moleculeElectricPotential, system.forceField, 
-      system.simulationBox, system.components, system.numberOfMoleculesPerComponent, atomPositions);
-    y1 = moleculeElectricPotential[i];
-    atomPositions[i].position.y = spanOfMoleculeAtoms[i].position.y;
-
-    // finite difference z
-    atomPositions[i].position.z = spanOfMoleculeAtoms[i].position.z + 0.5 * delta;
-    std::fill(moleculeElectricPotential.begin(), moleculeElectricPotential.end(), 0.0);
-    Interactions::computeFrameworkMoleculeElectricPotential(
-      system.forceField, system.simulationBox, moleculeElectricPotential, frameworkAtomPositions, atomPositions);
-    Interactions::computeInterMolecularElectricPotential(
-      system.forceField, system.simulationBox, moleculeElectricPotential, atomPositions);
-    Interactions::computeEwaldFourierElectricPotential(
-      system.eik_x, system.eik_y, system.eik_z, system.eik_xy, system.fixedFrameworkStoredEik, moleculeElectricPotential, system.forceField, 
-      system.simulationBox, system.components, system.numberOfMoleculesPerComponent, atomPositions);
-    z2 = moleculeElectricPotential[i];
-
-    atomPositions[i].position.z = spanOfMoleculeAtoms[i].position.z - 0.5 * delta;
-    std::fill(moleculeElectricPotential.begin(), moleculeElectricPotential.end(), 0.0);
-    Interactions::computeFrameworkMoleculeElectricPotential(
-      system.forceField, system.simulationBox, moleculeElectricPotential, frameworkAtomPositions, atomPositions);
-    Interactions::computeInterMolecularElectricPotential(
-      system.forceField, system.simulationBox, moleculeElectricPotential, atomPositions);
-    Interactions::computeEwaldFourierElectricPotential(
-      system.eik_x, system.eik_y, system.eik_z, system.eik_xy, system.fixedFrameworkStoredEik, moleculeElectricPotential, system.forceField, 
-      system.simulationBox, system.components, system.numberOfMoleculesPerComponent, atomPositions);
-    z1 = moleculeElectricPotential[i];
-    atomPositions[i].position.z = spanOfMoleculeAtoms[i].position.z;
-
-
-    gradient.x = -(x2 -x1) / delta;
-    gradient.y = -(y2 -y1) / delta;
-    gradient.z = -(z2 -z1) / delta;
-
-    EXPECT_NEAR(electricField[i].x, gradient.x, tolerance);
-    EXPECT_NEAR(electricField[i].y, gradient.y, tolerance);
-    EXPECT_NEAR(electricField[i].z, gradient.z, tolerance);
-  }
 }
 

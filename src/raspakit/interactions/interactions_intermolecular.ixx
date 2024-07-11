@@ -60,7 +60,7 @@ void computeInterMolecularElectricPotential(const ForceField &forceField, const 
 EnergyFactor computeInterMolecularPolarizationEnergy(const ForceField &forceField, const SimulationBox &simulationBox,
                                                std::span<const Atom> moleculeAtoms) noexcept;
 
-void computeInterMolecularElectricField(const ForceField &forceField, const SimulationBox &box,
-                                        std::span<double3> electricFieldMolecules,
-                                        std::span<const Atom> moleculeAtoms) noexcept;
+RunningEnergy computeInterMolecularElectricField(const ForceField &forceField, const SimulationBox &box,
+                                                 std::span<double3> electricFieldMolecules,
+                                                 std::span<const Atom> moleculeAtoms) noexcept;
 };

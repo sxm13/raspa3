@@ -1435,24 +1435,70 @@ RunningEnergy System::computeTotalEnergies() noexcept
   }
 
   std::span<const Atom> frameworkAtomPositions = spanOfFrameworkAtoms();
+  std::span<Atom> moleculeAtomPositions = spanOfMoleculeAtoms();
+
+  if(forceField.computePolarization)
+  {
+    std::span<double3> moleculeElectricField = spanOfMoleculeElectricField();
+
+    std::fill(moleculeElectricField.begin(), moleculeElectricField.end(), double3(0.0, 0.0, 0.0));
+
+    RunningEnergy frameworkMoleculeEnergy = Interactions::computeFrameworkMoleculeElectricField(
+        forceField, simulationBox, moleculeElectricField, frameworkAtomPositions, moleculeAtomPositions);
+
+    RunningEnergy intermolecularEnergy =
+        Interactions::computeInterMolecularElectricField(forceField, simulationBox, moleculeElectricField, moleculeAtomPositions);
+
+    RunningEnergy frameworkMoleculeTailEnergy = Interactions::computeFrameworkMoleculeTailEnergy(
+        forceField, simulationBox, frameworkAtomPositions, moleculeAtomPositions);
+    RunningEnergy intermolecularTailEnergy =
+        Interactions::computeInterMolecularTailEnergy(forceField, simulationBox, moleculeAtomPositions);
+
+    RunningEnergy ewaldEnergy = Interactions::computeEwaldFourierElectricField(
+        eik_x, eik_y, eik_z, eik_xy, fixedFrameworkStoredEik, storedEik, forceField, simulationBox, moleculeElectricField,
+        components, numberOfMoleculesPerComponent, moleculeAtomPositions);
+
+    RunningEnergy polarizationEnergy = computePolarizationEnergy();
+
+    return frameworkMoleculeEnergy + intermolecularEnergy + frameworkMoleculeTailEnergy + intermolecularTailEnergy +
+           ewaldEnergy + polarizationEnergy;
+  }
+  else
+  {
+    RunningEnergy frameworkMoleculeEnergy = Interactions::computeFrameworkMoleculeEnergy(
+        forceField, simulationBox, frameworkAtomPositions, moleculeAtomPositions);
+    RunningEnergy intermolecularEnergy =
+        Interactions::computeInterMolecularEnergy(forceField, simulationBox, moleculeAtomPositions);
+
+    RunningEnergy frameworkMoleculeTailEnergy = Interactions::computeFrameworkMoleculeTailEnergy(
+        forceField, simulationBox, frameworkAtomPositions, moleculeAtomPositions);
+    RunningEnergy intermolecularTailEnergy =
+        Interactions::computeInterMolecularTailEnergy(forceField, simulationBox, moleculeAtomPositions);
+
+    RunningEnergy ewaldEnergy = Interactions::computeEwaldFourierEnergy(
+        eik_x, eik_y, eik_z, eik_xy, fixedFrameworkStoredEik, storedEik, forceField, simulationBox, components,
+        numberOfMoleculesPerComponent, moleculeAtomPositions);
+
+    return frameworkMoleculeEnergy + intermolecularEnergy + frameworkMoleculeTailEnergy + intermolecularTailEnergy +
+           ewaldEnergy;
+  }
+}
+
+RunningEnergy System::computePolarizationEnergy() noexcept
+{
+  RunningEnergy energy{};
+
   std::span<const Atom> moleculeAtomPositions = spanOfMoleculeAtoms();
+  std::span<double3> moleculeElectricField = spanOfMoleculeElectricField();
 
-  RunningEnergy frameworkMoleculeEnergy = Interactions::computeFrameworkMoleculeEnergy(
-      forceField, simulationBox, frameworkAtomPositions, moleculeAtomPositions);
-  RunningEnergy intermolecularEnergy =
-      Interactions::computeInterMolecularEnergy(forceField, simulationBox, moleculeAtomPositions);
+  for(size_t i = 0; i < moleculeAtomPositions.size(); ++i)
+  {
+    size_t type = moleculeAtomPositions[i].type;
+    double polarizability = forceField.pseudoAtoms[type].polarizability / Units::CoulombicConversionFactor;
+    energy.polarization -= 0.5 * polarizability * double3::dot(moleculeElectricField[i], moleculeElectricField[i]);
+  }
 
-  RunningEnergy frameworkMoleculeTailEnergy = Interactions::computeFrameworkMoleculeTailEnergy(
-      forceField, simulationBox, frameworkAtomPositions, moleculeAtomPositions);
-  RunningEnergy intermolecularTailEnergy =
-      Interactions::computeInterMolecularTailEnergy(forceField, simulationBox, moleculeAtomPositions);
-
-  RunningEnergy ewaldEnergy = Interactions::computeEwaldFourierEnergy(
-      eik_x, eik_y, eik_z, eik_xy, fixedFrameworkStoredEik, storedEik, forceField, simulationBox, components,
-      numberOfMoleculesPerComponent, moleculeAtomPositions);
-
-  return frameworkMoleculeEnergy + intermolecularEnergy + frameworkMoleculeTailEnergy + intermolecularTailEnergy +
-         ewaldEnergy;
+  return energy;
 }
 
 RunningEnergy System::computeTotalGradients() noexcept
@@ -1518,6 +1564,8 @@ void System::computeTotalElectricField() noexcept
   std::span<Atom> moleculeAtomPositions = spanOfMoleculeAtoms();
   std::span<double3> moleculeElectricField = spanOfMoleculeElectricField();
 
+  std::fill(moleculeElectricField.begin(), moleculeElectricField.end(), double3(0.0, 0.0, 0.0));
+
   Interactions::computeInterMolecularElectricField(
       forceField, simulationBox, moleculeElectricField, moleculeAtomPositions);
 
@@ -1525,9 +1573,10 @@ void System::computeTotalElectricField() noexcept
       forceField, simulationBox, moleculeElectricField, frameworkAtomPositions, moleculeAtomPositions);
 
   Interactions::computeEwaldFourierElectricField(
-    eik_x, eik_y, eik_z, eik_xy, fixedFrameworkStoredEik, forceField, simulationBox, moleculeElectricField,
+    eik_x, eik_y, eik_z, eik_xy, fixedFrameworkStoredEik, storedEik, forceField, simulationBox, moleculeElectricField,
     components, numberOfMoleculesPerComponent, moleculeAtomPositions);
 }
+
 
 
 

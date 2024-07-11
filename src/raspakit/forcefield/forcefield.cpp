@@ -315,8 +315,8 @@ std::string ForceField::printPseudoAtomStatus() const
 
   for (size_t i = 0; i < numberOfPseudoAtoms; ++i)
   {
-    std::print(stream, "{:3d} - {:8} mass: {:8.5f}, charge: {:8.5f}\n", i, pseudoAtoms[i].name, pseudoAtoms[i].mass,
-               pseudoAtoms[i].charge);
+    std::print(stream, "{:3d} - {:8} mass: {:8.5f}, charge: {:8.5f}, polarizability: {:8.5f}\n", i, pseudoAtoms[i].name, pseudoAtoms[i].mass,
+               pseudoAtoms[i].charge, pseudoAtoms[i].polarizability);
   }
   std::print(stream, "\n");
 

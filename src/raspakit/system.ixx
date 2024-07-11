@@ -270,6 +270,7 @@ export struct System
 
   void precomputeTotalRigidEnergy() noexcept;
   RunningEnergy computeTotalEnergies() noexcept;
+  RunningEnergy computePolarizationEnergy() noexcept;
   RunningEnergy computeTotalGradients() noexcept;
   void computeTotalElectricPotential() noexcept;
   void computeTotalElectricField() noexcept;
