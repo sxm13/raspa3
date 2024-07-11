@@ -39,6 +39,7 @@ import potential_energy_vdw;
 import potential_energy_coulomb;
 import potential_gradient_vdw;
 import potential_gradient_coulomb;
+import potential_electrostatics;
 import simulationbox;
 import double3;
 import double3x3;
@@ -449,3 +450,113 @@ RunningEnergy Interactions::computeFrameworkMoleculeGradient(const ForceField &f
 
   return std::make_pair(energy, strainDerivativeTensor);
 }
+
+
+void Interactions::computeFrameworkMoleculeElectricPotential(const ForceField &forceField,
+                                                             const SimulationBox &simulationBox,
+                                                             std::span<double> electricPotentialMolecules,
+                                                             std::span<const Atom> frameworkAtoms,
+                                                             std::span<const Atom> moleculeAtoms) noexcept
+{
+  double3 dr, posA, posB, f;
+  double rr;
+
+  bool noCharges = forceField.noCharges;
+  const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
+
+  if (noCharges) return;
+  if (moleculeAtoms.empty()) return;
+
+  for (std::span<const Atom>::iterator it1 = frameworkAtoms.begin(); it1 != frameworkAtoms.end(); ++it1)
+  {
+    posA = it1->position;
+    double scalingCoulombA = it1->scalingCoulomb;
+    double chargeA = it1->charge;
+
+    for (std::span<const Atom>::iterator it2 = moleculeAtoms.begin(); it2 != moleculeAtoms.end(); ++it2)
+    {
+      posB = it2->position;
+
+      dr = posA - posB;
+      dr = simulationBox.applyPeriodicBoundaryConditions(dr);
+      rr = double3::dot(dr, dr);
+
+      if (rr < cutOffChargeSquared)
+      {
+        double r = std::sqrt(rr);
+
+        size_t index = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it2));
+        electricPotentialMolecules[index] += potentialElectrostatics(forceField, scalingCoulombA, r, chargeA);
+      }
+    }
+  }
+}
+
+RunningEnergy Interactions::computeFrameworkMoleculeElectricField(const ForceField &forceField,
+                                                         const SimulationBox &simulationBox,
+                                                         std::span<double3> electricFieldMolecules,
+                                                         std::span<const Atom> frameworkAtoms,
+                                                         std::span<const Atom> moleculeAtoms) noexcept
+{
+  double3 dr, posA, posB, f;
+  double rr;
+
+  RunningEnergy energySum{};
+
+  bool noCharges = forceField.noCharges;
+  const double cutOffVDWSquared = forceField.cutOffVDW * forceField.cutOffVDW;
+  const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
+
+  if (noCharges) return energySum;
+  if (moleculeAtoms.empty()) return energySum;
+
+  for (std::span<const Atom>::iterator it1 = frameworkAtoms.begin(); it1 != frameworkAtoms.end(); ++it1)
+  {
+    posA = it1->position;
+    size_t typeA = static_cast<size_t>(it1->type);
+    bool groupIdA = static_cast<bool>(it1->groupId);
+    double scalingVDWA = it1->scalingVDW;
+    double scalingCoulombA = it1->scalingCoulomb;
+    double chargeA = it1->charge;
+
+    for (std::span<const Atom>::iterator it2 = moleculeAtoms.begin(); it2 != moleculeAtoms.end(); ++it2)
+    {
+      posB = it2->position;
+      size_t typeB = static_cast<size_t>(it2->type);
+      bool groupIdB = static_cast<bool>(it2->groupId);
+      double scalingVDWB = it2->scalingVDW;
+      double scalingCoulombB = it2->scalingCoulomb;
+      double chargeB = it2->charge;
+
+      dr = posA - posB;
+      dr = simulationBox.applyPeriodicBoundaryConditions(dr);
+      rr = double3::dot(dr, dr);
+
+      if (rr < cutOffVDWSquared)
+      {
+        EnergyFactor energyFactor =
+            potentialVDWEnergy(forceField, groupIdA, groupIdB, scalingVDWA, scalingVDWB, rr, typeA, typeB);
+
+        energySum.frameworkMoleculeVDW += energyFactor.energy;
+        energySum.dudlambdaVDW += energyFactor.dUdlambda;
+      }
+      if (!noCharges && rr < cutOffChargeSquared)
+      {
+        double r = std::sqrt(rr);
+        EnergyFactor energyFactor =
+            potentialCoulombEnergy(forceField, groupIdA, groupIdB, scalingCoulombA, scalingCoulombB, r, chargeA, chargeB);
+
+        energySum.frameworkMoleculeCharge += energyFactor.energy;
+        energySum.dudlambdaCharge += energyFactor.dUdlambda;
+
+        ForceFactor forceFactor = scalingCoulombA * chargeA * potentialCoulombGradient(forceField, groupIdA, groupIdB, 1.0, 1.0, r, 1.0, 1.0);
+
+        size_t index = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it2));
+        electricFieldMolecules[index] += forceFactor.forceFactor * dr;
+      }
+    }
+  }
+
+  return energySum;
+}
+

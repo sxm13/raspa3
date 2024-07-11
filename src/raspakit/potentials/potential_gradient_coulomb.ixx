@@ -35,9 +35,8 @@ export [[clang::always_inline]] inline ForceFactor potentialCoulombGradient(
       double temp = Units::CoulombicConversionFactor * chargeA * chargeB * std::erfc(alpha * r) / r;
       ForceFactor result = ForceFactor(scaling * temp,
                                        -Units::CoulombicConversionFactor * scaling * chargeA * chargeB *
-                                           ((std::erfc(alpha * r) + 2.0 * alpha * r * std::exp(-alpha * alpha * r * r) *
-                                                                        std::numbers::inv_sqrtpi_v<double>) /
-                                            (r * r * r)),
+                                       ((std::erfc(alpha * r) + 2.0 * alpha * r * std::exp(-alpha * alpha * r * r) *
+                                       std::numbers::inv_sqrtpi_v<double>) / (r * r * r)),
                                        (groupIdA ? scalingB * temp : 0.0) + (groupIdB ? scalingA * temp : 0.0));
       return result;
     }

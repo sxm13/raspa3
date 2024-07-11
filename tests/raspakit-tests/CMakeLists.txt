@@ -11,6 +11,8 @@ add_executable(unit_tests_raspakit
                pressure.cpp
                static_energy.cpp
                rigid_gradient.cpp
+               electrostatic_potential.cpp
+               electrostatic_field.cpp
                main.cpp)
 
 

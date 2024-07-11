@@ -586,6 +586,16 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
       forceFields[systemId]->omitEwaldFourier = value["OmitEwaldFourier"].get<bool>();
     }
 
+    if (value["ComputePolarization"].is_boolean())
+    {
+      if (!forceFields[systemId].has_value())
+      {
+        throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
+      }
+      forceFields[systemId]->computePolarization = value["ComputePolarization"].get<bool>();
+    }
+
+
     if (value["ChargeMethod"].is_string())
     {
       if (!forceFields[systemId].has_value())

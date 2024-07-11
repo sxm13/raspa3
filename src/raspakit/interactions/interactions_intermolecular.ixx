@@ -16,11 +16,13 @@ import <tuple>;
 import <vector>;
 #endif
 
+import double3;
 import double3x3;
 import atom;
 import running_energy;
 import energy_status;
 import simulationbox;
+import energy_factor;
 import force_factor;
 import forcefield;
 import component;
@@ -50,4 +52,15 @@ std::pair<EnergyStatus, double3x3> computeInterMolecularEnergyStrainDerivative(c
                                                                                const std::vector<Component> &components,
                                                                                const SimulationBox &simulationBox,
                                                                                std::span<Atom> moleculeAtoms) noexcept;
-};  // namespace Interactions
+
+void computeInterMolecularElectricPotential(const ForceField &forceField, const SimulationBox &box,
+                                            std::span<double> electricPotentialMolecules,
+                                            std::span<const Atom> moleculeAtoms) noexcept;
+
+EnergyFactor computeInterMolecularPolarizationEnergy(const ForceField &forceField, const SimulationBox &simulationBox,
+                                               std::span<const Atom> moleculeAtoms) noexcept;
+
+RunningEnergy computeInterMolecularElectricField(const ForceField &forceField, const SimulationBox &box,
+                                                 std::span<double3> electricFieldMolecules,
+                                                 std::span<const Atom> moleculeAtoms) noexcept;
+};

@@ -33,7 +33,7 @@ TEST(MC_strain_tensor, Test_20_CH4_25x25x25_LJ)
   double tolerance = 1e-4;
 
   ForceField forceField = ForceField(
-    { PseudoAtom("CH4", 16.04246, 0.0, 6, false) },
+    { PseudoAtom("CH4", 16.04246, 0.0, 0.0, 6, false) },
     { VDWParameters(158.5, 3.72) },
     ForceField::MixingRule::Lorentz_Berthelot,
     12.0,
@@ -111,11 +111,11 @@ TEST(MC_strain_tensor, Test_20_Na_Cl_25x25x25_LJ_Real)
   double tolerance = 1e-4;
 
   ForceField forceField = ForceField(
-    { PseudoAtom("Si",    28.0855,   2.05,  14, false),
-      PseudoAtom("O",     15.999,   -1.025,  8, false),
-      PseudoAtom("CH4",   16.04246,  0.0,    6, false),
-      PseudoAtom("Na+",   12.0,      1.0,    6, false),
-      PseudoAtom("Cl-",   15.9994,  -1.0,    8, false),
+    { PseudoAtom("Si",    28.0855,   2.05,  0.0, 14, false),
+      PseudoAtom("O",     15.999,   -1.025, 0.0,  8, false),
+      PseudoAtom("CH4",   16.04246,  0.0,   0.0,  6, false),
+      PseudoAtom("Na+",   12.0,      1.0,   0.0,  6, false),
+      PseudoAtom("Cl-",   15.9994,  -1.0,   0.0,  8, false),
     },
     { VDWParameters(22.0, 2.30),
       VDWParameters(53.0, 3.3),

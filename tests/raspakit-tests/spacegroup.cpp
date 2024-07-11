@@ -28,7 +28,7 @@ import interactions_ewald;
 TEST(spacegroup, TestLennardJonesVDWTwoMethanes)
 {
   ForceField forceField = ForceField(
-    { PseudoAtom("CH4", 16.04246, 0.0, 6, false) },
+    { PseudoAtom("CH4", 16.04246, 0.0, 0.0, 6, false) },
     { VDWParameters(158.5, 3.72) },
     ForceField::MixingRule::Lorentz_Berthelot,
     12.0,
@@ -52,9 +52,9 @@ TEST(spacegroup, TestLennardJonesVDWTwoMethanes)
 TEST(spacegroup, TestLennardJonesVDWMethaneInITQ_29_P1)
 {
   ForceField forceField = ForceField(
-    { PseudoAtom("Si", 28.0855, 2.05, 14, false),
-      PseudoAtom("O", 15.999, -1.025, 8, false),
-      PseudoAtom("CH4", 16.04246, 0.0, 6, false)
+    { PseudoAtom("Si",  28.0855,   2.05,  0.0, 14, false),
+      PseudoAtom("O",   15.999,   -1.025, 0.0,  8, false),
+      PseudoAtom("CH4", 16.04246,  0.0,   0.0,  6, false)
     },
     { VDWParameters(22.0, 2.30),
       VDWParameters(53.0, 3.3),
@@ -159,9 +159,9 @@ TEST(spacegroup, TestLennardJonesVDWMethaneInITQ_29_P1)
 TEST(spacegroup, TestLennardJonesVDWMethaneInITQ_29_2x2x2_P1)
 {
   ForceField forceField = ForceField(
-    { PseudoAtom("Si", 28.0855, 2.05, 14, false),
-      PseudoAtom("O", 15.999, -1.025, 8, false),
-      PseudoAtom("CH4", 16.04246, 0.0, 6, false)
+    { PseudoAtom("Si",  28.0855,   2.05,  0.0, 14, false),
+      PseudoAtom("O",   15.999,   -1.025, 0.0,  8, false),
+      PseudoAtom("CH4", 16.04246,  0.0,   0.0,  6, false)
     },
     { VDWParameters(22.0, 2.30),
       VDWParameters(53.0, 3.3),
@@ -266,9 +266,9 @@ TEST(spacegroup, TestLennardJonesVDWMethaneInITQ_29_2x2x2_P1)
 TEST(spacegroup, TestLennardJonesVDWMethaneInITQ_29)
 {
   ForceField forceField = ForceField(
-    { PseudoAtom("Si", 28.0855, 2.05, 14, false),
-      PseudoAtom("O", 15.999, -1.025, 8, false),
-      PseudoAtom("CH4", 16.04246, 0.0, 6, false)
+    { PseudoAtom("Si",  28.0855,   2.05,  0.0, 14, false),
+      PseudoAtom("O",   15.999,   -1.025, 0.0,  8, false),
+      PseudoAtom("CH4", 16.04246,  0.0,   0.0,  6, false)
     },
     { VDWParameters(22.0, 2.30),
       VDWParameters(53.0, 3.3),
@@ -305,9 +305,9 @@ TEST(spacegroup, TestLennardJonesVDWMethaneInITQ_29)
 TEST(spacegroup, TestLennardJonesVDWMethaneInMFI)
 {
   ForceField forceField = ForceField(
-    { PseudoAtom("Si", 28.0855, 2.05, 14, false),
-      PseudoAtom("O", 15.999, -1.025, 8, false),
-      PseudoAtom("CH4", 16.04246, 0.0, 6, false)
+    { PseudoAtom("Si",  28.0855,   2.05,  0.0, 14, false),
+      PseudoAtom("O",   15.999,   -1.025, 0.0,  8, false),
+      PseudoAtom("CH4", 16.04246,  0.0,   0.0,  6, false)
     },
     { VDWParameters(22.0, 2.30),
       VDWParameters(53.0, 3.3),
@@ -378,9 +378,9 @@ TEST(spacegroup, TestLennardJonesVDWMethaneInMFI)
 TEST(spacegroup, TestLennardJonesVDWMethaneInMFI2x2x2)
 {
   ForceField forceField = ForceField(
-    { PseudoAtom("Si", 28.0855, 2.05, 14, false),
-      PseudoAtom("O", 15.999, -1.025, 8, false),
-      PseudoAtom("CH4", 16.04246, 0.0, 6, false)
+    { PseudoAtom("Si",  28.0855,   2.05,  0.0, 14, false),
+      PseudoAtom("O",   15.999,   -1.025, 0.0,  8, false),
+      PseudoAtom("CH4", 16.04246,  0.0,   0.0,  6, false)
     },
     { VDWParameters(22.0, 2.30),
       VDWParameters(53.0, 3.3),
@@ -451,9 +451,9 @@ TEST(spacegroup, TestLennardJonesVDWMethaneInMFI2x2x2)
 TEST(spacegroup, TestLennardJonesVDWMethaneInMFI_P1)
 {
   ForceField forceField = ForceField(
-    { PseudoAtom("Si", 28.0855, 2.05, 14, false),
-      PseudoAtom("O", 15.999, -1.025, 8, false),
-      PseudoAtom("CH4", 16.04246, 0.0, 6, false)
+    { PseudoAtom("Si",  28.0855,   2.05,  0.0, 14, false),
+      PseudoAtom("O",   15.999,   -1.025, 0.0,  8, false),
+      PseudoAtom("CH4", 16.04246,  0.0,   0.0,  6, false)
     },
     { VDWParameters(22.0, 2.30),
       VDWParameters(53.0, 3.3),

@@ -1120,3 +1120,392 @@ std::pair<EnergyStatus, double3x3> Interactions::computeEwaldFourierEnergyStrain
 
   return std::make_pair(energy, strainDerivative);
 }
+
+void Interactions::computeEwaldFourierElectricPotential(
+    std::vector<std::complex<double>> &eik_x, std::vector<std::complex<double>> &eik_y,
+    std::vector<std::complex<double>> &eik_z, std::vector<std::complex<double>> &eik_xy,
+    std::vector<std::pair<std::complex<double>, std::complex<double>>> &fixedFrameworkStoredEik,
+    std::span<double> electricPotentialMolecules, const ForceField &forceField,
+    const SimulationBox &simulationBox, const std::vector<Component> &components,
+    const std::vector<size_t> &numberOfMoleculesPerComponent, std::span<const Atom> moleculeAtomPositions)
+{
+  double alpha = forceField.EwaldAlpha;
+  double alpha_squared = alpha * alpha;
+  double3x3 inv_box = simulationBox.inverseCell;
+  double3 ax = double3(inv_box.ax, inv_box.bx, inv_box.cx);
+  double3 ay = double3(inv_box.ay, inv_box.by, inv_box.cy);
+  double3 az = double3(inv_box.az, inv_box.bz, inv_box.cz);
+  RunningEnergy energySum{};
+
+  if (forceField.noCharges) return;
+  if (forceField.omitEwaldFourier) return;
+
+  size_t numberOfAtoms = moleculeAtomPositions.size();
+
+  size_t kx_max_unsigned = static_cast<size_t>(forceField.numberOfWaveVectors.x);
+  size_t ky_max_unsigned = static_cast<size_t>(forceField.numberOfWaveVectors.y);
+  size_t kz_max_unsigned = static_cast<size_t>(forceField.numberOfWaveVectors.z);
+
+  std::make_signed_t<std::size_t> kx_max = static_cast<std::make_signed_t<std::size_t>>(kx_max_unsigned);
+  std::make_signed_t<std::size_t> ky_max = static_cast<std::make_signed_t<std::size_t>>(ky_max_unsigned);
+  std::make_signed_t<std::size_t> kz_max = static_cast<std::make_signed_t<std::size_t>>(kz_max_unsigned);
+
+  if (numberOfAtoms * (kx_max_unsigned + 1) > eik_x.size()) eik_x.resize(numberOfAtoms * (kx_max_unsigned + 1));
+  if (numberOfAtoms * (ky_max_unsigned + 1) > eik_y.size()) eik_y.resize(numberOfAtoms * (ky_max_unsigned + 1));
+  if (numberOfAtoms * (kz_max_unsigned + 1) > eik_z.size()) eik_z.resize(numberOfAtoms * (kz_max_unsigned + 1));
+  if (numberOfAtoms > eik_xy.size()) eik_xy.resize(numberOfAtoms);
+
+  //size_t numberOfWaveVectors = (kx_max_unsigned + 1) * 2 * (ky_max_unsigned + 1) * 2 * (kz_max_unsigned + 1);
+
+  // Construct exp(ik.r) for atoms and k-vectors kx, ky, kz = 0, 1 explicitly
+  for (size_t i = 0; i != numberOfAtoms; ++i)
+  {
+    eik_x[i + 0 * numberOfAtoms] = std::complex<double>(1.0, 0.0);
+    eik_y[i + 0 * numberOfAtoms] = std::complex<double>(1.0, 0.0);
+    eik_z[i + 0 * numberOfAtoms] = std::complex<double>(1.0, 0.0);
+    double3 s = 2.0 * std::numbers::pi * (inv_box * moleculeAtomPositions[i].position);
+    eik_x[i + 1 * numberOfAtoms] = std::complex<double>(std::cos(s.x), std::sin(s.x));
+    eik_y[i + 1 * numberOfAtoms] = std::complex<double>(std::cos(s.y), std::sin(s.y));
+    eik_z[i + 1 * numberOfAtoms] = std::complex<double>(std::cos(s.z), std::sin(s.z));
+  }
+
+  // Calculate remaining positive kx, ky and kz by recurrence
+  for (size_t kx = 2; kx <= kx_max_unsigned; ++kx)
+  {
+    for (size_t i = 0; i != numberOfAtoms; ++i)
+    {
+      eik_x[i + kx * numberOfAtoms] = eik_x[i + (kx - 1) * numberOfAtoms] * eik_x[i + 1 * numberOfAtoms];
+    }
+  }
+  for (size_t ky = 2; ky <= ky_max_unsigned; ++ky)
+  {
+    for (size_t i = 0; i != numberOfAtoms; ++i)
+    {
+      eik_y[i + ky * numberOfAtoms] = eik_y[i + (ky - 1) * numberOfAtoms] * eik_y[i + 1 * numberOfAtoms];
+    }
+  }
+  for (size_t kz = 2; kz <= kz_max_unsigned; ++kz)
+  {
+    for (size_t i = 0; i != numberOfAtoms; ++i)
+    {
+      eik_z[i + kz * numberOfAtoms] = eik_z[i + (kz - 1) * numberOfAtoms] * eik_z[i + 1 * numberOfAtoms];
+    }
+  }
+
+  size_t nvec = 0;
+  double prefactor = Units::CoulombicConversionFactor * (2.0 * std::numbers::pi / simulationBox.volume);
+  for (std::make_signed_t<std::size_t> kx = 0; kx <= kx_max; ++kx)
+  {
+    double3 kvec_x = 2.0 * std::numbers::pi * static_cast<double>(kx) * ax;
+
+    // Only positive kx are used, the negative kx are taken into account by the factor of two
+    double factor = (kx == 0) ? (1.0 * prefactor) : (2.0 * prefactor);
+
+    for (std::make_signed_t<std::size_t> ky = -ky_max; ky <= ky_max; ++ky)
+    {
+      double3 kvec_y = 2.0 * std::numbers::pi * static_cast<double>(ky) * ay;
+
+      // Precompute and store eik_x * eik_y outside the kz-loop
+      for (size_t i = 0; i != numberOfAtoms; ++i)
+      {
+        std::complex<double> eiky_temp = eik_y[i + numberOfAtoms * static_cast<size_t>(std::abs(ky))];
+        eiky_temp.imag(ky >= 0 ? eiky_temp.imag() : -eiky_temp.imag());
+        eik_xy[i] = eik_x[i + numberOfAtoms * static_cast<size_t>(kx)] * eiky_temp;
+      }
+
+      for (std::make_signed_t<std::size_t> kz = -kz_max; kz <= kz_max; ++kz)
+      {
+        // Ommit kvec==0
+        if ((kx * kx + ky * ky + kz * kz) != 0)
+        {
+          double3 kvec_z = 2.0 * std::numbers::pi * static_cast<double>(kz) * az;
+          double3 rk = kvec_x + kvec_y + kvec_z;
+          double rksq = rk.length_squared();
+
+          std::complex<double> cksum;
+          for (size_t i = 0; i != numberOfAtoms; ++i)
+          {
+            std::complex<double> eikz_temp = eik_z[i + numberOfAtoms * static_cast<size_t>(std::abs(kz))];
+            eikz_temp.imag(kz >= 0 ? eikz_temp.imag() : -eikz_temp.imag());
+            double charge = moleculeAtomPositions[i].charge;
+            double scaling = moleculeAtomPositions[i].scalingCoulomb;
+            cksum += scaling * charge * (eik_xy[i] * eikz_temp);
+          }
+
+          std::complex<double> rigid = fixedFrameworkStoredEik[nvec].first;
+          cksum += rigid;
+
+          double temp = factor * std::exp((-0.25 / alpha_squared) * rksq) / rksq;
+          for (size_t i = 0; i != numberOfAtoms; ++i)
+          {
+            std::complex<double> eikz_temp = eik_z[i + numberOfAtoms * static_cast<size_t>(std::abs(kz))];
+            eikz_temp.imag(kz >= 0 ? eikz_temp.imag() : -eikz_temp.imag());
+            std::complex<double> cki = eik_xy[i] * eikz_temp;
+            electricPotentialMolecules[i] += temp * (cki.real() * cksum.real() + cki.imag() * cksum.imag())
+                      + temp * (cki.real() * rigid.real() + cki.imag() * rigid.imag());
+          }
+
+          ++nvec;
+        }
+      }
+    }
+  }
+
+  // Subtract self-energy
+  double prefactor_self = Units::CoulombicConversionFactor * forceField.EwaldAlpha / std::sqrt(std::numbers::pi);
+  for (size_t i = 0; i != moleculeAtomPositions.size(); ++i)
+  {
+    double charge = moleculeAtomPositions[i].charge;
+    double scaling = moleculeAtomPositions[i].scalingCoulomb;
+    electricPotentialMolecules[i] -= prefactor_self * scaling * charge;
+  }
+
+  // Subtract exclusion-energy
+  size_t index{0};
+  for (size_t l = 0; l != components.size(); ++l)
+  {
+    size_t size = components[l].atoms.size();
+    for (size_t m = 0; m != numberOfMoleculesPerComponent[l]; ++m)
+    {
+      std::span<const Atom> span = std::span(&moleculeAtomPositions[index], size);
+      std::span<double> electricPotential = std::span(&electricPotentialMolecules[index], size);
+      for (size_t i = 0; i != span.size(); i++)
+      {
+        double3 posA = span[i].position;
+        for (size_t j = 0; j != span.size(); j++)
+        {
+          if(i != j)
+          {
+            double chargeB = span[j].charge;
+            double scalingB = span[j].scalingCoulomb;
+            double3 posB = span[j].position;
+
+            double3 dr = posA - posB;
+            dr = simulationBox.applyPeriodicBoundaryConditions(dr);
+            double rr = double3::dot(dr, dr);
+            double r = std::sqrt(rr);
+
+            electricPotential[i] -= 0.5 * Units::CoulombicConversionFactor * scalingB * chargeB * std::erf(alpha * r) / r;
+          }
+        }
+      }
+      index += size;
+    }
+  }
+
+
+  // Handle net-charges
+  // for(size_t i = 0; i != components.size(); ++i)
+  //{
+  //  for(size_t j = 0; j != components.size(); ++j)
+  //  {
+  //    //energyStatus.ewald += CoulombicFourierEnergySingleIon * netCharge[i] * netCharge[j];
+  //  }
+  //}
+}
+
+RunningEnergy Interactions::computeEwaldFourierElectricField(
+    std::vector<std::complex<double>> &eik_x, std::vector<std::complex<double>> &eik_y,
+    std::vector<std::complex<double>> &eik_z, std::vector<std::complex<double>> &eik_xy,
+    std::vector<std::pair<std::complex<double>, std::complex<double>>> &fixedFrameworkStoredEik,
+    std::vector<std::pair<std::complex<double>, std::complex<double>>> &storedEik,
+    const ForceField &forceField, const SimulationBox &simulationBox, std::span<double3> electricFieldMolecules, 
+    const std::vector<Component> &components, const std::vector<size_t> &numberOfMoleculesPerComponent,
+    std::span<Atom> moleculeAtomPositions)
+{
+  double alpha = forceField.EwaldAlpha;
+  double alpha_squared = alpha * alpha;
+  double3x3 inv_box = simulationBox.inverseCell;
+  double3 ax = double3(inv_box.ax, inv_box.bx, inv_box.cx);
+  double3 ay = double3(inv_box.ay, inv_box.by, inv_box.cy);
+  double3 az = double3(inv_box.az, inv_box.bz, inv_box.cz);
+  RunningEnergy energySum{};
+
+  if (forceField.noCharges) return energySum;
+  if (forceField.omitEwaldFourier) return energySum;
+
+  size_t numberOfAtoms = moleculeAtomPositions.size();
+
+  size_t kx_max_unsigned = static_cast<size_t>(forceField.numberOfWaveVectors.x);
+  size_t ky_max_unsigned = static_cast<size_t>(forceField.numberOfWaveVectors.y);
+  size_t kz_max_unsigned = static_cast<size_t>(forceField.numberOfWaveVectors.z);
+
+  std::make_signed_t<std::size_t> kx_max = static_cast<std::make_signed_t<std::size_t>>(kx_max_unsigned);
+  std::make_signed_t<std::size_t> ky_max = static_cast<std::make_signed_t<std::size_t>>(ky_max_unsigned);
+  std::make_signed_t<std::size_t> kz_max = static_cast<std::make_signed_t<std::size_t>>(kz_max_unsigned);
+
+  if (numberOfAtoms * (kx_max_unsigned + 1) > eik_x.size()) eik_x.resize(numberOfAtoms * (kx_max_unsigned + 1));
+  if (numberOfAtoms * (ky_max_unsigned + 1) > eik_y.size()) eik_y.resize(numberOfAtoms * (ky_max_unsigned + 1));
+  if (numberOfAtoms * (kz_max_unsigned + 1) > eik_z.size()) eik_z.resize(numberOfAtoms * (kz_max_unsigned + 1));
+  if (numberOfAtoms > eik_xy.size()) eik_xy.resize(numberOfAtoms);
+
+  size_t numberOfWaveVectors = (kx_max_unsigned + 1) * 2 * (ky_max_unsigned + 1) * 2 * (kz_max_unsigned + 1);
+  if (storedEik.size() < numberOfWaveVectors) storedEik.resize(numberOfWaveVectors);
+
+  // Construct exp(ik.r) for atoms and k-vectors kx, ky, kz = 0, 1 explicitly
+  for (size_t i = 0; i != numberOfAtoms; ++i)
+  {
+    eik_x[i + 0 * numberOfAtoms] = std::complex<double>(1.0, 0.0);
+    eik_y[i + 0 * numberOfAtoms] = std::complex<double>(1.0, 0.0);
+    eik_z[i + 0 * numberOfAtoms] = std::complex<double>(1.0, 0.0);
+    double3 s = 2.0 * std::numbers::pi * (inv_box * moleculeAtomPositions[i].position);
+    eik_x[i + 1 * numberOfAtoms] = std::complex<double>(std::cos(s.x), std::sin(s.x));
+    eik_y[i + 1 * numberOfAtoms] = std::complex<double>(std::cos(s.y), std::sin(s.y));
+    eik_z[i + 1 * numberOfAtoms] = std::complex<double>(std::cos(s.z), std::sin(s.z));
+  }
+
+  // Calculate remaining positive kx, ky and kz by recurrence
+  for (size_t kx = 2; kx <= kx_max_unsigned; ++kx)
+  {
+    for (size_t i = 0; i != numberOfAtoms; ++i)
+    {
+      eik_x[i + kx * numberOfAtoms] = eik_x[i + (kx - 1) * numberOfAtoms] * eik_x[i + 1 * numberOfAtoms];
+    }
+  }
+  for (size_t ky = 2; ky <= ky_max_unsigned; ++ky)
+  {
+    for (size_t i = 0; i != numberOfAtoms; ++i)
+    {
+      eik_y[i + ky * numberOfAtoms] = eik_y[i + (ky - 1) * numberOfAtoms] * eik_y[i + 1 * numberOfAtoms];
+    }
+  }
+  for (size_t kz = 2; kz <= kz_max_unsigned; ++kz)
+  {
+    for (size_t i = 0; i != numberOfAtoms; ++i)
+    {
+      eik_z[i + kz * numberOfAtoms] = eik_z[i + (kz - 1) * numberOfAtoms] * eik_z[i + 1 * numberOfAtoms];
+    }
+  }
+
+  size_t nvec = 0;
+  double prefactor = Units::CoulombicConversionFactor * (2.0 * std::numbers::pi / simulationBox.volume);
+  for (std::make_signed_t<std::size_t> kx = 0; kx <= kx_max; ++kx)
+  {
+    double3 kvec_x = 2.0 * std::numbers::pi * static_cast<double>(kx) * ax;
+
+    // Only positive kx are used, the negative kx are taken into account by the factor of two
+    double factor = (kx == 0) ? (1.0 * prefactor) : (2.0 * prefactor);
+
+    for (std::make_signed_t<std::size_t> ky = -ky_max; ky <= ky_max; ++ky)
+    {
+      double3 kvec_y = 2.0 * std::numbers::pi * static_cast<double>(ky) * ay;
+
+      // Precompute and store eik_x * eik_y outside the kz-loop
+      for (size_t i = 0; i != numberOfAtoms; ++i)
+      {
+        std::complex<double> eiky_temp = eik_y[i + numberOfAtoms * static_cast<size_t>(std::abs(ky))];
+        eiky_temp.imag(ky >= 0 ? eiky_temp.imag() : -eiky_temp.imag());
+        eik_xy[i] = eik_x[i + numberOfAtoms * static_cast<size_t>(kx)] * eiky_temp;
+      }
+
+      for (std::make_signed_t<std::size_t> kz = -kz_max; kz <= kz_max; ++kz)
+      {
+        // Ommit kvec==0
+        if ((kx * kx + ky * ky + kz * kz) != 0)
+        {
+          double3 kvec_z = 2.0 * std::numbers::pi * static_cast<double>(kz) * az;
+          double3 rk = kvec_x + kvec_y + kvec_z;
+          double rksq = rk.length_squared();
+
+
+          std::pair<std::complex<double>, std::complex<double>> cksum;
+          for (size_t i = 0; i != numberOfAtoms; ++i)
+          {
+            std::complex<double> eikz_temp = eik_z[i + numberOfAtoms * static_cast<size_t>(std::abs(kz))];
+            eikz_temp.imag(kz >= 0 ? eikz_temp.imag() : -eikz_temp.imag());
+            double charge = moleculeAtomPositions[i].charge;
+            double scaling = moleculeAtomPositions[i].scalingCoulomb;
+            bool groupIdA = static_cast<bool>(moleculeAtomPositions[i].groupId);
+            cksum.first += scaling * charge * (eik_xy[i] * eikz_temp);
+            cksum.second += groupIdA ? charge * eik_xy[i] * eikz_temp : 0.0;
+          }
+
+          std::pair<std::complex<double>, std::complex<double>> rigid = fixedFrameworkStoredEik[nvec];
+          cksum.first += rigid.first;
+          cksum.second += rigid.second;
+
+          double temp = factor * std::exp((-0.25 / alpha_squared) * rksq) / rksq;
+          double rigidEnergy =
+              temp * (rigid.first.real() * rigid.first.real() + rigid.first.imag() * rigid.first.imag());
+          energySum.ewald +=
+              temp * (cksum.first.real() * cksum.first.real() + cksum.first.imag() * cksum.first.imag()) - rigidEnergy;
+          energySum.dudlambdaEwald +=
+              2.0 * temp * (cksum.first.real() * cksum.second.real() + cksum.first.imag() * cksum.second.imag());
+          energySum.dudlambdaEwald -=
+              2.0 * temp * (rigid.first.real() * rigid.second.real() + rigid.first.imag() * rigid.second.imag());
+
+          for (size_t i = 0; i != numberOfAtoms; ++i)
+          {
+            std::complex<double> eikz_temp = eik_z[i + numberOfAtoms * static_cast<size_t>(std::abs(kz))];
+            eikz_temp.imag(kz >= 0 ? eikz_temp.imag() : -eikz_temp.imag());
+            std::complex<double> cki = eik_xy[i] * eikz_temp;
+            electricFieldMolecules[i] +=
+                temp * (cki.imag() * cksum.first.real() - cki.real() * cksum.first.imag()) * rk
+                + temp * (cki.imag() * rigid.first.real() - cki.real() * rigid.first.imag()) * rk;
+          }
+
+          storedEik[nvec] = cksum;
+          ++nvec;
+        }
+      }
+    }
+  }
+
+  // Subtract self-energy
+  double prefactor_self = Units::CoulombicConversionFactor * forceField.EwaldAlpha / std::sqrt(std::numbers::pi);
+  for (size_t i = 0; i != moleculeAtomPositions.size(); ++i)
+  {
+    double charge = moleculeAtomPositions[i].charge;
+    double scaling = moleculeAtomPositions[i].scalingCoulomb;
+    bool groupIdA = static_cast<bool>(moleculeAtomPositions[i].groupId);
+    energySum.ewald -= prefactor_self * scaling * charge * scaling * charge;
+    energySum.dudlambdaEwald -= groupIdA ? 2.0 * prefactor_self * scaling * charge * charge : 0.0;
+  }
+
+  // Subtract exclusion-energy
+  size_t index{0};
+  for (size_t l = 0; l != components.size(); ++l)
+  {
+    size_t size = components[l].atoms.size();
+    for (size_t m = 0; m != numberOfMoleculesPerComponent[l]; ++m)
+    {
+      std::span<Atom> span = std::span(&moleculeAtomPositions[index], size);
+      std::span<double3> electricField = std::span(&electricFieldMolecules[index], size);
+      for (size_t i = 0; i != span.size(); i++)
+      {
+        double chargeA = span[i].charge;
+        double scalingA = span[i].scalingCoulomb;
+        bool groupIdA = static_cast<bool>(span[i].groupId);
+        double3 posA = span[i].position;
+        for (size_t j = 0; j != span.size(); j++)
+        {
+          if(i != j)
+          {
+            double chargeB = span[j].charge;
+            double scalingB = span[j].scalingCoulomb;
+            bool groupIdB = static_cast<bool>(span[j].groupId);
+            double3 posB = span[j].position;
+
+            double3 dr = posA - posB;
+            dr = simulationBox.applyPeriodicBoundaryConditions(dr);
+            double rr = double3::dot(dr, dr);
+            double r = std::sqrt(rr);
+
+            double temp = Units::CoulombicConversionFactor * chargeA * chargeB * std::erf(alpha * r) / r;
+            energySum.ewald -= scalingA * scalingB * temp;
+            energySum.dudlambdaEwald -= (groupIdA ? scalingB * temp : 0.0) + (groupIdB ? scalingA * temp : 0.0);
+
+            temp = Units::CoulombicConversionFactor * (2.0 * std::numbers::inv_sqrtpi) * alpha *
+                   std::exp(-(alpha * alpha * r * r)) / rr;
+            double Bt0 = -Units::CoulombicConversionFactor * std::erf(alpha * r) / r;
+            double Bt1 = temp + Bt0 / rr;
+            electricField[i] += 0.5 * scalingB * chargeB * Bt1 * dr;
+          }
+        }
+      }
+      index += size;
+    }
+  }
+
+  return energySum;
+}

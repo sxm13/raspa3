@@ -31,11 +31,11 @@ import energy_status;
 TEST(rigid_gradient, Test_2_CO2_in_ITQ_29_2x2x2)
 {
   ForceField forceField = ForceField(
-    { PseudoAtom("Si",    28.0855,   2.05,  14, false),
-      PseudoAtom("O",     15.999,   -1.025,  8, false),
-      PseudoAtom("CH4",   16.04246,  0.0,    6, false),
-      PseudoAtom("C_co2", 12.0,      0.6512, 6, false),
-      PseudoAtom("O_co2", 15.9994,  -0.3256, 8, false),
+    { PseudoAtom("Si",    28.0855,   2.05,   0.0, 14, false),
+      PseudoAtom("O",     15.999,   -1.025,  0.0,  8, false),
+      PseudoAtom("CH4",   16.04246,  0.0,    0.0,  6, false),
+      PseudoAtom("C_co2", 12.0,      0.6512, 0.0,  6, false),
+      PseudoAtom("O_co2", 15.9994,  -0.3256, 0.0,  8, false),
     },
     { VDWParameters(22.0, 2.30),
       VDWParameters(53.0, 3.3),
@@ -129,11 +129,11 @@ TEST(rigid_gradient, Test_2_CO2_in_ITQ_29_2x2x2)
 TEST(rigid_gradient, Test_2_CO2_in_ITQ_29_2x2x2_no_symmetry)
 {
   ForceField forceField = ForceField(
-    { PseudoAtom("Si",    28.0855,   2.05,  14, false),
-      PseudoAtom("O",     15.999,   -1.025,  8, false),
-      PseudoAtom("CH4",   16.04246,  0.0,    6, false),
-      PseudoAtom("C_co2", 12.0,      0.6512, 6, false),
-      PseudoAtom("O_co2", 15.9994,  -0.3256, 8, false),
+    { PseudoAtom("Si",    28.0855,   2.05,   0.0, 14, false),
+      PseudoAtom("O",     15.999,   -1.025,  0.0,  8, false),
+      PseudoAtom("CH4",   16.04246,  0.0,    0.0,  6, false),
+      PseudoAtom("C_co2", 12.0,      0.6512, 0.0,  6, false),
+      PseudoAtom("O_co2", 15.9994,  -0.3256, 0.0,  8, false),
     },
     { VDWParameters(22.0, 2.30),
       VDWParameters(53.0, 3.3),
@@ -227,14 +227,14 @@ TEST(rigid_gradient, Test_2_CO2_in_ITQ_29_2x2x2_no_symmetry)
 TEST(rigid_gradient, Test_2_H2O_in_ITQ_29_2x2x2_no_symmetry)
 {
   ForceField forceField = ForceField(
-    { PseudoAtom("Si",    28.0855,   2.05,  14, false),
-      PseudoAtom("O",     15.999,   -1.025,  8, false),
-      PseudoAtom("CH4",   16.04246,  0.0,    6, false),
-      PseudoAtom("C_co2", 12.0,      0.6512, 6, false),
-      PseudoAtom("O_co2", 15.9994,  -0.3256, 8, false),
-      PseudoAtom("Ow",    15.9996,   0.0,    8, false),
-      PseudoAtom("Hw",     1.0008,   0.241,  1, false),
-      PseudoAtom("Lw",     0.0,     -0.241,  0, false),
+    { PseudoAtom("Si",    28.0855,   2.05,   0.0, 14, false),
+      PseudoAtom("O",     15.999,   -1.025,  0.0,  8, false),
+      PseudoAtom("CH4",   16.04246,  0.0,    0.0,  6, false),
+      PseudoAtom("C_co2", 12.0,      0.6512, 0.0,  6, false),
+      PseudoAtom("O_co2", 15.9994,  -0.3256, 0.0,  8, false),
+      PseudoAtom("Ow",    15.9996,   0.0,    0.0,  8, false),
+      PseudoAtom("Hw",     1.0008,   0.241,  0.0,  1, false),
+      PseudoAtom("Lw",     0.0,     -0.241,  0.0,  0, false),
     },
     { VDWParameters(22.0, 2.30),
       VDWParameters(53.0, 3.3),
