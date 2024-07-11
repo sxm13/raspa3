@@ -67,5 +67,5 @@ if(BUILD_TESTING)
 endif()
 
 if(BUILD_PYTHON)
-  add_subdirectory(raspa3)
+  add_subdirectory(raspa)
 endif()
