@@ -78,8 +78,9 @@ PYBIND11_MODULE(raspalib, m)
       .def(pybind11::init<double, double>(), pybind11::arg("epsilon"), pybind11::arg("sigma"));
 
   pybind11::class_<PseudoAtom>(m, "PseudoAtom")
-      .def(pybind11::init<std::string, double, double, size_t, bool>(), pybind11::arg("name"), pybind11::arg("mass"),
-           pybind11::arg("charge"), pybind11::arg("atomicNumber"), pybind11::arg("printToPDB"));
+      .def(pybind11::init<std::string, double, double, double, size_t, bool, std::string>(), pybind11::arg("name"),
+           pybind11::arg("mass"), pybind11::arg("charge"), pybind11::arg("polarizability"),
+           pybind11::arg("atomicNumber"), pybind11::arg("printToPDB"), pybind11::arg("source"));
 
   pybind11::class_<ForceField> forceField(m, "ForceField");
   forceField.def(

@@ -10,17 +10,21 @@ class PseudoAtom(RaspaBase):
         name: str = "C",
         mass: float = 1.0,
         charge: float = 0.0,
+        polarizability: float = 0.0,
         atomicNumber: int = 8,
         printToPDB: bool = False,
+        source: str = "-"
     ):
         super().__init__()
         self.__name = name
         self.__mass = mass
         self.__charge = charge
+        self.__polarizability = polarizability
         self.__atomicNumber = atomicNumber
         self.__printToPDB = printToPDB
+        self.__source = source
 
-        self._cpp_obj = raspalib.PseudoAtom(name, mass, charge, atomicNumber, printToPDB)
+        self._cpp_obj = raspalib.PseudoAtom(name, mass, charge, polarizability, atomicNumber, printToPDB, source)
 
 
 class VDWParameter(RaspaBase):
