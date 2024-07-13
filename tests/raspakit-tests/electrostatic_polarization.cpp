@@ -88,6 +88,6 @@ TEST(electrostatic_polarization, Test_2_CO2_in_ITQ_29_2x2x2)
 
   RunningEnergy energy = system.computeTotalEnergies();
 
-  EXPECT_NEAR(energy.polarization * Units::EnergyToKelvin, -0.690908, 1e-4);
+  EXPECT_NEAR(energy.polarization * Units::EnergyToKelvin, -2.763632, 1e-6);
 }
 

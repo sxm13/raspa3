@@ -588,7 +588,7 @@ void Interactions::computeInterMolecularElectricPotential(const ForceField &forc
           double r = std::sqrt(rr);
 
           size_t index = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it2));
-          electricPotentialMolecules[index] += 0.5 * potentialElectrostatics(forceField, scalingCoulombA, r, chargeA);
+          electricPotentialMolecules[index] += potentialElectrostatics(forceField, scalingCoulombA, r, chargeA);
         }
       }
     }
@@ -658,7 +658,7 @@ RunningEnergy Interactions::computeInterMolecularElectricField(const ForceField 
 
           ForceFactor forceFactor = scalingCoulombA * chargeA * potentialCoulombGradient(forceField, groupIdA, groupIdB, 1.0, 1.0, r, 1.0, 1.0);
           size_t index = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it2));
-          electricFieldMolecules[index] += 0.5 * forceFactor.forceFactor * dr;
+          electricFieldMolecules[index] += forceFactor.forceFactor * dr;
         }
       }
     }

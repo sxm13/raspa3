@@ -101,7 +101,7 @@ TEST(electrostatic_potential, Test_2_CO2_in_ITQ_29_2x2x2)
   double potentialEnergy{};
   for(size_t i = 0; i < 6; ++i)
   {
-    potentialEnergy += spanOfMoleculeAtoms[i].scalingCoulomb * spanOfMoleculeAtoms[i].charge * moleculeElectricPotential[i];
+    potentialEnergy += 0.5 * spanOfMoleculeAtoms[i].scalingCoulomb * spanOfMoleculeAtoms[i].charge * moleculeElectricPotential[i];
   }
 
   EXPECT_NEAR(potentialEnergy * Units::EnergyToKelvin, (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) * Units::EnergyToKelvin, 1e-4);

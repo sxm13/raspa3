@@ -1241,8 +1241,8 @@ void Interactions::computeEwaldFourierElectricPotential(
             std::complex<double> eikz_temp = eik_z[i + numberOfAtoms * static_cast<size_t>(std::abs(kz))];
             eikz_temp.imag(kz >= 0 ? eikz_temp.imag() : -eikz_temp.imag());
             std::complex<double> cki = eik_xy[i] * eikz_temp;
-            electricPotentialMolecules[i] += temp * (cki.real() * cksum.real() + cki.imag() * cksum.imag())
-                      + temp * (cki.real() * rigid.real() + cki.imag() * rigid.imag());
+            electricPotentialMolecules[i] += 2.0 * temp * (cki.real() * cksum.real() + cki.imag() * cksum.imag())
+                                           + 2.0 * temp * (cki.real() * rigid.real() + cki.imag() * rigid.imag());
           }
 
           ++nvec;
@@ -1257,7 +1257,7 @@ void Interactions::computeEwaldFourierElectricPotential(
   {
     double charge = moleculeAtomPositions[i].charge;
     double scaling = moleculeAtomPositions[i].scalingCoulomb;
-    electricPotentialMolecules[i] -= prefactor_self * scaling * charge;
+    electricPotentialMolecules[i] -= 2.0 * prefactor_self * scaling * charge;
   }
 
   // Subtract exclusion-energy
@@ -1285,7 +1285,7 @@ void Interactions::computeEwaldFourierElectricPotential(
             double rr = double3::dot(dr, dr);
             double r = std::sqrt(rr);
 
-            electricPotential[i] -= 0.5 * Units::CoulombicConversionFactor * scalingB * chargeB * std::erf(alpha * r) / r;
+            electricPotential[i] -= Units::CoulombicConversionFactor * scalingB * chargeB * std::erf(alpha * r) / r;
           }
         }
       }
@@ -1440,8 +1440,8 @@ RunningEnergy Interactions::computeEwaldFourierElectricField(
             eikz_temp.imag(kz >= 0 ? eikz_temp.imag() : -eikz_temp.imag());
             std::complex<double> cki = eik_xy[i] * eikz_temp;
             electricFieldMolecules[i] +=
-                temp * (cki.imag() * cksum.first.real() - cki.real() * cksum.first.imag()) * rk
-                + temp * (cki.imag() * rigid.first.real() - cki.real() * rigid.first.imag()) * rk;
+                2.0 * temp * (cki.imag() * cksum.first.real() - cki.real() * cksum.first.imag()) * rk
+                + 2.0 * temp * (cki.imag() * rigid.first.real() - cki.real() * rigid.first.imag()) * rk;
           }
 
           storedEik[nvec] = cksum;
@@ -1499,7 +1499,7 @@ RunningEnergy Interactions::computeEwaldFourierElectricField(
                    std::exp(-(alpha * alpha * r * r)) / rr;
             double Bt0 = -Units::CoulombicConversionFactor * std::erf(alpha * r) / r;
             double Bt1 = temp + Bt0 / rr;
-            electricField[i] += 0.5 * scalingB * chargeB * Bt1 * dr;
+            electricField[i] += scalingB * chargeB * Bt1 * dr;
           }
         }
       }
