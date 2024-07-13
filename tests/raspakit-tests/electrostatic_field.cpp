@@ -72,18 +72,18 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2)
   std::span<const Atom> frameworkAtomPositions = system.spanOfFrameworkAtoms();
   std::span<double> moleculeElectricPotential = system.spanOfMoleculeElectricPotential();
   spanOfMoleculeAtoms[0].position = double3(5.93355, 7.93355, 5.93355 + 1.149);
-  spanOfMoleculeAtoms[0].scalingCoulomb = 0.45;
+  spanOfMoleculeAtoms[0].scalingCoulomb = 1.0;
   spanOfMoleculeAtoms[1].position = double3(5.93355, 7.93355, 5.93355 + 0.0);
-  spanOfMoleculeAtoms[1].scalingCoulomb = 0.45;
+  spanOfMoleculeAtoms[1].scalingCoulomb = 1.0;
   spanOfMoleculeAtoms[2].position = double3(5.93355, 7.93355, 5.93355 - 1.149);
-  spanOfMoleculeAtoms[2].scalingCoulomb = 0.45;
+  spanOfMoleculeAtoms[2].scalingCoulomb = 1.0;
 
   spanOfMoleculeAtoms[3].position = double3(5.93355, 3.93355, 5.93355 + 1.149);
-  spanOfMoleculeAtoms[3].scalingCoulomb = 0.65;
+  spanOfMoleculeAtoms[3].scalingCoulomb = 1.0;
   spanOfMoleculeAtoms[4].position = double3(5.93355, 3.93355, 5.93355 + 0.0);
-  spanOfMoleculeAtoms[4].scalingCoulomb = 0.65;
+  spanOfMoleculeAtoms[4].scalingCoulomb = 1.0;
   spanOfMoleculeAtoms[5].position = double3(5.93355, 3.93355, 5.93355 - 1.149);
-  spanOfMoleculeAtoms[5].scalingCoulomb = 0.65;
+  spanOfMoleculeAtoms[5].scalingCoulomb = 1.0;
 
   system.computeTotalElectricField();
   std::span<double3> electricField = system.spanOfMoleculeElectricField();
@@ -179,6 +179,8 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2)
     EXPECT_NEAR(electricField[i].x, gradient.x, tolerance);
     EXPECT_NEAR(electricField[i].y, gradient.y, tolerance);
     EXPECT_NEAR(electricField[i].z, gradient.z, tolerance);
+
+    std::cout << "gradient: " << gradient.x << ", " << gradient.y << ", " << gradient.z << std::endl;
   }
 }
 

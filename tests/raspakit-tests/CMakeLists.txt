@@ -13,6 +13,7 @@ add_executable(unit_tests_raspakit
                rigid_gradient.cpp
                electrostatic_potential.cpp
                electrostatic_field.cpp
+               electrostatic_polarization.cpp
                main.cpp)
 
 
