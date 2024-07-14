@@ -27,6 +27,122 @@ import interactions_framework_molecule;
 import interactions_ewald;
 import energy_status;
 
+// Table 5, page 61, thesis D. Dubbeldam
+TEST(electrostatic_field, Test_reference_system_1)
+{
+  ForceField forceField = ForceField(
+    { PseudoAtom("t1", 1.0,  0.5,  0.0, 1, false),
+      PseudoAtom("t2", 1.0,  1.5,  0.0, 1, false),
+      PseudoAtom("t2", 1.0, -0.75, 0.0, 1, false),
+      PseudoAtom("t4", 1.0, -1.25, 0.0, 1, false),
+    },
+    {
+      VDWParameters(0.0, 1.0)
+    },
+    ForceField::MixingRule::Lorentz_Berthelot,
+    50.0,
+    true,
+    false);
+  Component c1 = Component(0, forceField, "t1", 0.0, 0.0, 0.0,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  0.0), 0.5, 1.0, 0, 0, 0, 0),
+    }, 5, 21);
+  Component c2 = Component(1, forceField, "t2", 0.0, 0.0, 0.0,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  0.0), 1.5, 1.0, 1, 1, 1, 0),
+    }, 5, 21);
+  Component c3 = Component(2, forceField, "t3", 0.0, 0.0, 0.0,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  0.0), -0.75, 1.0, 2, 2, 2, 0),
+    }, 5, 21);
+  Component c4 = Component(3, forceField, "t4", 0.0, 0.0, 0.0,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  0.0), -1.25, 1.0, 3, 3, 3, 0),
+    }, 5, 21);
+
+  System system = System(0, SimulationBox(100.0, 100.0, 100.0), 300.0, 1e4, forceField, {}, { c1, c2, c3, c4 }, { 1, 1, 1, 1 }, 5);
+
+  std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
+  spanOfMoleculeAtoms[0].position = double3(-1.0,  0.0, 0.0);
+  spanOfMoleculeAtoms[1].position = double3( 1.0,  0.0, 0.0);
+  spanOfMoleculeAtoms[2].position = double3( 0.0,  1.0, 0.0);
+  spanOfMoleculeAtoms[3].position = double3( 0.0, -1.0, 0.0);
+
+  system.computeTotalElectricField();
+  std::span<double3> electricField = system.spanOfMoleculeElectricField();
+
+  EXPECT_NEAR(electricField[0].x / Units::CoulombicConversionFactor,  0.332107, 1e-5);
+  EXPECT_NEAR(electricField[0].y / Units::CoulombicConversionFactor, -0.17677,  1e-5);
+  EXPECT_NEAR(electricField[0].z / Units::CoulombicConversionFactor,  0.0,      1e-5);
+
+  EXPECT_NEAR(electricField[1].x / Units::CoulombicConversionFactor, -0.582107, 1e-5);
+  EXPECT_NEAR(electricField[1].y / Units::CoulombicConversionFactor, -0.176777,  1e-5);
+  EXPECT_NEAR(electricField[1].z / Units::CoulombicConversionFactor,  0.0,      1e-5);
+
+  EXPECT_NEAR(electricField[2].x / Units::CoulombicConversionFactor, -0.353553, 1e-5);
+  EXPECT_NEAR(electricField[2].y / Units::CoulombicConversionFactor,  0.394607,  1e-5);
+  EXPECT_NEAR(electricField[2].z / Units::CoulombicConversionFactor,  0.0,      1e-5);
+
+  EXPECT_NEAR(electricField[3].x / Units::CoulombicConversionFactor, -0.353553, 1e-5);
+  EXPECT_NEAR(electricField[3].y / Units::CoulombicConversionFactor, -0.519607,  1e-5);
+  EXPECT_NEAR(electricField[3].z / Units::CoulombicConversionFactor,  0.0,      1e-5);
+}
+
+// Table 5, page 61 thesis D. Dubbeldam
+TEST(electrostatic_field, Test_reference_system_2)
+{
+  ForceField forceField = ForceField(
+    { PseudoAtom("t1", 1.0,  0.5,  0.0, 1, false),
+      PseudoAtom("t2", 1.0, -1.25, 0.0, 1, false),
+      PseudoAtom("t2", 1.0,  1.5,  0.0, 1, false),
+      PseudoAtom("t4", 1.0, -0.75, 0.0, 1, false),
+    },
+    {
+      VDWParameters(0.0, 1.0)
+    },
+    ForceField::MixingRule::Lorentz_Berthelot,
+    50.0,
+    true,
+    false);
+  Component c1 = Component(0, forceField, "t1", 0.0, 0.0, 0.0,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  0.0),  0.5,  1.0, 0, 0, 0, 0),
+      Atom(double3(0.0, 0.0,  0.0), -1.25, 1.0, 0, 1, 0, 0)
+    }, 5, 21);
+  Component c2 = Component(1, forceField, "t2", 0.0, 0.0, 0.0,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  0.0),  1.5,  1.0, 1, 2, 1, 0),
+      Atom(double3(0.0, 0.0,  0.0), -0.75, 1.0, 1, 3, 1, 0)
+    }, 5, 21);
+
+  System system = System(0, SimulationBox(100.0, 100.0, 100.0), 300.0, 1e4, forceField, {}, { c1, c2 }, { 1, 1 }, 5);
+
+  std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
+  spanOfMoleculeAtoms[0].position = double3(-1.0,  0.0, 0.0);
+  spanOfMoleculeAtoms[1].position = double3( 0.0, -1.0, 0.0);
+  spanOfMoleculeAtoms[2].position = double3( 1.0,  0.0, 0.0);
+  spanOfMoleculeAtoms[3].position = double3( 0.0,  1.0, 0.0);
+
+  system.computeTotalElectricField();
+  std::span<double3> electricField = system.spanOfMoleculeElectricField();
+
+  EXPECT_NEAR(electricField[0].x / Units::CoulombicConversionFactor, -0.109835, 1e-5);
+  EXPECT_NEAR(electricField[0].y / Units::CoulombicConversionFactor,  0.265165, 1e-5);
+  EXPECT_NEAR(electricField[0].z / Units::CoulombicConversionFactor,  0.0,      1e-5);
+
+  EXPECT_NEAR(electricField[1].x / Units::CoulombicConversionFactor, -0.53033,  1e-5);
+  EXPECT_NEAR(electricField[1].y / Units::CoulombicConversionFactor, -0.34283,  1e-5);
+  EXPECT_NEAR(electricField[1].z / Units::CoulombicConversionFactor,  0.0,      1e-5);
+
+  EXPECT_NEAR(electricField[2].x / Units::CoulombicConversionFactor, -0.316942, 1e-5);
+  EXPECT_NEAR(electricField[2].y / Units::CoulombicConversionFactor, -0.441941, 1e-5);
+  EXPECT_NEAR(electricField[2].z / Units::CoulombicConversionFactor,  0.0,      1e-5);
+
+  EXPECT_NEAR(electricField[3].x / Units::CoulombicConversionFactor,  0.176777, 1e-5);
+  EXPECT_NEAR(electricField[3].y / Units::CoulombicConversionFactor, -0.135723, 1e-5);
+  EXPECT_NEAR(electricField[3].z / Units::CoulombicConversionFactor,  0.0,      1e-5);
+}
+
 
 TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2)
 {
@@ -179,8 +295,6 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2)
     EXPECT_NEAR(electricField[i].x, gradient.x, tolerance);
     EXPECT_NEAR(electricField[i].y, gradient.y, tolerance);
     EXPECT_NEAR(electricField[i].z, gradient.z, tolerance);
-
-    std::cout << "gradient: " << gradient.x << ", " << gradient.y << ", " << gradient.z << std::endl;
   }
 }
 

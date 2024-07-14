@@ -27,6 +27,149 @@ import interactions_framework_molecule;
 import interactions_ewald;
 import energy_status;
 
+
+// Table 5, page 61 thesis D. Dubbeldam
+TEST(electrostatic_potential, Test_reference_system_1)
+{
+  ForceField forceField = ForceField(
+    { PseudoAtom("t1", 1.0,  0.5,  0.0, 1, false),
+      PseudoAtom("t2", 1.0,  1.5,  0.0, 1, false),
+      PseudoAtom("t2", 1.0, -0.75, 0.0, 1, false),
+      PseudoAtom("t4", 1.0, -1.25, 0.0, 1, false),
+    },
+    { 
+      VDWParameters(0.0, 1.0)
+    },
+    ForceField::MixingRule::Lorentz_Berthelot,
+    500.0,
+    true,
+    false);
+  Component c1 = Component(0, forceField, "t1", 0.0, 0.0, 0.0,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  0.0), 0.5, 1.0, 0, 0, 0, 0),
+    }, 5, 21);
+  Component c2 = Component(1, forceField, "t2", 0.0, 0.0, 0.0,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  0.0), 1.5, 1.0, 1, 1, 1, 0),
+    }, 5, 21);
+  Component c3 = Component(2, forceField, "t3", 0.0, 0.0, 0.0,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  0.0), -0.75, 1.0, 2, 2, 2, 0),
+    }, 5, 21);
+  Component c4 = Component(3, forceField, "t4", 0.0, 0.0, 0.0,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  0.0), -1.25, 1.0, 3, 3, 3, 0),
+    }, 5, 21);
+
+  System system = System(0, SimulationBox(1000.0, 1000.0, 1000.0), 300.0, 1e4, forceField, {}, { c1, c2, c3, c4 }, { 1, 1, 1, 1 }, 5);
+
+  std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
+  std::span<const Atom> frameworkAtomPositions = system.spanOfFrameworkAtoms();
+  std::span<double> moleculeElectricPotential = system.spanOfMoleculeElectricPotential();
+  spanOfMoleculeAtoms[0].position = double3(-1.0,  0.0, 0.0);
+  spanOfMoleculeAtoms[1].position = double3( 1.0,  0.0, 0.0);
+  spanOfMoleculeAtoms[2].position = double3( 0.0,  1.0, 0.0);
+  spanOfMoleculeAtoms[3].position = double3( 0.0, -1.0, 0.0);
+
+  if (system.fixedFrameworkStoredEik.empty())
+  {
+    system.precomputeTotalRigidEnergy();
+  }
+
+  RunningEnergy energy = Interactions::computeInterMolecularEnergy(system.forceField, system.simulationBox, spanOfMoleculeAtoms) +
+                         Interactions::computeFrameworkMoleculeEnergy(system.forceField,system.simulationBox, frameworkAtomPositions, spanOfMoleculeAtoms) +
+                         Interactions::computeEwaldFourierEnergy(system.eik_x, system.eik_y, system.eik_z, system.eik_xy, 
+                                         system.fixedFrameworkStoredEik, system.storedEik, system.forceField, system.simulationBox,
+                                         system.components, system.numberOfMoleculesPerComponent, spanOfMoleculeAtoms);
+
+  system.computeTotalElectricPotential();
+
+  // U = \sum_i q_i \phi_i
+  double potentialEnergy{};
+  for(size_t i = 0; i < 6; ++i)
+  {
+    potentialEnergy += 0.5 * spanOfMoleculeAtoms[i].scalingCoulomb * spanOfMoleculeAtoms[i].charge * moleculeElectricPotential[i];
+  }
+
+  EXPECT_NEAR(moleculeElectricPotential[0] / Units::CoulombicConversionFactor, -0.664214, 1e-5);
+  EXPECT_NEAR(moleculeElectricPotential[1] / Units::CoulombicConversionFactor, -1.16421,  1e-5);
+  EXPECT_NEAR(moleculeElectricPotential[2] / Units::CoulombicConversionFactor,  0.789214, 1e-5);
+  EXPECT_NEAR(moleculeElectricPotential[3] / Units::CoulombicConversionFactor,  1.03921,  1e-5);
+
+  EXPECT_NEAR(potentialEnergy * Units::EnergyToKelvin, 
+              (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) * Units::EnergyToKelvin, 1e-4);
+  EXPECT_NEAR((energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) / Units::CoulombicConversionFactor, -1.98467, 1e-4);
+}
+
+// Table 5, page 61 thesis D. Dubbeldam
+TEST(electrostatic_potential, Test_reference_system_2)
+{
+  ForceField forceField = ForceField(
+    { PseudoAtom("t1", 1.0,  0.5,  0.0, 1, false),
+      PseudoAtom("t2", 1.0, -1.25, 0.0, 1, false),
+      PseudoAtom("t2", 1.0,  1.5,  0.0, 1, false),
+      PseudoAtom("t4", 1.0, -0.75, 0.0, 1, false),
+    },
+    { 
+      VDWParameters(0.0, 1.0)
+    },
+    ForceField::MixingRule::Lorentz_Berthelot,
+    500.0,
+    true,
+    false);
+  Component c1 = Component(0, forceField, "t1", 0.0, 0.0, 0.0,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  0.0),  0.5,  1.0, 0, 0, 0, 0),
+      Atom(double3(0.0, 0.0,  0.0), -1.25, 1.0, 0, 1, 0, 0)
+    }, 5, 21);
+  Component c2 = Component(1, forceField, "t2", 0.0, 0.0, 0.0,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  0.0),  1.5,  1.0, 1, 2, 1, 0),
+      Atom(double3(0.0, 0.0,  0.0), -0.75, 1.0, 1, 3, 1, 0)
+    }, 5, 21);
+
+  System system = System(0, SimulationBox(1000.0, 1000.0, 1000.0), 300.0, 1e4, forceField, {}, { c1, c2 }, { 1, 1 }, 5);
+
+  std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
+  std::span<const Atom> frameworkAtomPositions = system.spanOfFrameworkAtoms();
+  std::span<double> moleculeElectricPotential = system.spanOfMoleculeElectricPotential();
+  spanOfMoleculeAtoms[0].position = double3(-1.0,  0.0, 0.0);
+  spanOfMoleculeAtoms[1].position = double3( 0.0, -1.0, 0.0);
+  spanOfMoleculeAtoms[2].position = double3( 1.0,  0.0, 0.0);
+  spanOfMoleculeAtoms[3].position = double3( 0.0,  1.0, 0.0);
+
+  if (system.fixedFrameworkStoredEik.empty())
+  {
+    system.precomputeTotalRigidEnergy();
+  }
+
+  RunningEnergy energy = Interactions::computeInterMolecularEnergy(system.forceField, system.simulationBox, spanOfMoleculeAtoms) +
+                         Interactions::computeFrameworkMoleculeEnergy(system.forceField,system.simulationBox, frameworkAtomPositions, spanOfMoleculeAtoms) +
+                         Interactions::computeEwaldFourierEnergy(system.eik_x, system.eik_y, system.eik_z, system.eik_xy, 
+                                         system.fixedFrameworkStoredEik, system.storedEik, system.forceField, system.simulationBox,
+                                         system.components, system.numberOfMoleculesPerComponent, spanOfMoleculeAtoms);
+
+  system.computeTotalElectricPotential();
+
+  // U = \sum_i q_i \phi_i
+  double potentialEnergy{};
+  for(size_t i = 0; i < 6; ++i)
+  {
+    potentialEnergy += 0.5 * spanOfMoleculeAtoms[i].scalingCoulomb * spanOfMoleculeAtoms[i].charge * moleculeElectricPotential[i];
+  }
+
+  EXPECT_NEAR(moleculeElectricPotential[0] / Units::CoulombicConversionFactor,  0.21967,  1e-5);
+  EXPECT_NEAR(moleculeElectricPotential[1] / Units::CoulombicConversionFactor,  0.68566,  1e-5);
+  EXPECT_NEAR(moleculeElectricPotential[2] / Units::CoulombicConversionFactor, -0.633883, 1e-5);
+  EXPECT_NEAR(moleculeElectricPotential[3] / Units::CoulombicConversionFactor, -0.271447, 1e-5);
+
+  EXPECT_NEAR(potentialEnergy * Units::EnergyToKelvin, 
+              (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) * Units::EnergyToKelvin, 1e-4);
+
+  // Check again, when net charges are implemented
+  EXPECT_NEAR((energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) / Units::CoulombicConversionFactor, -0.745882, 1e-2);
+}
+
 TEST(electrostatic_potential, Test_2_CO2_in_ITQ_29_2x2x2)
 {
   ForceField forceField = ForceField(
