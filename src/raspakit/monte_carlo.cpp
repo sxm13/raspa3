@@ -105,6 +105,24 @@ MonteCarlo::MonteCarlo(InputReader& reader) noexcept
 {
 }
 
+MonteCarlo::MonteCarlo(size_t numberOfCycles, size_t numberOfInitializationCycles, size_t numberOfEquilibrationCycles,
+                       size_t printEvery, size_t writeBinaryRestartEvery, size_t rescaleWangLandauEvery,
+                       size_t optimizeMCMovesEvery, std::vector<System>& systems, RandomNumber& randomSeed,
+                       size_t numberOfBlocks)
+    : numberOfCycles(numberOfCycles),
+      numberOfInitializationCycles(numberOfInitializationCycles),
+      numberOfEquilibrationCycles(numberOfEquilibrationCycles),
+      printEvery(printEvery),
+      writeBinaryRestartEvery(writeBinaryRestartEvery),
+      rescaleWangLandauEvery(rescaleWangLandauEvery),
+      optimizeMCMovesEvery(optimizeMCMovesEvery),
+      systems(std::move(systems)),
+      random(randomSeed),
+      outputJsons(systems.size()),
+      estimation(numberOfBlocks, numberOfCycles)
+{
+}
+
 System& MonteCarlo::randomSystem() { return systems[size_t(random.uniform() * static_cast<double>(systems.size()))]; }
 
 void MonteCarlo::run()
@@ -554,7 +572,7 @@ void MonteCarlo::output()
         system.mc_moves_cputime.jsonSystemMCMoveCPUTimeStatistics();
 
     outputJsons[system.systemId]["properties"]["averageEnergies"] = system.averageEnergies.jsonAveragesStatistics(
-         system.hasExternalField, system.frameworkComponents, system.components);
+        system.hasExternalField, system.frameworkComponents, system.components);
     outputJsons[system.systemId]["properties"]["averagePressure"] = system.averagePressure.jsonAveragesStatistics();
     outputJsons[system.systemId]["properties"]["averageEnthalpy"] =
         system.averageEnthalpiesOfAdsorption.jsonAveragesStatistics(system.swappableComponents, system.components);

@@ -36,6 +36,7 @@ import mc_moves_probabilities_system;
 import framework;
 import component;
 import system;
+import randomnumbers;
 
 PYBIND11_MODULE(raspalib, m)
 {
@@ -46,6 +47,8 @@ PYBIND11_MODULE(raspalib, m)
       .def_readwrite("x", &double3::x)
       .def_readwrite("y", &double3::y)
       .def_readwrite("z", &double3::z);
+
+  pybind11::class_<RandomNumber>(m, "random").def(pybind11::init<size_t>());
 
   pybind11::class_<RunningEnergy>(m, "RunningEnergy")
       .def(pybind11::init<>())
@@ -120,4 +123,9 @@ PYBIND11_MODULE(raspalib, m)
       .def("computeTotalEnergies", &System::computeTotalEnergies)
       .def_readwrite("atomPositions", &System::atomPositions)
       .def("__repr__", &System::repr);
+
+  pybind11::class_<MonteCarlo>(m, "MonteCarlo")
+      .def(pybind11::init < size_t, size_t, size_t, size_t, size_t, size_t, size_t, std::vector<System> &,
+           RandomNumber &, size_t)
+      .def("run", &MonteCarlo::run)
 }
