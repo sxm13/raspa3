@@ -47,9 +47,12 @@ class System(RaspaBase):
     @property
     def atomPositions(self):
         return self._cpp_obj.atomPositions
-    
+
     @atomPositions.setter
     def atomPositions(self, index_position_tuple: tuple[np.ndarray, np.ndarray]):
         indices, position = index_position_tuple
-        for idx in indices:
-            self._cpp_obj.atomPositions[idx].position = raspalib.double3(*position[idx])
+        for i, idx in enumerate(indices):
+            self._cpp_obj.atomPositions[idx].position = raspalib.double3(*position[i])
+
+    def computeTotalEnergies(self):
+        return self._cpp_obj.computeTotalEnergies()

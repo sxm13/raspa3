@@ -1,18 +1,18 @@
 from raspa import raspalib
 
 atomTypes = [
-    raspalib.PseudoAtom("Si", 28.0855, 2.05, 14, False),
-    raspalib.PseudoAtom("O", 15.999, -1.025, 8, False),
-    raspalib.PseudoAtom("CH4", 16.04246, 0.0, 6, False),
-    raspalib.PseudoAtom("C_co2", 12.0, 0.6512, 6, False),
-    raspalib.PseudoAtom("O_co2", 15.9994, -0.3256, 8, False),
+    raspalib.PseudoAtom("Si", 28.0855, 2.05, 0.0, 14, False, "-"),
+    raspalib.PseudoAtom("O", 15.999, -1.025, 0.0, 8, False, "-"),
+    raspalib.PseudoAtom("CH4", 16.04246, 0.0, 0.0, 6, False, "-"),
+    raspalib.PseudoAtom("C_co2", 12.0, 0.6512, 0.0, 6, False, "-"),
+    raspalib.PseudoAtom("O_co2", 15.9994, -0.3256, 0.0, 8, False, "-"),
 ]
 parameters = [
-    raspalib.VDWParameters(22.0 / 1.2027242847, 2.30),
-    raspalib.VDWParameters(53.0 / 1.2027242847, 3.3),
-    raspalib.VDWParameters(158.5 / 1.2027242847, 3.72),
-    raspalib.VDWParameters(29.933 / 1.2027242847, 2.745),
-    raspalib.VDWParameters(85.671 / 1.2027242847, 3.017),
+    raspalib.VDWParameters(22.0, 2.30),
+    raspalib.VDWParameters(53.0, 3.3),
+    raspalib.VDWParameters(158.5, 3.72),
+    raspalib.VDWParameters(29.933, 2.745),
+    raspalib.VDWParameters(85.671, 3.017),
 ]
 
 force_field = raspalib.ForceField(

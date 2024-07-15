@@ -46,6 +46,7 @@ class Framework(RaspaBase):
                 simulationBox._cpp_obj,
                 spaceGroupHallNumber,
                 [atom._cpp_obj for atom in definedAtoms],
+                raspalib.int3(*numberOfUnitCells),
             )
         else:
             raise RaspaError("Pick either json or definedAtoms to init force field.")

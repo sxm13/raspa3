@@ -1,15 +1,10 @@
 import raspalib
 
-from .forcefield import ForceField, PseudoAtom, VDWParameter
+from .forcefield import ForceField, PseudoAtom, VDWParameter, exampleMoleculeForceField
 from .atom import Atom
 from .simulationbox import SimulationBox
 from .framework import Framework
 from .mcmoveprobabilities import MCMoveProbabilitiesParticles
 from .component import Component
-
-import os
-from importlib.resources import files
-
-
-RASPA_DIR = files(__name__)
-SHARE_DIR = os.path.join(RASPA_DIR, "..", "share", "raspa3")
+from .utils import RASPA_DIR, SHARE_DIR
+from .system import System

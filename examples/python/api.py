@@ -7,10 +7,10 @@ ff = raspa.ForceField.from_json("force_field.json")
 box = raspa.SimulationBox(11.8671 * np.ones(3))
 
 fw_atoms = [
-    raspa.Atom(np.array([0.3683, 0.1847, 0.0]), 2.05, type_=0),
-    raspa.Atom(np.array([0.5, 0.2179, 0.0]), -1.025, type_=1),
-    raspa.Atom(np.array([0.2939, 0.2939, 0.0]), -1.025, type_=1),
-    raspa.Atom(np.array([0.3429, 0.1098, 0.1098]), -1.025, type_=1),
+    raspa.Atom(np.array([0.3683, 0.1847, 0.0]), 2.05, type_=2),
+    raspa.Atom(np.array([0.5, 0.2179, 0.0]), -1.025, type_=0),
+    raspa.Atom(np.array([0.2939, 0.2939, 0.0]), -1.025, type_=0),
+    raspa.Atom(np.array([0.3429, 0.1098, 0.1098]), -1.025, type_=0),
 ]
 itq = raspa.Framework(
     0, ff, "ITQ-29", spaceGroupHallNumber=517, definedAtoms=fw_atoms, simulationBox=box, numberOfUnitCells=[1, 1, 1]
@@ -21,9 +21,9 @@ print(ff)
 mcmoves = raspa.MCMoveProbabilitiesParticles()
 
 co2_atoms = [
-    raspa.Atom(np.array([0.0, 0.0, 1.149]), -0.3256, type_=4),
-    raspa.Atom(np.array([0.0, 0.0, 0.0]), 6512, type_=3),
-    raspa.Atom(np.array([0.0, 0.0, -1.149]), -0.3256, type_=4),
+    raspa.Atom(np.array([0.0, 0.0, 1.149]), -0.3256, type_=5),
+    raspa.Atom(np.array([0.0, 0.0, 0.0]), 0.6512, type_=4),
+    raspa.Atom(np.array([0.0, 0.0, -1.149]), -0.3256, type_=5),
 ]
 co2 = raspa.Component(0, ff, "CO2", 304.1282, 7377300, 0.22394, co2_atoms, 5, 21, mcmoves)
 

@@ -2,7 +2,8 @@ from typing import Literal
 
 import raspalib
 from .base import RaspaBase
-
+from .utils import RASPA_DIR, SHARE_DIR
+import os
 
 class PseudoAtom(RaspaBase):
     def __init__(
@@ -72,3 +73,6 @@ class ForceField(RaspaBase):
         ff.__vdwParameters = ff._cpp_obj.vdwParameters
         ff.__mixingRule = ff._cpp_obj.MixingRule
         return ff
+
+# exampleMoleculeForceField = ForceField.from_json(os.path.join(SHARE_DIR, "forcefields", "example_molecule_forcefield"))
+exampleMoleculeForceField = 90

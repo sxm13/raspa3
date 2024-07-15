@@ -6,10 +6,12 @@ from .mcmoveprobabilities import MCMoveProbabilitiesParticles
 
 
 class Component(RaspaBase):
+
     def __init__(
         self,
         componentId: int,
         forceField: ForceField,
+        componentName: str,
         criticalTemperature: float,
         criticalPressure: float,
         acentricFactor: float,
@@ -22,6 +24,7 @@ class Component(RaspaBase):
 
         self.__componentId = componentId
         self.__forceField = forceField
+        self.__componentName = componentName
         self.__criticalTemperature = criticalTemperature
         self.__criticalPressure = criticalPressure
         self.__acentricFactor = acentricFactor
@@ -33,6 +36,7 @@ class Component(RaspaBase):
         self._cpp_obj = raspalib.Component(
             componentId,
             forceField._cpp_obj,
+            componentName,
             criticalTemperature,
             criticalPressure,
             acentricFactor,
