@@ -5,6 +5,7 @@ from .forcefield import ForceField
 from .framework import Framework
 from .component import Component
 
+import numpy as np
 
 class System(RaspaBase):
     def __init__(
@@ -42,3 +43,13 @@ class System(RaspaBase):
             initialNumberOfMolecules,
             numberOfBlocks,
         )
+
+    @property
+    def atomPositions(self):
+        return self._cpp_obj.atomPositions
+    
+    @atomPositions.setter
+    def atomPositions(self, index_position_tuple: tuple[np.ndarray, np.ndarray]):
+        indices, position = index_position_tuple
+        for idx in indices:
+            self._cpp_obj.atomPositions[idx].position = raspalib.double3(*position[idx])

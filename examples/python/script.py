@@ -1,4 +1,4 @@
-from raspa3 import raspalib
+from raspa import raspalib
 
 atomTypes = [
     raspalib.PseudoAtom("Si", 28.0855, 2.05, 14, False),
