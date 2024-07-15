@@ -63,4 +63,9 @@ EnergyFactor computeInterMolecularPolarizationEnergy(const ForceField &forceFiel
 RunningEnergy computeInterMolecularElectricField(const ForceField &forceField, const SimulationBox &box,
                                                  std::span<double3> electricFieldMolecules,
                                                  std::span<const Atom> moleculeAtoms) noexcept;
+
+std::optional<RunningEnergy> computeInterMolecularElectricFieldDifference(
+    const ForceField &forceField, const SimulationBox &box,
+    std::span<double3> electricFieldMolecules, std::span<const Atom> moleculeAtoms,
+    std::span<const Atom> newatoms, std::span<const Atom> oldatoms) noexcept;
 };

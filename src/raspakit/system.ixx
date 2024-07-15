@@ -170,6 +170,7 @@ export struct System
   std::vector<Molecule> moleculePositions;
   std::vector<double> electricPotential;
   std::vector<double3> electricField;
+  std::vector<double3> electricFieldDifference;
 
   double conservedEnergy{};
   double referenceEnergy{};
@@ -301,6 +302,7 @@ export struct System
   std::span<Atom> spanOfMoleculeAtoms();
   std::span<double> spanOfMoleculeElectricPotential();
   std::span<double3> spanOfMoleculeElectricField();
+  std::span<double3> spanOfMoleculeElectricFieldDifference();
 
   size_t numberOfMolecules() const
   {
