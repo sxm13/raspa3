@@ -1,6 +1,6 @@
 import raspalib
 
-from .forcefield import ForceField, PseudoAtom, VDWParameter, exampleMoleculeForceField
+from .forcefield import ForceField, PseudoAtom, VDWParameter
 from .atom import Atom
 from .simulationbox import SimulationBox
 from .framework import Framework

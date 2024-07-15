@@ -66,13 +66,15 @@ class ForceField(RaspaBase):
         )
 
     @classmethod
-    def from_json(cls, json_fn: str):
+    def from_json(cls, ff_path: str):
         ff = cls([PseudoAtom()], [VDWParameter(1.0, 1.0)])
-        ff._cpp_obj = raspalib.readForceField(None, json_fn)
+        ff._cpp_obj = raspalib.readForceField(*os.path.split(ff_path))
         ff.__pseudoAtoms = ff._cpp_obj.pseudoAtoms
         ff.__vdwParameters = ff._cpp_obj.vdwParameters
         ff.__mixingRule = ff._cpp_obj.MixingRule
         return ff
 
-# exampleMoleculeForceField = ForceField.from_json(os.path.join(SHARE_DIR, "forcefields", "example_molecule_forcefield"))
-exampleMoleculeForceField = 90
+
+exampleMoleculeForceField = ForceField.from_json(
+    os.path.join(SHARE_DIR, "forcefields", "example_molecule_forcefield", "force_field.json")
+)

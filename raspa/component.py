@@ -4,6 +4,7 @@ from .forcefield import ForceField
 from .atom import Atom
 from .mcmoveprobabilities import MCMoveProbabilitiesParticles
 
+import json
 
 class Component(RaspaBase):
 
@@ -45,3 +46,8 @@ class Component(RaspaBase):
             numberOfLambdaBins,
             moveProbabilities._cpp_obj,
         )
+
+    @classmethod
+    def from_json(cls, json_path: str):
+        with open(json_path) as f:
+            data = json.load(f)

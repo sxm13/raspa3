@@ -37,6 +37,7 @@ import framework;
 import component;
 import system;
 import randomnumbers;
+import monte_carlo;
 
 PYBIND11_MODULE(raspalib, m)
 {
@@ -89,10 +90,10 @@ PYBIND11_MODULE(raspalib, m)
   forceField.def(
       pybind11::init<std::vector<PseudoAtom>, std::vector<VDWParameters>, ForceField::MixingRule, double, bool, bool>(),
       pybind11::arg("pseudoAtoms"), pybind11::arg("parameters"), pybind11::arg("mixingRule"), pybind11::arg("cutOff"),
-      pybind11::arg("shifted"), pybind11::arg("tailCorrecions"));
-  forceField.def("__repr__", &ForceField::repr);
-  forceField.def_readonly("pseudoAtoms", &ForceField::pseudoAtoms);
-  forceField.def_readonly("vdwParameters", &ForceField::data);
+      pybind11::arg("shifted"), pybind11::arg("tailCorrecions"))
+  .def("__repr__", &ForceField::repr)
+  .def_readonly("pseudoAtoms", &ForceField::pseudoAtoms)
+  .def_readonly("vdwParameters", &ForceField::data);
   m.def("readForceField", &ForceField::readForceField, pybind11::return_value_policy::reference);
 
   pybind11::enum_<ForceField::MixingRule>(forceField, "MixingRule")
@@ -126,6 +127,6 @@ PYBIND11_MODULE(raspalib, m)
 
   pybind11::class_<MonteCarlo>(m, "MonteCarlo")
       .def(pybind11::init < size_t, size_t, size_t, size_t, size_t, size_t, size_t, std::vector<System> &,
-           RandomNumber &, size_t)
-      .def("run", &MonteCarlo::run)
+           RandomNumber &, size_t>())
+      .def("run", &MonteCarlo::run);
 }

@@ -1,8 +1,8 @@
 import os
-from importlib.resources import files
+import site
 
-RASPA_DIR = files(__package__)
-SHARE_DIR = os.path.join(RASPA_DIR, "..", "share", "raspa3")
+RASPA_DIR = os.path.join(site.getsitepackages()[0], "raspa")
+SHARE_DIR = os.path.join(site.getsitepackages()[0], "share", "raspa3")
 
 class RaspaError(Exception):
     """Custom exception class for Raspa errors."""
