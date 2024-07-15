@@ -520,8 +520,8 @@ std::pair<EnergyStatus, double3x3> Interactions::computeInterMolecularEnergyStra
           ForceFactor energyFactor = potentialCoulombGradient(forceField, groupIdA, groupIdB, scalingCoulombA,
                                                               scalingCoulombB, r, chargeA, chargeB);
 
-          energy.componentEnergy(compA, compB).CoulombicReal += 0.5 * EnergyFactor(energyFactor.energy, 0);
-          energy.componentEnergy(compB, compA).CoulombicReal += 0.5 * EnergyFactor(energyFactor.energy, 0);
+          energy.componentEnergy(compA, compB).CoulombicReal += 0.5 * EnergyFactor(energyFactor.energy, 0.0);
+          energy.componentEnergy(compB, compA).CoulombicReal += 0.5 * EnergyFactor(energyFactor.energy, 0.0);
 
           const double3 g = energyFactor.forceFactor * dr;
 
@@ -561,7 +561,7 @@ void Interactions::computeInterMolecularElectricPotential(const ForceField &forc
   if (noCharges) return;
   if (moleculeAtoms.empty()) return;
 
-  for (std::span<const Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end(); ++it1)
+  for (std::span<const Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end() - 1; ++it1)
   {
     posA = it1->position;
     size_t molA = static_cast<size_t>(it1->moleculeId);
@@ -569,7 +569,7 @@ void Interactions::computeInterMolecularElectricPotential(const ForceField &forc
     double scalingCoulombA = it1->scalingCoulomb;
     double chargeA = it1->charge;
 
-    for (std::span<const Atom>::iterator it2 = moleculeAtoms.begin(); it2 != moleculeAtoms.end(); ++it2)
+    for (std::span<const Atom>::iterator it2 = it1 + 1; it2 != moleculeAtoms.end(); ++it2)
     {
       size_t molB = static_cast<size_t>(it2->moleculeId);
       size_t compB = static_cast<size_t>(it2->componentId);
@@ -578,6 +578,8 @@ void Interactions::computeInterMolecularElectricPotential(const ForceField &forc
       if (!((compA == compB) && (molA == molB)))
       {
         posB = it2->position;
+        double scalingCoulombB = it2->scalingCoulomb;
+        double chargeB = it2->charge;
 
         dr = posA - posB;
         dr = box.applyPeriodicBoundaryConditions(dr);
@@ -587,8 +589,13 @@ void Interactions::computeInterMolecularElectricPotential(const ForceField &forc
         {
           double r = std::sqrt(rr);
 
-          size_t index = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it2));
-          electricPotentialMolecules[index] += potentialElectrostatics(forceField, scalingCoulombA, r, chargeA);
+          double potential = potentialElectrostatics(forceField, 1.0, r, 1.0);
+
+          size_t indexA = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it1));
+          electricPotentialMolecules[indexA] += scalingCoulombB * chargeB * potential;
+
+          size_t indexB = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it2));
+          electricPotentialMolecules[indexB] += scalingCoulombA * chargeA * potential;
         }
       }
     }
@@ -610,7 +617,7 @@ RunningEnergy Interactions::computeInterMolecularElectricField(const ForceField 
   if (noCharges) return energySum;
   if (moleculeAtoms.empty()) return energySum;
 
-  for (std::span<const Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end(); ++it1)
+  for (std::span<const Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end() - 1; ++it1)
   {
     posA = it1->position;
     size_t typeA = static_cast<size_t>(it1->type);
@@ -621,7 +628,7 @@ RunningEnergy Interactions::computeInterMolecularElectricField(const ForceField 
     double scalingCoulombA = it1->scalingCoulomb;
     double chargeA = it1->charge;
 
-    for (std::span<const Atom>::iterator it2 = moleculeAtoms.begin(); it2 != moleculeAtoms.end(); ++it2)
+    for (std::span<const Atom>::iterator it2 = it1 + 1; it2 != moleculeAtoms.end(); ++it2)
     {
       size_t molB = static_cast<size_t>(it2->moleculeId);
       size_t compB = static_cast<size_t>(it2->componentId);
@@ -656,9 +663,16 @@ RunningEnergy Interactions::computeInterMolecularElectricField(const ForceField 
           energySum.moleculeMoleculeCharge += energyFactor.energy;
           energySum.dudlambdaCharge += energyFactor.dUdlambda;
 
-          ForceFactor forceFactor = scalingCoulombA * chargeA * potentialCoulombGradient(forceField, groupIdA, groupIdB, 1.0, 1.0, r, 1.0, 1.0);
-          size_t index = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it2));
-          electricFieldMolecules[index] += forceFactor.forceFactor * dr;
+          ForceFactor gradient = potentialCoulombGradient(forceField, groupIdA, groupIdB, 1.0, 1.0, r, 1.0, 1.0);
+
+          ForceFactor forceFactorA = scalingCoulombB * chargeB * gradient;
+          size_t indexA = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it1));
+          electricFieldMolecules[indexA] -= forceFactorA.forceFactor * dr;
+
+          ForceFactor forceFactorB = scalingCoulombA * chargeA * gradient;
+          size_t indexB = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it2));
+          electricFieldMolecules[indexB] += forceFactorB.forceFactor * dr;
+
         }
       }
     }

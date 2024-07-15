@@ -569,6 +569,32 @@ const std::span<const Atom> System::spanOfMolecule(size_t selectedComponent, siz
   return std::span(&atomPositions[index + numberOfFrameworkAtoms], size);
 }
 
+std::span<double3> System::spanElectricFieldDifference(size_t selectedComponent, size_t selectedMolecule)
+{
+  size_t index{0};
+  for (size_t i = 0; i < selectedComponent; ++i)
+  {
+    size_t size = components[i].atoms.size();
+    index += size * numberOfMoleculesPerComponent[i];
+  }
+  size_t size = components[selectedComponent].atoms.size();
+  index += size * selectedMolecule;
+  return std::span(&electricFieldDifference[index + numberOfFrameworkAtoms], size);
+}
+
+const std::span<const double3> System::spanElectricFieldDifference(size_t selectedComponent, size_t selectedMolecule) const
+{
+  size_t index{0};
+  for (size_t i = 0; i < selectedComponent; ++i)
+  {
+    size_t size = components[i].atoms.size();
+    index += size * numberOfMoleculesPerComponent[i];
+  }
+  size_t size = components[selectedComponent].atoms.size();
+  index += size * selectedMolecule;
+  return std::span(&electricFieldDifference[index + numberOfFrameworkAtoms], size);
+}
+
 size_t System::indexOfFirstMolecule(size_t selectedComponent)
 {
   size_t index{0};

@@ -44,6 +44,7 @@ TEST(electrostatic_potential, Test_reference_system_1)
     500.0,
     true,
     false);
+  forceField.computePolarization = true;
   Component c1 = Component(0, forceField, "t1", 0.0, 0.0, 0.0,
     { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
       Atom(double3(0.0, 0.0,  0.0), 0.5, 1.0, 0, 0, 0, 0),
@@ -97,8 +98,8 @@ TEST(electrostatic_potential, Test_reference_system_1)
   EXPECT_NEAR(moleculeElectricPotential[3] / Units::CoulombicConversionFactor,  1.03921,  1e-5);
 
   EXPECT_NEAR(potentialEnergy * Units::EnergyToKelvin, 
-              (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) * Units::EnergyToKelvin, 1e-4);
-  EXPECT_NEAR((energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) / Units::CoulombicConversionFactor, -1.98467, 1e-4);
+              (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) * Units::EnergyToKelvin, 1e-5);
+  EXPECT_NEAR((energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) / Units::CoulombicConversionFactor, -1.98467, 1e-5);
 }
 
 // Table 5, page 61 thesis D. Dubbeldam
@@ -117,6 +118,7 @@ TEST(electrostatic_potential, Test_reference_system_2)
     500.0,
     true,
     false);
+  forceField.computePolarization = true;
   Component c1 = Component(0, forceField, "t1", 0.0, 0.0, 0.0,
     { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
       Atom(double3(0.0, 0.0,  0.0),  0.5,  1.0, 0, 0, 0, 0),
@@ -189,6 +191,7 @@ TEST(electrostatic_potential, Test_2_CO2_in_ITQ_29_2x2x2)
     11.8,
     true,
     false);
+  forceField.computePolarization = true;
   Framework f = Framework(0, forceField, "ITQ-29", SimulationBox(11.8671, 11.8671, 11.8671),
     517,
     { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
@@ -247,6 +250,6 @@ TEST(electrostatic_potential, Test_2_CO2_in_ITQ_29_2x2x2)
     potentialEnergy += 0.5 * spanOfMoleculeAtoms[i].scalingCoulomb * spanOfMoleculeAtoms[i].charge * moleculeElectricPotential[i];
   }
 
-  EXPECT_NEAR(potentialEnergy * Units::EnergyToKelvin, (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) * Units::EnergyToKelvin, 1e-4);
+  EXPECT_NEAR(potentialEnergy * Units::EnergyToKelvin, (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) * Units::EnergyToKelvin, 1e-5);
 }
 

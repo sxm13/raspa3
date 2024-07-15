@@ -43,6 +43,7 @@ TEST(electrostatic_field, Test_reference_system_1)
     50.0,
     true,
     false);
+  forceField.computePolarization = true;
   Component c1 = Component(0, forceField, "t1", 0.0, 0.0, 0.0,
     { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
       Atom(double3(0.0, 0.0,  0.0), 0.5, 1.0, 0, 0, 0, 0),
@@ -104,6 +105,7 @@ TEST(electrostatic_field, Test_reference_system_2)
     50.0,
     true,
     false);
+  forceField.computePolarization = true;
   Component c1 = Component(0, forceField, "t1", 0.0, 0.0, 0.0,
     { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
       Atom(double3(0.0, 0.0,  0.0),  0.5,  1.0, 0, 0, 0, 0),
@@ -163,6 +165,7 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2)
     11.8,
     true,
     false);
+  forceField.computePolarization = true;
   Framework f = Framework(0, forceField, "ITQ-29", SimulationBox(11.8671, 11.8671, 11.8671),
     517,
     { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId

@@ -303,6 +303,8 @@ export struct System
   std::span<double> spanOfMoleculeElectricPotential();
   std::span<double3> spanOfMoleculeElectricField();
   std::span<double3> spanOfMoleculeElectricFieldDifference();
+  std::span<double3> spanElectricFieldDifference(size_t selectedComponent, size_t selectedMolecule);
+  const std::span<const double3> spanElectricFieldDifference(size_t selectedComponent, size_t selectedMolecule) const;
 
   size_t numberOfMolecules() const
   {
