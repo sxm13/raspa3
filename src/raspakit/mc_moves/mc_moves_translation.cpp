@@ -55,8 +55,9 @@ import interactions_framework_molecule;
 import interactions_intermolecular;
 import interactions_ewald;
 import interactions_external_field;
+import interactions_polarization;
 
-std::optional<RunningEnergy> MC_Moves::translationMove(RandomNumber &random, System &system, size_t selectedComponent,
+std::optional<RunningEnergy> MC_Moves::translationMove(RandomNumber &random, System &system, size_t selectedComponent, size_t selectedMolecule,
                                                        const std::vector<Component> &components, Molecule &molecule,
                                                        std::span<Atom> molecule_atoms)
 {
@@ -68,6 +69,11 @@ std::optional<RunningEnergy> MC_Moves::translationMove(RandomNumber &random, Sys
   displacement[selectedDirection] = maxDisplacement[selectedDirection] * 2.0 * (random.uniform() - 0.5);
   system.components[selectedComponent].mc_moves_statistics.translationMove.counts[selectedDirection] += 1;
   system.components[selectedComponent].mc_moves_statistics.translationMove.totalCounts[selectedDirection] += 1;
+
+  if(system.forceField.computePolarization)
+  {
+    std::copy(system.electricField.begin(), system.electricField.end(), system.electricFieldNew.begin());
+  }
 
   // construct the trial positions
   std::pair<Molecule, std::vector<Atom>> trialMolecule =
@@ -84,8 +90,19 @@ std::optional<RunningEnergy> MC_Moves::translationMove(RandomNumber &random, Sys
 
   // compute framework-molecule energy contribution
   time_begin = std::chrono::system_clock::now();
-  std::optional<RunningEnergy> frameworkMolecule = Interactions::computeFrameworkMoleculeEnergyDifference(
+  std::optional<RunningEnergy> frameworkMolecule;
+  if(system.forceField.computePolarization)
+  {
+    std::span<double3> electricFieldMoleculeNew = system.spanElectricFieldNew(selectedComponent, selectedMolecule);
+    frameworkMolecule = Interactions::computeFrameworkMoleculeElectricFieldDifference(
+      system.forceField, system.simulationBox, system.spanOfFrameworkAtoms(),
+      electricFieldMoleculeNew, trialMolecule.second, molecule_atoms);
+  }
+  else 
+  {
+    frameworkMolecule = Interactions::computeFrameworkMoleculeEnergyDifference(
       system.forceField, system.simulationBox, system.spanOfFrameworkAtoms(), trialMolecule.second, molecule_atoms);
+  }
   time_end = std::chrono::system_clock::now();
   system.components[selectedComponent].mc_moves_cputime.translationMoveFrameworkMolecule += (time_end - time_begin);
   system.mc_moves_cputime.translationMoveFrameworkMolecule += (time_end - time_begin);
@@ -93,8 +110,20 @@ std::optional<RunningEnergy> MC_Moves::translationMove(RandomNumber &random, Sys
 
   // compute molecule-molecule energy contribution
   time_begin = std::chrono::system_clock::now();
-  std::optional<RunningEnergy> interMolecule = Interactions::computeInterMolecularEnergyDifference(
+  std::optional<RunningEnergy> interMolecule;
+  if(system.forceField.computePolarization)
+  {
+    std::span<double3> electricFieldNew = system.spanOfMoleculeElectricFieldNew();
+    std::span<double3> electricFieldMoleculeNew = system.spanElectricFieldNew(selectedComponent, selectedMolecule);
+    interMolecule = Interactions::computeInterMolecularElectricFieldDifference(
+      system.forceField, system.simulationBox, electricFieldNew, electricFieldMoleculeNew,
+      system.spanOfMoleculeAtoms(), trialMolecule.second, molecule_atoms);
+  }
+  else 
+  {
+    interMolecule = Interactions::computeInterMolecularEnergyDifference(
       system.forceField, system.simulationBox, system.spanOfMoleculeAtoms(), trialMolecule.second, molecule_atoms);
+  }
   time_end = std::chrono::system_clock::now();
   system.components[selectedComponent].mc_moves_cputime.translationMoveMoleculeMolecule += (time_end - time_begin);
   system.mc_moves_cputime.translationMoveMoleculeMolecule += (time_end - time_begin);
@@ -109,9 +138,16 @@ std::optional<RunningEnergy> MC_Moves::translationMove(RandomNumber &random, Sys
   system.components[selectedComponent].mc_moves_cputime.translationMoveEwald += (time_end - time_begin);
   system.mc_moves_cputime.translationMoveEwald += (time_end - time_begin);
 
+  RunningEnergy polarization;
+  if(system.forceField.computePolarization)
+  {
+    polarization = Interactions::computePolarizationEnergyDifference(system.forceField, system.spanOfMoleculeElectricFieldNew(),
+                                                                     system.spanOfMoleculeElectricField(), system.spanOfMoleculeAtoms());
+  }
+
   // get the total difference in energy
   RunningEnergy energyDifference =
-      externalFieldMolecule.value() + frameworkMolecule.value() + interMolecule.value() + ewaldFourierEnergy;
+      externalFieldMolecule.value() + frameworkMolecule.value() + interMolecule.value() + ewaldFourierEnergy + polarization;
 
   system.components[selectedComponent].mc_moves_statistics.translationMove.constructed[selectedDirection] += 1;
   system.components[selectedComponent].mc_moves_statistics.translationMove.totalConstructed[selectedDirection] += 1;
@@ -125,6 +161,11 @@ std::optional<RunningEnergy> MC_Moves::translationMove(RandomNumber &random, Sys
     Interactions::acceptEwaldMove(system.forceField, system.storedEik, system.totalEik);
     std::copy(trialMolecule.second.cbegin(), trialMolecule.second.cend(), molecule_atoms.begin());
     molecule = trialMolecule.first;
+
+    if(system.forceField.computePolarization)
+    {
+      std::copy(system.electricFieldNew.begin(), system.electricFieldNew.end(), system.electricField.begin());
+    }
 
     return energyDifference;
   };
