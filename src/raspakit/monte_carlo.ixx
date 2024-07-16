@@ -81,11 +81,10 @@ export struct MonteCarlo
   std::chrono::duration<double> totalEquilibrationSimulationTime{0};
   std::chrono::duration<double> totalProductionSimulationTime{0};
   std::chrono::duration<double> totalSimulationTime{0};
-  std::chrono::duration<double> tcycle;
 
   void createOutputFiles();
   void run();
-  std::chrono::duration<double> cycle();
+  void cycle();
   void initialize();
   void equilibrate();
   void production();

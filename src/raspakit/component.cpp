@@ -104,14 +104,14 @@ Component::Component() {}
 // create Component in 'inputreader.cpp'
 Component::Component(Component::Type type, size_t currentComponent, const ForceField &forceField,
                      const std::string &componentName, std::optional<const std::string> fileName, size_t numberOfBlocks,
-                     size_t numberOfLambdaBins, const MCMoveProbabilitiesParticles &particleProbalities) noexcept(false)
+                     size_t numberOfLambdaBins, const MCMoveProbabilitiesParticles &particleProbabilities) noexcept(false)
     : type(type),
       componentId(currentComponent),
       name(componentName),
       filenameData(fileName),
       lambdaGC(numberOfBlocks, numberOfLambdaBins),
       lambdaGibbs(numberOfBlocks, numberOfLambdaBins),
-      mc_moves_probabilities(particleProbalities),
+      mc_moves_probabilities(particleProbabilities),
       averageRosenbluthWeights(numberOfBlocks)
 {
   if (filenameData.has_value())
@@ -123,7 +123,7 @@ Component::Component(Component::Type type, size_t currentComponent, const ForceF
 // create programmatically an 'adsorbate' component
 Component::Component(size_t componentId, const ForceField &forceField, std::string componentName, double T_c,
                      double P_c, double w, std::vector<Atom> atomList, size_t numberOfBlocks, size_t numberOfLambdaBins,
-                     const MCMoveProbabilitiesParticles &particleProbalities) noexcept(false)
+                     const MCMoveProbabilitiesParticles &particleProbabilities) noexcept(false)
     : type(Type::Adsorbate),
       componentId(componentId),
       name(componentName),
@@ -132,7 +132,7 @@ Component::Component(size_t componentId, const ForceField &forceField, std::stri
       acentricFactor(w),
       lambdaGC(numberOfBlocks, numberOfLambdaBins),
       lambdaGibbs(numberOfBlocks, numberOfLambdaBins),
-      mc_moves_probabilities(particleProbalities),
+      mc_moves_probabilities(particleProbabilities),
       averageRosenbluthWeights(numberOfBlocks)
 {
   totalMass = 0.0;

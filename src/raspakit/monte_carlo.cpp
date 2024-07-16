@@ -163,7 +163,7 @@ void MonteCarlo::createOutputFiles()
   }
 }
 
-std::chrono::duration<double> MonteCarlo::cycle()
+void MonteCarlo::cycle()
 {
   std::chrono::system_clock::time_point t1, t2;
   size_t totalNumberOfMolecules{0uz};
@@ -310,7 +310,21 @@ std::chrono::duration<double> MonteCarlo::cycle()
   }
 
   t2 = std::chrono::system_clock::now();
-  return t2 - t1;
+  switch (simulationStage)
+  {
+    case SimulationStage::Initialization:
+      totalInitializationSimulationTime += (t2 - t1);
+      break;
+    case SimulationStage::Equilibration:
+      totalEquilibrationSimulationTime += (t2 - t1);
+      break;
+    case SimulationStage::Production:
+      totalProductionSimulationTime += (t2 - t1);
+      break;
+    default:
+      throw std::runtime_error("Unexpected simulation stage");
+  }
+  totalSimulationTime += (t2 - t1);
 }
 
 void MonteCarlo::initialize()
@@ -374,9 +388,7 @@ void MonteCarlo::initialize()
 
   for (currentCycle = 0uz; currentCycle != numberOfInitializationCycles; currentCycle++)
   {
-    tcycle = cycle();
-    totalInitializationSimulationTime += tcycle;
-    totalSimulationTime += tcycle;
+    cycle();
 
   continueInitializationStage:;
   }
@@ -409,10 +421,8 @@ void MonteCarlo::equilibrate()
 
   for (currentCycle = 0uz; currentCycle != numberOfEquilibrationCycles; ++currentCycle)
   {
-    tcycle = cycle();
+    cycle();
 
-    totalEquilibrationSimulationTime += tcycle;
-    totalSimulationTime += tcycle;
   continueEquilibrationStage:;
   }
 }
@@ -466,9 +476,7 @@ void MonteCarlo::production()
   numberOfSteps = 0uz;
   for (currentCycle = 0uz; currentCycle != numberOfCycles; ++currentCycle)
   {
-    tcycle = cycle();
-    totalProductionSimulationTime += tcycle;
-    totalSimulationTime += tcycle;
+    cycle();
 
   continueProductionStage:;
   }

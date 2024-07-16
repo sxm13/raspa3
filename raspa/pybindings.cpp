@@ -49,7 +49,7 @@ PYBIND11_MODULE(raspalib, m)
       .def_readwrite("y", &double3::y)
       .def_readwrite("z", &double3::z);
 
-  pybind11::class_<RandomNumber>(m, "random").def(pybind11::init<size_t>());
+  pybind11::class_<RandomNumber>(m, "random").def(pybind11::init<size_t>(), pybind11::arg("seed"));
 
   pybind11::class_<RunningEnergy>(m, "RunningEnergy")
       .def(pybind11::init<>())
@@ -57,7 +57,9 @@ PYBIND11_MODULE(raspalib, m)
       .def_readwrite("frameworkMoleculeVDW", &RunningEnergy::frameworkMoleculeVDW);
 
   pybind11::class_<Atom>(m, "Atom")
-      .def(pybind11::init<double3, double, double, uint32_t, uint16_t, uint8_t, uint8_t>())
+      .def(pybind11::init<double3, double, double, uint32_t, uint16_t, uint8_t, uint8_t>(), pybind11::arg("position"),
+           pybind11::arg("charge"), pybind11::arg("lambda"), pybind11::arg("moleculeId"), pybind11::arg("type"),
+           pybind11::arg("componentId"), pybind11::arg("groupId"))
       .def_readwrite("position", &Atom::position)
       .def("__repr__", &Atom::repr);
 
@@ -87,13 +89,14 @@ PYBIND11_MODULE(raspalib, m)
            pybind11::arg("atomicNumber"), pybind11::arg("printToPDB"), pybind11::arg("source"));
 
   pybind11::class_<ForceField> forceField(m, "ForceField");
-  forceField.def(
-      pybind11::init<std::vector<PseudoAtom>, std::vector<VDWParameters>, ForceField::MixingRule, double, bool, bool>(),
-      pybind11::arg("pseudoAtoms"), pybind11::arg("parameters"), pybind11::arg("mixingRule"), pybind11::arg("cutOff"),
-      pybind11::arg("shifted"), pybind11::arg("tailCorrecions"))
-  .def("__repr__", &ForceField::repr)
-  .def_readonly("pseudoAtoms", &ForceField::pseudoAtoms)
-  .def_readonly("vdwParameters", &ForceField::data);
+  forceField
+      .def(pybind11::init<std::vector<PseudoAtom>, std::vector<VDWParameters>, ForceField::MixingRule, double, bool,
+                          bool>(),
+           pybind11::arg("pseudoAtoms"), pybind11::arg("parameters"), pybind11::arg("mixingRule"),
+           pybind11::arg("cutOff"), pybind11::arg("shifted"), pybind11::arg("tailCorrecions"))
+      .def("__repr__", &ForceField::repr)
+      .def_readonly("pseudoAtoms", &ForceField::pseudoAtoms)
+      .def_readonly("vdwParameters", &ForceField::data);
   m.def("readForceField", &ForceField::readForceField, pybind11::return_value_policy::reference);
 
   pybind11::enum_<ForceField::MixingRule>(forceField, "MixingRule")
@@ -101,8 +104,13 @@ PYBIND11_MODULE(raspalib, m)
       .export_values();
 
   pybind11::class_<Framework>(m, "Framework")
-      .def(pybind11::init<size_t, const ForceField &, std::string, SimulationBox, size_t, std::vector<Atom>, int3>())
-      .def(pybind11::init<size_t, const ForceField &, const std::string &, std::optional<const std::string>, int3>())
+      .def(pybind11::init<size_t, const ForceField &, std::string, SimulationBox, size_t, std::vector<Atom>, int3>(),
+           pybind11::arg("currentComponent"), pybind11::arg("forceField"), pybind11::arg("componentName"),
+           pybind11::arg("simulationBox"), pybind11::arg("spaceGroupHallNumber"), pybind11::arg("definedAtoms"),
+           pybind11::arg("numberOfUnitCells"))
+      .def(pybind11::init<size_t, const ForceField &, const std::string &, std::optional<const std::string>, int3>(),
+           pybind11::arg("currentComponent"), pybind11::arg("forceField"), pybind11::arg("componentName"),
+           pybind11::arg("fileName"), pybind11::arg("numberOfUnitCells"))
       .def_readonly("name", &Framework::name)
       .def("__repr__", &Framework::repr);
 
@@ -112,21 +120,41 @@ PYBIND11_MODULE(raspalib, m)
       .def_readwrite("probabilityTranslationMove", &MCMoveProbabilitiesParticles::probabilityTranslationMove)
       .def_readwrite("probabilityRotationMove", &MCMoveProbabilitiesParticles::probabilityRotationMove);
 
-  pybind11::class_<Component>(m, "Component")
+  pybind11::class_<Component> component(m, "Component");
+  component
       .def(pybind11::init<size_t, const ForceField &, std::string, double, double, double, std::vector<Atom>, size_t,
-                          size_t, const MCMoveProbabilitiesParticles &>())
+                          size_t, const MCMoveProbabilitiesParticles &>(),
+           pybind11::arg("componentId"), pybind11::arg("forceField"), pybind11::arg("componentName"),
+           pybind11::arg("criticalTemperature"), pybind11::arg("criticalPressure"), pybind11::arg("acentricFactor"),
+           pybind11::arg("definedAtoms"), pybind11::arg("numberOfBlocks"), pybind11::arg("numberOfLambdaBins"),
+           pybind11::arg("particleProbabilities"))
+      .def(pybind11::init<Component::Type, size_t, const ForceField &, std::string &, std::string, size_t, size_t,
+                          const MCMoveProbabilitiesParticles &>(),
+           pybind11::arg("type"), pybind11::arg("componentId"), pybind11::arg("forceField"),
+           pybind11::arg("componentName"), pybind11::arg("fileName"), pybind11::arg("numberOfBlocks"),
+           pybind11::arg("numberOfLambdaBins"), pybind11::arg("particleProbabilities"))
       .def_readonly("name", &Component::name)
       .def("__repr__", &Component::repr);
 
+  pybind11::enum_<Component::Type>(component, "Type")
+      .value("Framework", Component::Type::Framework)
+      .value("Adsorbate", Component::Type::Adsorbate)
+      .value("Cation", Component::Type::Cation)
+      .export_values();
+
   pybind11::class_<System>(m, "System")
       .def(pybind11::init<size_t, std::optional<SimulationBox>, double, double, ForceField, std::vector<Framework>,
-                          std::vector<Component>, std::vector<size_t>, size_t>())
+                          std::vector<Component>, std::vector<size_t>, size_t, MCMoveProbabilitiesSystem>(),
+           pybind11::arg("id"), pybind11::arg("simulationBox"), pybind11::arg("temperature"), pybind11::arg("pressure"),
+           pybind11::arg("forceField"), pybind11::arg("frameworkComponents"), pybind11::arg("components"),
+           pybind11::arg("initialNumberOfMolecules"), pybind11::arg("numberOfBlocks"),
+           pybind11::arg("systemProbabilities"))
       .def("computeTotalEnergies", &System::computeTotalEnergies)
       .def_readwrite("atomPositions", &System::atomPositions)
       .def("__repr__", &System::repr);
 
   pybind11::class_<MonteCarlo>(m, "MonteCarlo")
-      .def(pybind11::init < size_t, size_t, size_t, size_t, size_t, size_t, size_t, std::vector<System> &,
-           RandomNumber &, size_t>())
+      .def(pybind11::init<size_t, size_t, size_t, size_t, size_t, size_t, size_t, std::vector<System> &, RandomNumber &,
+                          size_t>())
       .def("run", &MonteCarlo::run);
 }
