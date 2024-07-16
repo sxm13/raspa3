@@ -72,8 +72,8 @@ export namespace Interactions
 
   std::optional<RunningEnergy> computeFrameworkMoleculeElectricFieldDifference(const ForceField &forceField,
                                                       const SimulationBox &simulationBox,
-                                                      std::span<double3> electricField,
                                                       std::span<const Atom> frameworkAtoms,
+                                                      std::span<double3> electricFieldMolecule,
                                                       std::span<const Atom> newatoms,
                                                       std::span<const Atom> oldatoms) noexcept;
 };

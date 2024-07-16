@@ -66,6 +66,7 @@ RunningEnergy computeInterMolecularElectricField(const ForceField &forceField, c
 
 std::optional<RunningEnergy> computeInterMolecularElectricFieldDifference(
     const ForceField &forceField, const SimulationBox &box,
-    std::span<double3> electricFieldMolecules, std::span<const Atom> moleculeAtoms,
-    std::span<const Atom> newatoms, std::span<const Atom> oldatoms) noexcept;
+    std::span<double3> electricFieldMolecules, std::span<double3> electricFieldMolecule,
+    std::span<const Atom> moleculeAtoms, std::span<const Atom> newatoms,
+    std::span<const Atom> oldatoms) noexcept;
 };
