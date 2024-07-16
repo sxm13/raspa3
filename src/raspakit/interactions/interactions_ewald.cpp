@@ -1477,7 +1477,7 @@ RunningEnergy Interactions::computeEwaldFourierElectricField(
         double scalingA = span[i].scalingCoulomb;
         bool groupIdA = static_cast<bool>(span[i].groupId);
         double3 posA = span[i].position;
-        for (size_t j = 0; j != span.size(); j++)
+        for (size_t j = i + 1; j != span.size(); j++)
         {
           if(i != j)
           {
@@ -1500,6 +1500,7 @@ RunningEnergy Interactions::computeEwaldFourierElectricField(
             double Bt0 = -Units::CoulombicConversionFactor * std::erf(alpha * r) / r;
             double Bt1 = temp + Bt0 / rr;
             electricField[i] += scalingB * chargeB * Bt1 * dr;
+            electricField[j] -= scalingA * chargeA * Bt1 * dr;
           }
         }
       }

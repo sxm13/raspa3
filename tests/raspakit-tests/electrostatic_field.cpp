@@ -43,6 +43,7 @@ TEST(electrostatic_field, Test_reference_system_1)
     50.0,
     true,
     false);
+  forceField.computePolarization = true;
   Component c1 = Component(0, forceField, "t1", 0.0, 0.0, 0.0,
     { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
       Atom(double3(0.0, 0.0,  0.0), 0.5, 1.0, 0, 0, 0, 0),
@@ -104,6 +105,7 @@ TEST(electrostatic_field, Test_reference_system_2)
     50.0,
     true,
     false);
+  forceField.computePolarization = true;
   Component c1 = Component(0, forceField, "t1", 0.0, 0.0, 0.0,
     { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
       Atom(double3(0.0, 0.0,  0.0),  0.5,  1.0, 0, 0, 0, 0),
@@ -163,6 +165,7 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2)
     11.8,
     true,
     false);
+  forceField.computePolarization = true;
   Framework f = Framework(0, forceField, "ITQ-29", SimulationBox(11.8671, 11.8671, 11.8671),
     517,
     { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
@@ -298,3 +301,205 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2)
   }
 }
 
+
+TEST(electrostatic_field, Test_CO2_in_ITQ_29_2x2x2_difference)
+{
+  ForceField forceField = ForceField(
+    { PseudoAtom("Si",    28.0855,   2.05,   0.0, 14, false),
+      PseudoAtom("O",     15.999,   -1.025,  0.0,  8, false),
+      PseudoAtom("CH4",   16.04246,  0.0,    0.0,  6, false),
+      PseudoAtom("C_co2", 12.0,      0.6512, 0.2,  6, false),
+      PseudoAtom("O_co2", 15.9994,  -0.3256, 0.1,  8, false),
+    },
+    { VDWParameters(22.0, 2.30),
+      VDWParameters(53.0, 3.3),
+      VDWParameters(158.5, 3.72),
+      VDWParameters(29.933, 2.745),
+      VDWParameters(85.671, 3.017)
+    },
+    ForceField::MixingRule::Lorentz_Berthelot,
+    11.8,
+    true,
+    false);
+  forceField.computePolarization = true;
+  forceField.omitEwaldFourier = true;
+  Framework f = Framework(0, forceField, "ITQ-29", SimulationBox(11.8671, 11.8671, 11.8671),
+    517,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.3683, 0.1847, 0),       2.05,  1.0, 0, 0, 0, 0),
+      Atom(double3(0.5,    0.2179, 0),      -1.025, 1.0, 0, 1, 0, 0),
+      Atom(double3(0.2939, 0.2939, 0),      -1.025, 1.0, 0, 1, 0, 0),
+      Atom(double3(0.3429, 0.1098, 0.1098), -1.025, 1.0, 0, 1, 0, 0)
+    },
+    int3(2, 2, 2));
+  Component c = Component(1, forceField, "CO2", 304.1282, 7377300.0, 0.22394,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  1.149), -0.3256, 1.0, 0, 4, 0, 0),
+      Atom(double3(0.0, 0.0,  0.0),    0.6512, 1.0, 0, 3, 0, 0),
+      Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 0, 0)
+    }, 5, 21);
+
+  System system = System(0, std::nullopt, 300.0, 1e4, forceField, { f }, { c }, { 1 }, 5);
+  system.forceField.EwaldAlpha = 0.25;
+  system.forceField.numberOfWaveVectors = int3(8, 8, 8);
+  //system.forceField.omitEwaldFourier = true;
+
+  std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
+  spanOfMoleculeAtoms[0].position = double3(5.93355, 7.93355, 5.93355 + 1.149);
+  spanOfMoleculeAtoms[0].scalingCoulomb = 0.75;
+  spanOfMoleculeAtoms[1].position = double3(5.93355, 7.93355, 5.93355 + 0.0);
+  spanOfMoleculeAtoms[1].scalingCoulomb = 0.75;
+  spanOfMoleculeAtoms[2].position = double3(5.93355, 7.93355, 5.93355 - 1.149);
+  spanOfMoleculeAtoms[2].scalingCoulomb = 0.75;
+
+  system.computeTotalElectricField();
+
+  std::span<Atom> oldatoms = system.spanOfMolecule(0, 0);
+  std::vector<Atom> newatoms = std::vector(oldatoms.begin(), oldatoms.end());
+
+  newatoms[0].position = double3(5.93355+1.0, 7.93355, 5.93355 + 1.149);
+  newatoms[0].scalingCoulomb = 0.65;
+  newatoms[1].position = double3(5.93355+1.0, 7.93355, 5.93355 + 0.0);
+  newatoms[1].scalingCoulomb = 0.65;
+  newatoms[2].position = double3(5.93355+1.0, 7.93355, 5.93355 - 1.149);
+  newatoms[2].scalingCoulomb = 0.65;
+
+  std::span<double3> electricFieldMoleculeDifference = system.spanElectricFieldDifference(0, 0);
+
+  std::span<const Atom> frameworkAtomPositions = system.spanOfFrameworkAtoms();
+  [[maybe_unused]] std::optional<RunningEnergy> runningEnergy = Interactions::computeFrameworkMoleculeElectricFieldDifference(
+      system.forceField, system.simulationBox, frameworkAtomPositions,
+      electricFieldMoleculeDifference, newatoms, oldatoms);
+
+  std::transform(system.electricField.begin(), system.electricField.end(), system.electricFieldDifference.begin(), 
+                 system.electricFieldDifference.begin(), std::plus<double3>());
+
+  spanOfMoleculeAtoms[0].position = double3(5.93355+1.0, 7.93355, 5.93355 + 1.149);
+  spanOfMoleculeAtoms[0].scalingCoulomb = 0.65;
+  spanOfMoleculeAtoms[1].position = double3(5.93355+1.0, 7.93355, 5.93355 + 0.0);
+  spanOfMoleculeAtoms[1].scalingCoulomb = 0.65;
+  spanOfMoleculeAtoms[2].position = double3(5.93355+1.0, 7.93355, 5.93355 - 1.149);
+  spanOfMoleculeAtoms[2].scalingCoulomb = 0.65;
+
+  system.computeTotalElectricField();
+
+  std::span<double3> spanOfElectricField = system.spanOfMoleculeElectricField();
+  std::span<double3> spanOfElectricFieldDifference = system.spanOfMoleculeElectricFieldDifference();
+  double tolerance = 1e-5;
+  for(size_t i = 0; i < spanOfElectricField.size(); ++i)
+  {
+    EXPECT_NEAR(spanOfElectricField[i].x, spanOfElectricFieldDifference[i].x, tolerance);
+    EXPECT_NEAR(spanOfElectricField[i].y, spanOfElectricFieldDifference[i].y, tolerance);
+    EXPECT_NEAR(spanOfElectricField[i].z, spanOfElectricFieldDifference[i].z, tolerance);
+  }
+}
+
+TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2_difference)
+{
+  ForceField forceField = ForceField(
+    { PseudoAtom("Si",    28.0855,   2.05,   0.0, 14, false),
+      PseudoAtom("O",     15.999,   -1.025,  0.0,  8, false),
+      PseudoAtom("CH4",   16.04246,  0.0,    0.0,  6, false),
+      PseudoAtom("C_co2", 12.0,      0.6512, 0.2,  6, false),
+      PseudoAtom("O_co2", 15.9994,  -0.3256, 0.1,  8, false),
+    },
+    { VDWParameters(22.0, 2.30),
+      VDWParameters(53.0, 3.3),
+      VDWParameters(158.5, 3.72),
+      VDWParameters(29.933, 2.745),
+      VDWParameters(85.671, 3.017)
+    },
+    ForceField::MixingRule::Lorentz_Berthelot,
+    11.8,
+    true,
+    false);
+  forceField.computePolarization = true;
+  forceField.omitEwaldFourier = true;
+  Framework f = Framework(0, forceField, "ITQ-29", SimulationBox(11.8671, 11.8671, 11.8671),
+    517,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.3683, 0.1847, 0),       2.05,  1.0, 0, 0, 0, 0),
+      Atom(double3(0.5,    0.2179, 0),      -1.025, 1.0, 0, 1, 0, 0),
+      Atom(double3(0.2939, 0.2939, 0),      -1.025, 1.0, 0, 1, 0, 0),
+      Atom(double3(0.3429, 0.1098, 0.1098), -1.025, 1.0, 0, 1, 0, 0)
+    },
+    int3(2, 2, 2));
+  Component c = Component(1, forceField, "CO2", 304.1282, 7377300.0, 0.22394,
+    { // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId, uint8_t groupId
+      Atom(double3(0.0, 0.0,  1.149), -0.3256, 1.0, 0, 4, 0, 0),
+      Atom(double3(0.0, 0.0,  0.0),    0.6512, 1.0, 0, 3, 0, 0),
+      Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 0, 0)
+    }, 5, 21);
+
+  System system = System(0, std::nullopt, 300.0, 1e4, forceField, { f }, { c }, { 2 }, 5);
+  system.forceField.EwaldAlpha = 0.25;
+  system.forceField.numberOfWaveVectors = int3(8, 8, 8);
+  //system.forceField.omitEwaldFourier = true;
+
+  std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
+  spanOfMoleculeAtoms[0].position = double3(5.93355, 7.93355, 5.93355 + 1.149);
+  spanOfMoleculeAtoms[0].scalingCoulomb = 0.9;
+  spanOfMoleculeAtoms[1].position = double3(5.93355, 7.93355, 5.93355 + 0.0);
+  spanOfMoleculeAtoms[1].scalingCoulomb = 0.9;
+  spanOfMoleculeAtoms[2].position = double3(5.93355, 7.93355, 5.93355 - 1.149);
+  spanOfMoleculeAtoms[2].scalingCoulomb = 0.9;
+  spanOfMoleculeAtoms[3].position = double3(5.93355, 3.93355, 5.93355 + 1.149);
+  spanOfMoleculeAtoms[3].scalingCoulomb = 0.45;
+  spanOfMoleculeAtoms[4].position = double3(5.93355, 3.93355, 5.93355 + 0.0);
+  spanOfMoleculeAtoms[4].scalingCoulomb = 0.45;
+  spanOfMoleculeAtoms[5].position = double3(5.93355, 3.93355, 5.93355 - 1.149);
+  spanOfMoleculeAtoms[5].scalingCoulomb = 0.45;
+
+  system.computeTotalElectricField();
+
+
+  std::span<Atom> oldatoms = system.spanOfMolecule(0, 0);
+  std::vector<Atom> newatoms = std::vector(oldatoms.begin(), oldatoms.end());
+
+  newatoms[0].position = double3(5.93355+1.0, 7.93355, 5.93355 + 1.149);
+  newatoms[0].scalingCoulomb = 0.75;
+  newatoms[1].position = double3(5.93355+1.0, 7.93355, 5.93355 + 0.0);
+  newatoms[1].scalingCoulomb = 0.75;
+  newatoms[2].position = double3(5.93355+1.0, 7.93355, 5.93355 - 1.149);
+  newatoms[2].scalingCoulomb = 0.75;
+
+  std::span<double3> electricFieldDifference = system.spanOfMoleculeElectricFieldDifference();
+  std::span<double3> electricFieldMoleculeDifference = system.spanElectricFieldDifference(0, 0);
+
+  std::span<const Atom> frameworkAtomPositions = system.spanOfFrameworkAtoms();
+  [[maybe_unused]] std::optional<RunningEnergy> runningEnergyFramework = Interactions::computeFrameworkMoleculeElectricFieldDifference(
+      system.forceField, system.simulationBox, frameworkAtomPositions,
+      electricFieldMoleculeDifference, newatoms, oldatoms);
+  [[maybe_unused]] std::optional<RunningEnergy> runningEnergyInter = Interactions::computeInterMolecularElectricFieldDifference(
+      system.forceField, system.simulationBox, electricFieldDifference, electricFieldMoleculeDifference,
+      spanOfMoleculeAtoms, newatoms, oldatoms);
+
+  std::transform(system.electricField.begin(), system.electricField.end(), system.electricFieldDifference.begin(), 
+                 system.electricFieldDifference.begin(), std::plus<double3>());
+
+  spanOfMoleculeAtoms[0].position = double3(5.93355+1.0, 7.93355, 5.93355 + 1.149);
+  spanOfMoleculeAtoms[0].scalingCoulomb = 0.75;
+  spanOfMoleculeAtoms[1].position = double3(5.93355+1.0, 7.93355, 5.93355 + 0.0);
+  spanOfMoleculeAtoms[1].scalingCoulomb = 0.75;
+  spanOfMoleculeAtoms[2].position = double3(5.93355+1.0, 7.93355, 5.93355 - 1.149);
+  spanOfMoleculeAtoms[2].scalingCoulomb = 0.75;
+  spanOfMoleculeAtoms[3].position = double3(5.93355, 3.93355, 5.93355 + 1.149);
+  spanOfMoleculeAtoms[3].scalingCoulomb = 0.45;
+  spanOfMoleculeAtoms[4].position = double3(5.93355, 3.93355, 5.93355 + 0.0);
+  spanOfMoleculeAtoms[4].scalingCoulomb = 0.45;
+  spanOfMoleculeAtoms[5].position = double3(5.93355, 3.93355, 5.93355 - 1.149);
+  spanOfMoleculeAtoms[5].scalingCoulomb = 0.45;
+
+  system.computeTotalElectricField();
+
+  std::span<double3> spanOfElectricField = system.spanOfMoleculeElectricField();
+  std::span<double3> spanOfElectricFieldDifference = system.spanOfMoleculeElectricFieldDifference();
+  double tolerance = 1e-5;
+  for(size_t i = 0; i < spanOfElectricField.size(); ++i)
+  {
+    EXPECT_NEAR(spanOfElectricField[i].x, spanOfElectricFieldDifference[i].x, tolerance);
+    EXPECT_NEAR(spanOfElectricField[i].y, spanOfElectricFieldDifference[i].y, tolerance);
+    EXPECT_NEAR(spanOfElectricField[i].z, spanOfElectricFieldDifference[i].z, tolerance);
+  }
+
+}

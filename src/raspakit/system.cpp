@@ -206,6 +206,7 @@ void System::createFrameworks()
       atomPositions.push_back(atom);
       electricPotential.push_back(0.0);
       electricField.push_back(double3(0.0, 0.0, 0.0));
+      electricFieldDifference.push_back(double3(0.0, 0.0, 0.0));
     }
     numberOfFrameworkAtoms += atoms.size();
     numberOfRigidFrameworkAtoms += atoms.size();
@@ -239,6 +240,7 @@ void System::insertFractionalMolecule(size_t selectedComponent, [[maybe_unused]]
 
   electricPotential.resize(electricPotential.size() + atoms.size());
   electricField.resize(electricField.size() + atoms.size());
+  electricFieldDifference.resize(electricFieldDifference.size() + atoms.size());
 
   numberOfMoleculesPerComponent[selectedComponent] += 1;
 
@@ -279,6 +281,7 @@ void System::insertMolecule(size_t selectedComponent, [[maybe_unused]] const Mol
 
   electricPotential.resize(electricPotential.size() + atoms.size());
   electricField.resize(electricField.size() + atoms.size());
+  electricFieldDifference.resize(electricFieldDifference.size() + atoms.size());
 
   numberOfMoleculesPerComponent[selectedComponent] += 1;
   numberOfIntegerMoleculesPerComponent[selectedComponent] += 1;
@@ -325,7 +328,7 @@ void System::deleteMolecule(size_t selectedComponent, size_t selectedMolecule, c
   moleculePositions.erase(moleculeIterator, moleculeIterator + 1);
 
   electricPotential.resize(electricPotential.size() - molecule.size());
-  electricField.resize(electricField.size() - molecule.size());
+  electricFieldDifference.resize(electricFieldDifference.size() - molecule.size());
 
   numberOfMoleculesPerComponent[selectedComponent] -= 1;
   numberOfIntegerMoleculesPerComponent[selectedComponent] -= 1;
@@ -534,6 +537,12 @@ std::span<double3> System::spanOfMoleculeElectricField()
                    electricField.end());
 }
 
+std::span<double3> System::spanOfMoleculeElectricFieldDifference()
+{
+  return std::span(electricFieldDifference.begin() + static_cast<std::vector<double3>::difference_type>(numberOfFrameworkAtoms),
+                   electricFieldDifference.end());
+}
+
 std::span<Atom> System::spanOfMolecule(size_t selectedComponent, size_t selectedMolecule)
 {
   size_t index{0};
@@ -558,6 +567,32 @@ const std::span<const Atom> System::spanOfMolecule(size_t selectedComponent, siz
   size_t size = components[selectedComponent].atoms.size();
   index += size * selectedMolecule;
   return std::span(&atomPositions[index + numberOfFrameworkAtoms], size);
+}
+
+std::span<double3> System::spanElectricFieldDifference(size_t selectedComponent, size_t selectedMolecule)
+{
+  size_t index{0};
+  for (size_t i = 0; i < selectedComponent; ++i)
+  {
+    size_t size = components[i].atoms.size();
+    index += size * numberOfMoleculesPerComponent[i];
+  }
+  size_t size = components[selectedComponent].atoms.size();
+  index += size * selectedMolecule;
+  return std::span(&electricFieldDifference[index + numberOfFrameworkAtoms], size);
+}
+
+const std::span<const double3> System::spanElectricFieldDifference(size_t selectedComponent, size_t selectedMolecule) const
+{
+  size_t index{0};
+  for (size_t i = 0; i < selectedComponent; ++i)
+  {
+    size_t size = components[i].atoms.size();
+    index += size * numberOfMoleculesPerComponent[i];
+  }
+  size_t size = components[selectedComponent].atoms.size();
+  index += size * selectedMolecule;
+  return std::span(&electricFieldDifference[index + numberOfFrameworkAtoms], size);
 }
 
 size_t System::indexOfFirstMolecule(size_t selectedComponent)
@@ -2206,6 +2241,9 @@ Archive<std::ofstream>& operator<<(Archive<std::ofstream>& archive, const System
   archive << s.simulationBox;
   archive << s.atomPositions;
   archive << s.moleculePositions;
+  archive << s.electricPotential;
+  archive << s.electricField;
+  archive << s.electricFieldDifference;
   archive << s.conservedEnergy;
   archive << s.referenceEnergy;
   archive << s.rigidEnergies;
@@ -2304,6 +2342,9 @@ Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, System& s)
   archive >> s.simulationBox;
   archive >> s.atomPositions;
   archive >> s.moleculePositions;
+  archive >> s.electricPotential;
+  archive >> s.electricField;
+  archive >> s.electricFieldDifference;
   archive >> s.conservedEnergy;
   archive >> s.referenceEnergy;
   archive >> s.rigidEnergies;

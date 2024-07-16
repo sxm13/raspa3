@@ -70,8 +70,6 @@ TEST(electrostatic_polarization, Test_2_CO2_in_ITQ_29_2x2x2)
   //system.forceField.omitEwaldFourier = true;
 
   std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
-  std::span<const Atom> frameworkAtomPositions = system.spanOfFrameworkAtoms();
-  std::span<double> moleculeElectricPotential = system.spanOfMoleculeElectricPotential();
   spanOfMoleculeAtoms[0].position = double3(5.93355, 7.93355, 5.93355 + 1.149);
   spanOfMoleculeAtoms[0].scalingCoulomb = 1.0;
   spanOfMoleculeAtoms[1].position = double3(5.93355, 7.93355, 5.93355 + 0.0);
