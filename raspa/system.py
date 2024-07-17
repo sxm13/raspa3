@@ -20,7 +20,7 @@ class System(RaspaBase):
         initialNumberOfMolecules: list[int],
         numberOfBlocks: int = 5,
         pressure: float = None,
-        frameworkComponents: list[Framework] = None,
+        frameworkComponents: list[Framework] = [],
         simulationBox: SimulationBox = None,
         systemProbabilities: MCMoveProbabilitiesSystem = MCMoveProbabilitiesSystem(),
     ):
@@ -35,7 +35,6 @@ class System(RaspaBase):
     def atomPositions(self, index_position_tuple: tuple[np.ndarray, np.ndarray]):
         indices, position = index_position_tuple
         for i, idx in enumerate(indices):
-            print(position[i])
             self._cpp_obj.atomPositions[idx].position = raspalib.double3(*position[i])
 
     def computeTotalEnergies(self):

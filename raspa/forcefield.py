@@ -62,22 +62,5 @@ class ForceField(RaspaBase):
         self._cpp_obj = raspalib.ForceField(**self.cpp_args())
 
     @classmethod
-    def from_json(cls, ff_path: str):
-        with open(ff_path) as f:
-            config = json.load(f)
-        pseudoAtoms = [PseudoAtom.from_dict(psD) for psD in config["PseudoAtoms"]]
-        vdwParameters = [VDWParameter.from_dict(vdwD) for vdwD in config["SelfInteractions"]]
-
-        return cls(
-            pseudoAtoms,
-            vdwParameters,
-            mixingRule=config["MixingRule"],
-            shifted=config["TruncationMethod"] == "shifted",
-            tailCorrections=config["TailCorrections"],
-        )
-
-    @classmethod
     def exampleMoleculeForceField(cls):
-        return ForceField.from_json(
-            os.path.join(SHARE_DIR, "forcefields", "example_molecule_forcefield", "force_field.json")
-        )
+        return cls(fileName=os.path.join(SHARE_DIR, "forcefields", "example_molecule_forcefield", "force_field.json"))

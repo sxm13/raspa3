@@ -41,9 +41,10 @@ class Component(RaspaBase):
         forceField: ForceField,
         numberOfBlocks: int = 5,
         numberOfLambdaBins: int = 21,
-        moveProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
+        particleProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
     ):
-        settings = popSelf(locals())
+        settings = locals()
+        settings.pop("cls")
         return cls(
             componentName="CO2", fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "co2"), **settings
         )
@@ -55,9 +56,10 @@ class Component(RaspaBase):
         forceField: ForceField,
         numberOfBlocks: int = 5,
         numberOfLambdaBins: int = 21,
-        moveProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
+        particleProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
     ):
-        settings = popSelf(locals())
+        settings = locals()
+        settings.pop("cls")
         return cls(
             componentName="CH4", fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "methane"), **settings
         )
@@ -69,9 +71,10 @@ class Component(RaspaBase):
         forceField: ForceField,
         numberOfBlocks: int = 5,
         numberOfLambdaBins: int = 21,
-        moveProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
+        particleProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
     ):
-        settings = popSelf(locals())
+        settings = locals()
+        settings.pop("cls")
         return cls(
             componentName="N2", fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "co2"), **settings
         )
