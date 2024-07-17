@@ -43,15 +43,22 @@ class ForceField(RaspaBase):
 
     def __init__(
         self,
-        pseudoAtoms: list[PseudoAtom],
-        parameters: list[VDWParameter],
+        fileName: str = None,
+        pseudoAtoms: list[PseudoAtom] = None,
+        parameters: list[VDWParameter] = None,
         mixingRule: Literal["Lorentz_Berthelot"] = "Lorentz_Berthelot",
         cutOff: float = 12.0,
         shifted: bool = False,
         tailCorrections: bool = False,
     ):
-        mixingRule = getattr(raspalib.ForceField.MixingRule, mixingRule)
         super().__init__(**popSelf(locals()))
+
+        # handle double init
+        if fileName is None:
+            self.drop_args("fileName")
+            self._settings["mixingRule"] = getattr(raspalib.ForceField.MixingRule, self._settings["mixingRule"])
+        else:
+            self.drop_args("pseudoAtoms", "parameters", "mixingRule", "cutOff", "shifted", "tailCorrections")
         self._cpp_obj = raspalib.ForceField(**self.cpp_args())
 
     @classmethod

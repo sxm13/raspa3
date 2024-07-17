@@ -95,6 +95,7 @@ PYBIND11_MODULE(raspalib, m)
                           bool>(),
            pybind11::arg("pseudoAtoms"), pybind11::arg("parameters"), pybind11::arg("mixingRule"),
            pybind11::arg("cutOff"), pybind11::arg("shifted"), pybind11::arg("tailCorrections"))
+      .def(pybind11::init<std::string>(), pybind11::arg("fileName"))
       .def("__repr__", &ForceField::repr)
       .def_readonly("pseudoAtoms", &ForceField::pseudoAtoms)
       .def_readonly("vdwParameters", &ForceField::data);
