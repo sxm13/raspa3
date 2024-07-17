@@ -364,15 +364,15 @@ TEST(electrostatic_field, Test_CO2_in_ITQ_29_2x2x2_difference)
   newatoms[2].position = double3(5.93355+1.0, 7.93355, 5.93355 - 1.149);
   newatoms[2].scalingCoulomb = 0.65;
 
-  std::span<double3> electricFieldMoleculeDifference = system.spanElectricFieldDifference(0, 0);
+  std::span<double3> electricFieldMoleculeNew = system.spanElectricFieldNew(0, 0);
 
   std::span<const Atom> frameworkAtomPositions = system.spanOfFrameworkAtoms();
   [[maybe_unused]] std::optional<RunningEnergy> runningEnergy = Interactions::computeFrameworkMoleculeElectricFieldDifference(
       system.forceField, system.simulationBox, frameworkAtomPositions,
-      electricFieldMoleculeDifference, newatoms, oldatoms);
+      electricFieldMoleculeNew, newatoms, oldatoms);
 
-  std::transform(system.electricField.begin(), system.electricField.end(), system.electricFieldDifference.begin(), 
-                 system.electricFieldDifference.begin(), std::plus<double3>());
+  std::transform(system.electricField.begin(), system.electricField.end(), system.electricFieldNew.begin(), 
+                 system.electricFieldNew.begin(), std::plus<double3>());
 
   spanOfMoleculeAtoms[0].position = double3(5.93355+1.0, 7.93355, 5.93355 + 1.149);
   spanOfMoleculeAtoms[0].scalingCoulomb = 0.65;
@@ -384,13 +384,13 @@ TEST(electrostatic_field, Test_CO2_in_ITQ_29_2x2x2_difference)
   system.computeTotalElectricField();
 
   std::span<double3> spanOfElectricField = system.spanOfMoleculeElectricField();
-  std::span<double3> spanOfElectricFieldDifference = system.spanOfMoleculeElectricFieldDifference();
+  std::span<double3> spanOfElectricFieldNew = system.spanOfMoleculeElectricFieldNew();
   double tolerance = 1e-5;
   for(size_t i = 0; i < spanOfElectricField.size(); ++i)
   {
-    EXPECT_NEAR(spanOfElectricField[i].x, spanOfElectricFieldDifference[i].x, tolerance);
-    EXPECT_NEAR(spanOfElectricField[i].y, spanOfElectricFieldDifference[i].y, tolerance);
-    EXPECT_NEAR(spanOfElectricField[i].z, spanOfElectricFieldDifference[i].z, tolerance);
+    EXPECT_NEAR(spanOfElectricField[i].x, spanOfElectricFieldNew[i].x, tolerance);
+    EXPECT_NEAR(spanOfElectricField[i].y, spanOfElectricFieldNew[i].y, tolerance);
+    EXPECT_NEAR(spanOfElectricField[i].z, spanOfElectricFieldNew[i].z, tolerance);
   }
 }
 
@@ -463,19 +463,19 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2_difference)
   newatoms[2].position = double3(5.93355+1.0, 7.93355, 5.93355 - 1.149);
   newatoms[2].scalingCoulomb = 0.75;
 
-  std::span<double3> electricFieldDifference = system.spanOfMoleculeElectricFieldDifference();
-  std::span<double3> electricFieldMoleculeDifference = system.spanElectricFieldDifference(0, 0);
+  std::span<double3> electricFieldNew = system.spanOfMoleculeElectricFieldNew();
+  std::span<double3> electricFieldMoleculeNew = system.spanElectricFieldNew(0, 0);
 
   std::span<const Atom> frameworkAtomPositions = system.spanOfFrameworkAtoms();
   [[maybe_unused]] std::optional<RunningEnergy> runningEnergyFramework = Interactions::computeFrameworkMoleculeElectricFieldDifference(
       system.forceField, system.simulationBox, frameworkAtomPositions,
-      electricFieldMoleculeDifference, newatoms, oldatoms);
+      electricFieldMoleculeNew, newatoms, oldatoms);
   [[maybe_unused]] std::optional<RunningEnergy> runningEnergyInter = Interactions::computeInterMolecularElectricFieldDifference(
-      system.forceField, system.simulationBox, electricFieldDifference, electricFieldMoleculeDifference,
+      system.forceField, system.simulationBox, electricFieldNew, electricFieldMoleculeNew,
       spanOfMoleculeAtoms, newatoms, oldatoms);
 
-  std::transform(system.electricField.begin(), system.electricField.end(), system.electricFieldDifference.begin(), 
-                 system.electricFieldDifference.begin(), std::plus<double3>());
+  std::transform(system.electricField.begin(), system.electricField.end(), system.electricFieldNew.begin(), 
+                 system.electricFieldNew.begin(), std::plus<double3>());
 
   spanOfMoleculeAtoms[0].position = double3(5.93355+1.0, 7.93355, 5.93355 + 1.149);
   spanOfMoleculeAtoms[0].scalingCoulomb = 0.75;
@@ -493,13 +493,13 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2_difference)
   system.computeTotalElectricField();
 
   std::span<double3> spanOfElectricField = system.spanOfMoleculeElectricField();
-  std::span<double3> spanOfElectricFieldDifference = system.spanOfMoleculeElectricFieldDifference();
+  std::span<double3> spanOfElectricFieldNew = system.spanOfMoleculeElectricFieldNew();
   double tolerance = 1e-5;
   for(size_t i = 0; i < spanOfElectricField.size(); ++i)
   {
-    EXPECT_NEAR(spanOfElectricField[i].x, spanOfElectricFieldDifference[i].x, tolerance);
-    EXPECT_NEAR(spanOfElectricField[i].y, spanOfElectricFieldDifference[i].y, tolerance);
-    EXPECT_NEAR(spanOfElectricField[i].z, spanOfElectricFieldDifference[i].z, tolerance);
+    EXPECT_NEAR(spanOfElectricField[i].x, spanOfElectricFieldNew[i].x, tolerance);
+    EXPECT_NEAR(spanOfElectricField[i].y, spanOfElectricFieldNew[i].y, tolerance);
+    EXPECT_NEAR(spanOfElectricField[i].z, spanOfElectricFieldNew[i].z, tolerance);
   }
 
 }
