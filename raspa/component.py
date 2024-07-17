@@ -3,8 +3,10 @@ from .base import RaspaBase
 from .forcefield import ForceField
 from .atom import Atom
 from .mcmoveprobabilities import MCMoveProbabilitiesParticles
+from .utils import RaspaError, SHARE_DIR, popSelf
 
-import json
+import os
+
 
 class Component(RaspaBase):
 
@@ -13,41 +15,62 @@ class Component(RaspaBase):
         componentId: int,
         forceField: ForceField,
         componentName: str,
-        criticalTemperature: float,
-        criticalPressure: float,
-        acentricFactor: float,
-        definedAtoms: list[Atom],
+        fileName: str = None,
+        criticalTemperature: float = None,
+        criticalPressure: float = None,
+        acentricFactor: float = None,
+        definedAtoms: list[Atom] = None,
         numberOfBlocks: int = 5,
         numberOfLambdaBins: int = 21,
         moveProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
     ):
-        super().__init__()
+        super().__init__(**popSelf(locals()))
 
-        self.__componentId = componentId
-        self.__forceField = forceField
-        self.__componentName = componentName
-        self.__criticalTemperature = criticalTemperature
-        self.__criticalPressure = criticalPressure
-        self.__acentricFactor = acentricFactor
-        self.__definedAtoms = definedAtoms
-        self.__numberOfBlocks = numberOfBlocks
-        self.__numberOfLambdaBins = numberOfLambdaBins
-        self.__moveProbabilities = moveProbabilities
+        if self._settings[fileName] is None:
+            self.drop_args("fileName")
+        else:
+            self.drop_args("criticalTemperature", "criticalPressure", "acentricFactor", "definedAtoms")
 
-        self._cpp_obj = raspalib.Component(
-            componentId,
-            forceField._cpp_obj,
-            componentName,
-            criticalTemperature,
-            criticalPressure,
-            acentricFactor,
-            [atom._cpp_obj for atom in definedAtoms],
-            numberOfBlocks,
-            numberOfLambdaBins,
-            moveProbabilities._cpp_obj,
+        self._cpp_obj = raspalib.Component(**self.cpp_args())
+
+    @classmethod
+    def exampleCO2(
+        cls,
+        componentId: int,
+        forceField: ForceField,
+        numberOfBlocks: int = 5,
+        numberOfLambdaBins: int = 21,
+        moveProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
+    ):
+        settings = popSelf(locals())
+        return cls(
+            componentName="CO2", fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "co2"), **settings
         )
 
     @classmethod
-    def from_json(cls, json_path: str):
-        with open(json_path) as f:
-            data = json.load(f)
+    def exampleCH4(
+        cls,
+        componentId: int,
+        forceField: ForceField,
+        numberOfBlocks: int = 5,
+        numberOfLambdaBins: int = 21,
+        moveProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
+    ):
+        settings = popSelf(locals())
+        return cls(
+            componentName="CH4", fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "methane"), **settings
+        )
+
+    @classmethod
+    def exampleN2(
+        cls,
+        componentId: int,
+        forceField: ForceField,
+        numberOfBlocks: int = 5,
+        numberOfLambdaBins: int = 21,
+        moveProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
+    ):
+        settings = popSelf(locals())
+        return cls(
+            componentName="N2", fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "co2"), **settings
+        )

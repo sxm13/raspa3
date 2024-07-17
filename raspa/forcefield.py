@@ -2,10 +2,12 @@ from typing import Literal
 
 import raspalib
 from .base import RaspaBase
-from .utils import RASPA_DIR, SHARE_DIR
+from .utils import RASPA_DIR, SHARE_DIR, popSelf
 import os
+import json
 
 class PseudoAtom(RaspaBase):
+
     def __init__(
         self,
         name: str = "C",
@@ -14,67 +16,61 @@ class PseudoAtom(RaspaBase):
         polarizability: float = 0.0,
         atomicNumber: int = 8,
         printToPDB: bool = False,
-        source: str = "-"
+        source: str = "-",
     ):
-        super().__init__()
-        self.__name = name
-        self.__mass = mass
-        self.__charge = charge
-        self.__polarizability = polarizability
-        self.__atomicNumber = atomicNumber
-        self.__printToPDB = printToPDB
-        self.__source = source
+        super().__init__(**popSelf(locals()))
+        self._cpp_obj = raspalib.PseudoAtom(**self.cpp_args())
 
-        self._cpp_obj = raspalib.PseudoAtom(name, mass, charge, polarizability, atomicNumber, printToPDB, source)
+    @classmethod
+    def from_dict(cls, config: dict):
+        config.pop("element")
+        config.pop("print_as")
+        config["printToPDB"] = config.pop("print_to_output")
+        return cls(**config)
 
 
 class VDWParameter(RaspaBase):
     def __init__(self, epsilon: float, sigma: float):
-        super().__init__()
-        self.__epsilon = epsilon
-        self.__sigma = sigma
+        super().__init__(**popSelf(locals()))
+        self._cpp_obj = raspalib.VDWParameters(**self.cpp_args())
 
-        self._cpp_obj = raspalib.VDWParameters(epsilon, sigma)
+    @classmethod
+    def from_dict(cls, config: dict):
+        return cls(*config["parameters"])
 
 
 class ForceField(RaspaBase):
+
     def __init__(
         self,
         pseudoAtoms: list[PseudoAtom],
-        vdwParameters: list[VDWParameter],
-        mixingRule: Literal["Lorentz-Berthelot"] = "Lorentz-Berthelot",
+        parameters: list[VDWParameter],
+        mixingRule: Literal["Lorentz_Berthelot"] = "Lorentz_Berthelot",
         cutOff: float = 12.0,
         shifted: bool = False,
         tailCorrections: bool = False,
     ):
-        super().__init__()
-        self.__pseudoAtoms = pseudoAtoms
-        self.__vdwParameters = vdwParameters
-        mixingRule = {"Lorentz-Berthelot": raspalib.ForceField.MixingRule.Lorentz_Berthelot}[mixingRule]
-        self.__mixingRule = mixingRule
-        self.__cutOff = cutOff
-        self.__shifted = shifted
-        self.__tailCorrection = tailCorrections
-
-        self._cpp_obj = raspalib.ForceField(
-            [pA._cpp_obj for pA in pseudoAtoms],
-            [vP._cpp_obj for vP in vdwParameters],
-            mixingRule,
-            cutOff,
-            shifted,
-            tailCorrections,
-        )
+        mixingRule = getattr(raspalib.ForceField.MixingRule, mixingRule)
+        super().__init__(**popSelf(locals()))
+        self._cpp_obj = raspalib.ForceField(**self.cpp_args())
 
     @classmethod
     def from_json(cls, ff_path: str):
-        ff = cls([PseudoAtom()], [VDWParameter(1.0, 1.0)])
-        ff._cpp_obj = raspalib.readForceField(*os.path.split(ff_path))
-        ff.__pseudoAtoms = ff._cpp_obj.pseudoAtoms
-        ff.__vdwParameters = ff._cpp_obj.vdwParameters
-        ff.__mixingRule = ff._cpp_obj.MixingRule
-        return ff
+        with open(ff_path) as f:
+            config = json.load(f)
+        pseudoAtoms = [PseudoAtom.from_dict(psD) for psD in config["PseudoAtoms"]]
+        vdwParameters = [VDWParameter.from_dict(vdwD) for vdwD in config["SelfInteractions"]]
 
+        return cls(
+            pseudoAtoms,
+            vdwParameters,
+            mixingRule=config["MixingRule"],
+            shifted=config["TruncationMethod"] == "shifted",
+            tailCorrections=config["TailCorrections"],
+        )
 
-exampleMoleculeForceField = ForceField.from_json(
-    os.path.join(SHARE_DIR, "forcefields", "example_molecule_forcefield", "force_field.json")
-)
+    @classmethod
+    def exampleMoleculeForceField(cls):
+        return ForceField.from_json(
+            os.path.join(SHARE_DIR, "forcefields", "example_molecule_forcefield", "force_field.json")
+        )

@@ -41,10 +41,11 @@ import monte_carlo;
 
 PYBIND11_MODULE(raspalib, m)
 {
-  pybind11::class_<int3>(m, "int3").def(pybind11::init<int32_t, int32_t, int32_t>());
+  pybind11::class_<int3>(m, "int3").def(pybind11::init<int32_t, int32_t, int32_t>(), pybind11::arg("x"),
+                                        pybind11::arg("y"), pybind11::arg("z"));
 
   pybind11::class_<double3>(m, "double3")
-      .def(pybind11::init<double, double, double>())
+      .def(pybind11::init<double, double, double>(), pybind11::arg("x"), pybind11::arg("y"), pybind11::arg("z"))
       .def_readwrite("x", &double3::x)
       .def_readwrite("y", &double3::y)
       .def_readwrite("z", &double3::z);
@@ -93,7 +94,7 @@ PYBIND11_MODULE(raspalib, m)
       .def(pybind11::init<std::vector<PseudoAtom>, std::vector<VDWParameters>, ForceField::MixingRule, double, bool,
                           bool>(),
            pybind11::arg("pseudoAtoms"), pybind11::arg("parameters"), pybind11::arg("mixingRule"),
-           pybind11::arg("cutOff"), pybind11::arg("shifted"), pybind11::arg("tailCorrecions"))
+           pybind11::arg("cutOff"), pybind11::arg("shifted"), pybind11::arg("tailCorrections"))
       .def("__repr__", &ForceField::repr)
       .def_readonly("pseudoAtoms", &ForceField::pseudoAtoms)
       .def_readonly("vdwParameters", &ForceField::data);
@@ -120,6 +121,13 @@ PYBIND11_MODULE(raspalib, m)
       .def_readwrite("probabilityTranslationMove", &MCMoveProbabilitiesParticles::probabilityTranslationMove)
       .def_readwrite("probabilityRotationMove", &MCMoveProbabilitiesParticles::probabilityRotationMove);
 
+  pybind11::class_<MCMoveProbabilitiesSystem>(m, "MCMoveProbabilitiesSystem")
+      .def(pybind11::init<double, double, double>(), pybind11::arg("probabilityVolumeMove"),
+           pybind11::arg("probabilityGibbsVolumeMove"), pybind11::arg("probabilityParallelTemperingSwap"))
+      .def_readwrite("probabilityVolumeMove", &MCMoveProbabilitiesSystem::probabilityVolumeMove)
+      .def_readwrite("probabilityGibbsVolumeMove", &MCMoveProbabilitiesSystem::probabilityGibbsVolumeMove)
+      .def_readwrite("probabilityParallelTemperingSwap", &MCMoveProbabilitiesSystem::probabilityParallelTemperingSwap);
+
   pybind11::class_<Component> component(m, "Component");
   component
       .def(pybind11::init<size_t, const ForceField &, std::string, double, double, double, std::vector<Atom>, size_t,
@@ -143,8 +151,9 @@ PYBIND11_MODULE(raspalib, m)
       .export_values();
 
   pybind11::class_<System>(m, "System")
-      .def(pybind11::init<size_t, std::optional<SimulationBox>, double, double, ForceField, std::vector<Framework>,
-                          std::vector<Component>, std::vector<size_t>, size_t, MCMoveProbabilitiesSystem>(),
+      .def(pybind11::init<size_t, std::optional<SimulationBox>, double, std::optional<double>, ForceField,
+                          std::vector<Framework>, std::vector<Component>, std::vector<size_t>, size_t,
+                          MCMoveProbabilitiesSystem>(),
            pybind11::arg("id"), pybind11::arg("simulationBox"), pybind11::arg("temperature"), pybind11::arg("pressure"),
            pybind11::arg("forceField"), pybind11::arg("frameworkComponents"), pybind11::arg("components"),
            pybind11::arg("initialNumberOfMolecules"), pybind11::arg("numberOfBlocks"),
@@ -155,6 +164,11 @@ PYBIND11_MODULE(raspalib, m)
 
   pybind11::class_<MonteCarlo>(m, "MonteCarlo")
       .def(pybind11::init<size_t, size_t, size_t, size_t, size_t, size_t, size_t, std::vector<System> &, RandomNumber &,
-                          size_t>())
+                          size_t>(),
+           pybind11::arg("numberOfCycles"), pybind11::arg("numberOfInitializationCycles"),
+           pybind11::arg("numberOfEquilibrationCycles"), pybind11::arg("printEvery"),
+           pybind11::arg("writeBinaryRestartEvery"), pybind11::arg("rescaleWangLandauEvery"),
+           pybind11::arg("optimizeMCMovesEvery"), pybind11::arg("systems"), pybind11::arg("randomSeed"),
+           pybind11::arg("numberOfBlocks"))
       .def("run", &MonteCarlo::run);
 }

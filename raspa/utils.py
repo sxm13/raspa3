@@ -9,3 +9,7 @@ class RaspaError(Exception):
 
     def __init__(self, message):
         super().__init__(message)
+
+
+def popSelf(d):
+    return {key: val for key, val in d.items() if key != "self"}
