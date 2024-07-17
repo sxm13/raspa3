@@ -22,13 +22,14 @@ class Component(RaspaBase):
         definedAtoms: list[Atom] = None,
         numberOfBlocks: int = 5,
         numberOfLambdaBins: int = 21,
-        moveProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
+        particleProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
     ):
         super().__init__(**popSelf(locals()))
 
-        if self._settings[fileName] is None:
+        if self._settings["fileName"] is None:
             self.drop_args("fileName")
         else:
+            self._settings["type"] = raspalib.Component.Type.Adsorbate
             self.drop_args("criticalTemperature", "criticalPressure", "acentricFactor", "definedAtoms")
 
         self._cpp_obj = raspalib.Component(**self.cpp_args())

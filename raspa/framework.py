@@ -20,9 +20,10 @@ class Framework(RaspaBase):
     ):
 
         super().__init__(**popSelf(locals()))
-        
+        self._settings["numberOfUnitCells"] = raspalib.int3(*self._settings["numberOfUnitCells"])
+
         # pick either file or manual init
-        if self._settings[fileName] is None:
+        if self._settings["fileName"] is None:
             self.drop_args("fileName")
         else:
             self.drop_args("simulationBox", "spaceGroupHallNumber", "definedAtoms")

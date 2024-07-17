@@ -54,7 +54,7 @@ class ForceField(RaspaBase):
         super().__init__(**popSelf(locals()))
 
         # handle double init
-        if fileName is None:
+        if self._settings["fileName"] is None:
             self.drop_args("fileName")
             self._settings["mixingRule"] = getattr(raspalib.ForceField.MixingRule, self._settings["mixingRule"])
         else:

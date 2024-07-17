@@ -107,11 +107,11 @@ PYBIND11_MODULE(raspalib, m)
 
   pybind11::class_<Framework>(m, "Framework")
       .def(pybind11::init<size_t, const ForceField &, std::string, SimulationBox, size_t, std::vector<Atom>, int3>(),
-           pybind11::arg("currentComponent"), pybind11::arg("forceField"), pybind11::arg("componentName"),
+           pybind11::arg("frameworkId"), pybind11::arg("forceField"), pybind11::arg("componentName"),
            pybind11::arg("simulationBox"), pybind11::arg("spaceGroupHallNumber"), pybind11::arg("definedAtoms"),
            pybind11::arg("numberOfUnitCells"))
       .def(pybind11::init<size_t, const ForceField &, const std::string &, std::optional<const std::string>, int3>(),
-           pybind11::arg("currentComponent"), pybind11::arg("forceField"), pybind11::arg("componentName"),
+           pybind11::arg("frameworkId"), pybind11::arg("forceField"), pybind11::arg("componentName"),
            pybind11::arg("fileName"), pybind11::arg("numberOfUnitCells"))
       .def_readonly("name", &Framework::name)
       .def("__repr__", &Framework::repr);
@@ -155,7 +155,7 @@ PYBIND11_MODULE(raspalib, m)
       .def(pybind11::init<size_t, std::optional<SimulationBox>, double, std::optional<double>, ForceField,
                           std::vector<Framework>, std::vector<Component>, std::vector<size_t>, size_t,
                           MCMoveProbabilitiesSystem>(),
-           pybind11::arg("id"), pybind11::arg("simulationBox"), pybind11::arg("temperature"), pybind11::arg("pressure"),
+           pybind11::arg("systemId"), pybind11::arg("simulationBox"), pybind11::arg("temperature"), pybind11::arg("pressure"),
            pybind11::arg("forceField"), pybind11::arg("frameworkComponents"), pybind11::arg("components"),
            pybind11::arg("initialNumberOfMolecules"), pybind11::arg("numberOfBlocks"),
            pybind11::arg("systemProbabilities"))

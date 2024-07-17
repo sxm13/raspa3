@@ -111,8 +111,8 @@ ForceField::ForceField(std::string filePath)
   }
   catch (nlohmann::json::parse_error& ex)
   {
-    throw std::runtime_error(std::format("[Forcefield reader]: Parse error of file {} at byte {}\n{}\n",
-                                         filePath, ex.byte, ex.what()));
+    throw std::runtime_error(
+        std::format("[Forcefield reader]: Parse error of file {} at byte {}\n{}\n", filePath, ex.byte, ex.what()));
   }
 
   // Validate and read pseudo atoms
@@ -142,9 +142,10 @@ ForceField::ForceField(std::string filePath)
                               ? static_cast<size_t>(PredefinedElements::atomicNumberData.at(jsonElement))
                               : 1;
 
-    pseudoAtoms.emplace_back(jsonName, jsonMass, jsonCharge, jsonPolarizibility, atomicNumber, jsonPrintToOutput,
-                             jsonSource);
+    pseudoAtoms.emplace_back(
+        PseudoAtom(jsonName, jsonMass, jsonCharge, jsonPolarizibility, atomicNumber, jsonPrintToOutput, jsonSource));
   }
+
 
   // Read and set truncation methods
   bool shiftPotential = false;
@@ -162,9 +163,9 @@ ForceField::ForceField(std::string filePath)
         "[ReadForceFieldSelfInteractions]: No pseudo-atoms found [keyword 'SelfInteractions' missing]\n");
   }
 
-  data.reserve(numberOfPseudoAtoms * numberOfPseudoAtoms);
-  shiftPotentials.reserve(numberOfPseudoAtoms * numberOfPseudoAtoms);
-  tailCorrections.reserve(numberOfPseudoAtoms * numberOfPseudoAtoms);
+  data.resize(numberOfPseudoAtoms * numberOfPseudoAtoms, VDWParameters(0.0, 0.0));
+  shiftPotentials.resize(numberOfPseudoAtoms * numberOfPseudoAtoms, shiftPotential);
+  tailCorrections.resize(numberOfPseudoAtoms * numberOfPseudoAtoms, tailCorrection);
 
   for (const auto& [_, item] : parsed_data["SelfInteractions"].items())
   {
@@ -184,7 +185,7 @@ ForceField::ForceField(std::string filePath)
                       item["parameters"].dump(), ex.what()));
     }
 
-    std::optional<size_t> index = ForceField::findPseudoAtom(pseudoAtoms, jsonName);
+    std::optional<size_t> index = ForceField::findPseudoAtom(jsonName);
     if (!index.has_value())
     {
       throw std::runtime_error(std::format(
@@ -202,8 +203,6 @@ ForceField::ForceField(std::string filePath)
     double param1 = scannedJsonParameters[1];
 
     data[index.value() * numberOfPseudoAtoms + index.value()] = VDWParameters(param0, param1);
-    shiftPotentials[index.value() * numberOfPseudoAtoms + index.value()] = shiftPotential;
-    tailCorrections[index.value() * numberOfPseudoAtoms + index.value()] = tailCorrection;
   }
 
   // Set mixing rule and cut-off values
@@ -212,8 +211,8 @@ ForceField::ForceField(std::string filePath)
     mixingRule = MixingRule::Lorentz_Berthelot;
   }
 
-  cutOffVDW = parsed_data.value("CutOffVDW", 0.0);
-  cutOffCoulomb = parsed_data.value("CutOffCoulomb", 0.0);
+  cutOffVDW = parsed_data.value("CutOffVDW", 12.0);
+  cutOffCoulomb = parsed_data.value("CutOffCoulomb", 12.0);
 
   // Apply mixing rule and precompute potentials
   applyMixingRule();
@@ -289,14 +288,13 @@ std::optional<ForceField> ForceField::readForceField(std::optional<std::string> 
                                                      std::string forceFieldFileName) noexcept(false)
 {
   // try to look in directory 'directoryName' if set, otherwise the local directory
-  std::filesystem::path forceFieldPathfile =
-      std::filesystem::path(directoryName.value_or(".") + "/" + forceFieldFileName);
+  std::string filePath = directoryName.value_or(".") + "/" + forceFieldFileName;
+  std::filesystem::path forceFieldPathfile = std::filesystem::path(filePath);
   if (!std::filesystem::exists(forceFieldPathfile))
   {
     // if not found, try the install directory and directory 'directoryName' in 'share/raspa3/forcefields'
     const char* env_p = std::getenv("RASPA_DIR");
-    forceFieldPathfile = std::filesystem::path(std::string(env_p) + "/share/raspa3/forcefields/" +
-                                               directoryName.value_or(".") + "/" + forceFieldFileName);
+    forceFieldPathfile = std::filesystem::path(std::string(env_p) + "/share/raspa3/forcefields/" + filePath);
     if (!std::filesystem::exists(forceFieldPathfile))
     {
       return std::nullopt;
@@ -308,141 +306,7 @@ std::optional<ForceField> ForceField::readForceField(std::optional<std::string> 
   {
     return std::nullopt;
   }
-
-  nlohmann::basic_json<nlohmann::raspa_map> parsed_data{};
-
-  try
-  {
-    parsed_data = nlohmann::json::parse(forceFieldStream);
-  }
-  catch (nlohmann::json::parse_error& ex)
-  {
-    throw std::runtime_error(std::format("[Forcefield reader]: Parse error of file {} at byte {}\n{}\n",
-                                         forceFieldFileName, ex.byte, ex.what()));
-  }
-
-  if (!parsed_data.contains("PseudoAtoms"))
-  {
-    throw std::runtime_error(
-        std::format("[Forcefield reader]: No pseudo-atoms found [keyword 'PseudoAtoms' missing]\n"));
-  }
-  size_t numberOfPseudoAtoms = parsed_data["PseudoAtoms"].size();
-
-  if (numberOfPseudoAtoms == 0)
-  {
-    throw std::runtime_error(std::format("[ReadPseudoAtoms]: key 'PseudoAtoms' empty]\n"));
-  }
-
-  std::vector<PseudoAtom> jsonPseudoAtoms{};
-  jsonPseudoAtoms.reserve(numberOfPseudoAtoms);
-
-  for (auto& [_, item] : parsed_data["PseudoAtoms"].items())
-  {
-    std::string jsonName = item["name"].is_string() ? item["name"].get<std::string>() : std::string{};
-    double jsonMass = item["mass"].is_number() ? item["mass"].get<double>() : 0.0;
-    std::string jsonElement = item["element"].is_string() ? item["element"].get<std::string>() : "C";
-    double jsonCharge = item["charge"].is_number() ? item["charge"].get<double>() : 0.0;
-    double jsonPolarizibility = item["polarizibility"].is_number() ? item["polarizibility"].get<double>() : 0.0;
-    size_t jsonPrintToOutput = item["print_to_output"].is_boolean() ? item["print_to_output"].get<bool>() : true;
-    std::string jsonSource = item["source"].is_string() ? item["source"].get<std::string>() : std::string{};
-
-    size_t atomicNumber{1};
-    auto it = PredefinedElements::atomicNumberData.find(jsonElement);
-    if (it != PredefinedElements::atomicNumberData.end())
-    {
-      atomicNumber = static_cast<size_t>(it->second);
-    }
-
-    jsonPseudoAtoms.emplace_back(jsonName, jsonMass, jsonCharge, jsonPolarizibility, atomicNumber, jsonPrintToOutput,
-                                 jsonSource);
-  }
-
-  std::vector<VDWParameters> jsonSelfInteractions(numberOfPseudoAtoms);
-
-  if (!parsed_data.contains("SelfInteractions"))
-  {
-    throw std::runtime_error(
-        std::format("[ReadForceFieldSelfInteractions]: No pseudo-atoms found [keyword 'SelfInteractions' missing]\n"));
-  }
-  size_t jsonNumberOfPseudoAtoms = parsed_data["SelfInteractions"].size();
-
-  if (jsonNumberOfPseudoAtoms == 0)
-  {
-    throw std::runtime_error(std::format("[ReadForceFieldSelfInteractions]: key 'SelfInteractions' empty]\n"));
-  }
-
-  for (auto& [_, item] : parsed_data["SelfInteractions"].items())
-  {
-    std::string jsonName = item["name"].is_string() ? item["name"].get<std::string>() : std::string{};
-    std::string jsonType = item["type"].is_string() ? item["type"].get<std::string>() : "lennard-jones";
-    std::string jsonSource = item["source"].is_string() ? item["source"].get<std::string>() : std::string{};
-    std::vector<double> scannedJsonParameters{};
-    try
-    {
-      scannedJsonParameters =
-          item["parameters"].is_array() ? item["parameters"].get<std::vector<double>>() : std::vector<double>{};
-    }
-    catch (nlohmann::json::exception& ex)
-    {
-      throw std::runtime_error(
-          std::format("[ReadForceFieldSelfInteractions]: parameters {} must be array of numbers \n{}\n",
-                      item["parameters"].dump(), ex.what()));
-    }
-
-    std::optional<size_t> index = ForceField::findPseudoAtom(jsonPseudoAtoms, jsonName);
-
-    if (!index.has_value())
-    {
-      throw std::runtime_error(std::format(
-          "[ReadForceFieldSelfInteractions]: unknown pseudo-atom '{}', please define in 'pseudo_atoms.json'\n",
-          jsonName));
-    }
-
-    if (scannedJsonParameters.size() < 2)
-    {
-      throw std::runtime_error(
-          std::format("[ReadForceFieldSelfInteractions]: incorrect vdw parameters {}\n", item["parameters"].dump()));
-    }
-
-    double param0 = scannedJsonParameters[0];
-    double param1 = scannedJsonParameters[1];
-
-    jsonSelfInteractions[index.value()] = VDWParameters(param0, param1);
-  }
-
-  MixingRule jsonMixingRule{MixingRule::Lorentz_Berthelot};
-  if (parsed_data["MixingRule"].is_string())
-  {
-    if (caseInSensStringCompare(parsed_data["MixingRule"].get<std::string>(), "Lorentz-Berthelot"))
-    {
-    }
-  }
-
-  bool jsonShiftPotentials{true};
-  if (parsed_data["TruncationMethod"].is_string())
-  {
-    if (caseInSensStringCompare(parsed_data["TruncationMethod"].get<std::string>(), "shifted"))
-    {
-      jsonShiftPotentials = true;
-    }
-    else if (caseInSensStringCompare(parsed_data["TruncationMethod"].get<std::string>(), "truncated"))
-    {
-      jsonShiftPotentials = false;
-    }
-  }
-
-  bool jsonTailCorrections{false};
-  if (parsed_data["TailCorrections"].is_boolean())
-  {
-    if (parsed_data["TailCorrections"].get<bool>())
-    {
-      jsonTailCorrections = true;
-    }
-  }
-
-  double cutOff = 12.0;
-  return ForceField{jsonPseudoAtoms, jsonSelfInteractions, jsonMixingRule,
-                    cutOff,          jsonShiftPotentials,  jsonTailCorrections};
+  return ForceField(forceFieldPathfile.string());
 }
 
 std::string ForceField::printPseudoAtomStatus() const
