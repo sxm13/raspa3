@@ -42,7 +42,38 @@ import archive;
 import double3;
 import stringutils;
 
-void MCMoveProbabilitiesParticles::normalizeMoveProbabilties()
+MCMoveProbabilitiesParticles::MCMoveProbabilitiesParticles(
+    double probabilityTranslationMove, double probabilityRandomTranslationMove, double probabilityRotationMove,
+    double probabilityRandomRotationMove, double probabilityVolumeMove, double probabilityReinsertionMove_CBMC,
+    double probabilityIdentityChangeMove_CBMC, double probabilitySwapMove, double probabilitySwapMove_CBMC,
+    double probabilitySwapMove_CFCMC, double probabilitySwapMove_CFCMC_CBMC, double probabilityGibbsVolumeMove,
+    double probabilityGibbsSwapMove_CBMC, double probabilityGibbsSwapMove_CFCMC,
+    double probabilityGibbsSwapMove_CFCMC_CBMC, double probabilityWidomMove, double probabilityWidomMove_CFCMC,
+    double probabilityWidomMove_CFCMC_CBMC, double probabilityParallelTemperingSwap)
+    : probabilityTranslationMove(probabilityTranslationMove),
+      probabilityRandomTranslationMove(probabilityRandomTranslationMove),
+      probabilityRotationMove(probabilityRotationMove),
+      probabilityRandomRotationMove(probabilityRandomRotationMove),
+      probabilityVolumeMove(probabilityVolumeMove),
+      probabilityReinsertionMove_CBMC(probabilityReinsertionMove_CBMC),
+      probabilityIdentityChangeMove_CBMC(probabilityIdentityChangeMove_CBMC),
+      probabilitySwapMove(probabilitySwapMove),
+      probabilitySwapMove_CBMC(probabilitySwapMove_CBMC),
+      probabilitySwapMove_CFCMC(probabilitySwapMove_CFCMC),
+      probabilitySwapMove_CFCMC_CBMC(probabilitySwapMove_CFCMC_CBMC),
+      probabilityGibbsVolumeMove(probabilityGibbsVolumeMove),
+      probabilityGibbsSwapMove_CBMC(probabilityGibbsSwapMove_CBMC),
+      probabilityGibbsSwapMove_CFCMC(probabilityGibbsSwapMove_CFCMC),
+      probabilityGibbsSwapMove_CFCMC_CBMC(probabilityGibbsSwapMove_CFCMC_CBMC),
+      probabilityWidomMove(probabilityWidomMove),
+      probabilityWidomMove_CFCMC(probabilityWidomMove_CFCMC),
+      probabilityWidomMove_CFCMC_CBMC(probabilityWidomMove_CFCMC_CBMC),
+      probabilityParallelTemperingSwap(probabilityParallelTemperingSwap)
+{
+  normalizeMoveProbabilities();
+}
+
+void MCMoveProbabilitiesParticles::normalizeMoveProbabilities()
 {
   double totalProbability = probabilityTranslationMove + probabilityRandomTranslationMove + probabilityRotationMove +
                             probabilityRandomRotationMove + probabilityVolumeMove + probabilityReinsertionMove_CBMC +

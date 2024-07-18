@@ -6,6 +6,7 @@ from .utils import RASPA_DIR, SHARE_DIR, popSelf
 import os
 import json
 
+
 class PseudoAtom(RaspaBase):
     """
     A class representing a pseudo atom in RASPA.

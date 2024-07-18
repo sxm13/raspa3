@@ -61,7 +61,9 @@ class Component(RaspaBase):
         settings = locals()
         settings.pop("cls")
         return cls(
-            componentName="CH4", fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "methane"), **settings
+            componentName="CH4",
+            fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "methane"),
+            **settings,
         )
 
     @classmethod

@@ -117,14 +117,14 @@ PYBIND11_MODULE(raspalib, m)
 
   pybind11::class_<MCMoveProbabilitiesParticles>(m, "MCMoveProbabilitiesParticles")
       .def(pybind11::init<double, double, double, double, double, double, double, double, double, double, double,
-                          double, double, double, double, double, double, double>(),
+                          double, double, double, double, double, double, double, double>(),
            pybind11::arg("probabilityTranslationMove") = 0.0, pybind11::arg("probabilityRandomTranslationMove") = 0.0,
            pybind11::arg("probabilityRotationMove") = 0.0, pybind11::arg("probabilityRandomRotationMove") = 0.0,
-           pybind11::arg("probabilityVolumeMove") = 0.0, pybind11::arg("probabilityIdentityChangeMove_CBMC") = 0.0,
-           pybind11::arg("probabilitySwapMove") = 0.0, pybind11::arg("probabilitySwapMove_CBMC") = 0.0,
-           pybind11::arg("probabilitySwapMove_CFCMC") = 0.0, pybind11::arg("probabilitySwapMove_CFCMC_CBMC") = 0.0,
-           pybind11::arg("probabilityGibbsVolumeMove") = 0.0, pybind11::arg("probabilityGibbsSwapMove_CBMC") = 0.0,
-           pybind11::arg("probabilityGibbsSwapMove_CFCMC") = 0.0,
+           pybind11::arg("probabilityVolumeMove") = 0.0, pybind11::arg("probabilityReinsertionMove_CBMC") = 0.0,
+           pybind11::arg("probabilityIdentityChangeMove_CBMC") = 0.0, pybind11::arg("probabilitySwapMove") = 0.0,
+           pybind11::arg("probabilitySwapMove_CBMC") = 0.0, pybind11::arg("probabilitySwapMove_CFCMC") = 0.0,
+           pybind11::arg("probabilitySwapMove_CFCMC_CBMC") = 0.0, pybind11::arg("probabilityGibbsVolumeMove") = 0.0,
+           pybind11::arg("probabilityGibbsSwapMove_CBMC") = 0.0, pybind11::arg("probabilityGibbsSwapMove_CFCMC") = 0.0,
            pybind11::arg("probabilityGibbsSwapMove_CFCMC_CBMC") = 0.0, pybind11::arg("probabilityWidomMove") = 0.0,
            pybind11::arg("probabilityWidomMove_CFCMC") = 0.0, pybind11::arg("probabilityWidomMove_CFCMC_CBMC") = 0.0,
            pybind11::arg("probabilityParallelTemperingSwap") = 0.0)
@@ -134,6 +134,7 @@ PYBIND11_MODULE(raspalib, m)
       .def_readwrite("probabilityRotationMove", &MCMoveProbabilitiesParticles::probabilityRotationMove)
       .def_readwrite("probabilityRandomRotationMove", &MCMoveProbabilitiesParticles::probabilityRandomRotationMove)
       .def_readwrite("probabilityVolumeMove", &MCMoveProbabilitiesParticles::probabilityVolumeMove)
+      .def_readwrite("probabilityReinsertionMove_CBMC", &MCMoveProbabilitiesParticles::probabilityReinsertionMove_CBMC)
       .def_readwrite("probabilityIdentityChangeMove_CBMC",
                      &MCMoveProbabilitiesParticles::probabilityIdentityChangeMove_CBMC)
       .def_readwrite("probabilitySwapMove", &MCMoveProbabilitiesParticles::probabilitySwapMove)

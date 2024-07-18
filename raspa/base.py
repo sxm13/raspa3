@@ -1,6 +1,7 @@
 import numpy as np
 import raspalib
 
+
 class RaspaBase:
     """
     A base class for RASPA objects, facilitating interaction with C++ objects and their settings.
@@ -20,7 +21,7 @@ class RaspaBase:
         kwargs.pop("__class__")
         self._settings = kwargs
         self._cpp_obj = None
-        
+
     def cpp_args(self) -> dict:
         """
         Convert settings to a dictionary format compatible with the associated C++ object.
@@ -42,7 +43,7 @@ class RaspaBase:
             else:
                 cpp_dict[key] = val
         return cpp_dict
-    
+
     def drop_args(self, *args):
         """
         Remove specified arguments from the settings.
@@ -52,7 +53,7 @@ class RaspaBase:
         """
         for arg in args:
             self._settings.pop(arg, None)
-            
+
     def attr_haswrite(self, key) -> bool:
         """
         Check if the C++ object attribute can be written to.
@@ -64,7 +65,7 @@ class RaspaBase:
             bool: True if the attribute can be written to, False otherwise.
         """
         if hasattr(self._cpp_obj, key):
-            try: 
+            try:
                 tmp = getattr(self._cpp_obj, key)
                 setattr(self._cpp_obj, key, tmp)
                 return True
@@ -89,7 +90,7 @@ class RaspaBase:
         elif name in self._settings:
             return self._settings[name]
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
-        
+
     def __setattr__(self, name, value):
         """
         Set the value of an attribute.
@@ -98,7 +99,7 @@ class RaspaBase:
             name (str): The name of the attribute.
             value: The value to set the attribute to.
         """
-        if name in self.__dict__ or name in {'_settings', '_cpp_obj'}:
+        if name in self.__dict__ or name in {"_settings", "_cpp_obj"}:
             super().__setattr__(name, value)
         elif name in self._settings:
             self._settings[name] = value

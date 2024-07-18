@@ -4,10 +4,12 @@ from .base import RaspaBase
 from .system import System
 from .utils import popSelf
 
+
 class RandomSeed(RaspaBase):
     def __init__(self, seed=12):
         super().__init__(**popSelf(locals()))
         self._cpp_obj = raspalib.random(**self.cpp_args())
+
 
 class MonteCarlo(RaspaBase):
     def __init__(

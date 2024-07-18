@@ -365,12 +365,12 @@ void System::checkMoleculeIds()
         if (moleculeAtoms[index].moleculeId != static_cast<uint32_t>(i))
         {
           throw std::runtime_error(std::format("Wrong molecule-id detected {} for component {} molecule {}\n",
-                moleculeAtoms[index].moleculeId, componentId, i));
+                                               moleculeAtoms[index].moleculeId, componentId, i));
         }
         if (moleculeAtoms[index].componentId != static_cast<uint8_t>(componentId))
         {
           throw std::runtime_error(std::format("Wrong component-id detected {} for component {} molecule {}\n",
-                moleculeAtoms[index].componentId, componentId, i));
+                                               moleculeAtoms[index].componentId, componentId, i));
         }
         ++index;
       }
@@ -379,14 +379,14 @@ void System::checkMoleculeIds()
 
   for (size_t componentId = 0; componentId < components.size(); componentId++)
   {
-    if(numberOfGCFractionalMoleculesPerComponent_CFCMC[componentId] > 0)
+    if (numberOfGCFractionalMoleculesPerComponent_CFCMC[componentId] > 0)
     {
       size_t indexFractionalMolecule = indexOfGCFractionalMoleculesPerComponent_CFCMC(componentId);
       std::span<Atom> fractionalMolecule = spanOfMolecule(componentId, indexFractionalMolecule);
 
-      for (const Atom &atom: fractionalMolecule)
+      for (const Atom& atom : fractionalMolecule)
       {
-        if(components[componentId].lambdaGC.computeDUdlambda)
+        if (components[componentId].lambdaGC.computeDUdlambda)
         {
           if (static_cast<size_t>(atom.groupId) == 0)
           {
@@ -527,8 +527,9 @@ std::span<Atom> System::spanOfMoleculeAtoms()
 
 std::span<double> System::spanOfMoleculeElectricPotential()
 {
-  return std::span(electricPotential.begin() + static_cast<std::vector<double3>::difference_type>(numberOfFrameworkAtoms),
-                   electricPotential.end());
+  return std::span(
+      electricPotential.begin() + static_cast<std::vector<double3>::difference_type>(numberOfFrameworkAtoms),
+      electricPotential.end());
 }
 
 std::span<double3> System::spanOfMoleculeElectricField()
@@ -539,8 +540,9 @@ std::span<double3> System::spanOfMoleculeElectricField()
 
 std::span<double3> System::spanOfMoleculeElectricFieldNew()
 {
-  return std::span(electricFieldNew.begin() + static_cast<std::vector<double3>::difference_type>(numberOfFrameworkAtoms),
-                   electricFieldNew.end());
+  return std::span(
+      electricFieldNew.begin() + static_cast<std::vector<double3>::difference_type>(numberOfFrameworkAtoms),
+      electricFieldNew.end());
 }
 
 std::span<Atom> System::spanOfMolecule(size_t selectedComponent, size_t selectedMolecule)
@@ -693,7 +695,7 @@ void System::rescaleMoveProbabilities()
     component.mc_moves_probabilities.probabilityParallelTemperingSwap =
         mc_moves_probabilities.probabilityParallelTemperingSwap;
 
-    component.mc_moves_probabilities.normalizeMoveProbabilties();
+    component.mc_moves_probabilities.normalizeMoveProbabilities();
   }
 }
 
@@ -1472,7 +1474,7 @@ RunningEnergy System::computeTotalEnergies() noexcept
   std::span<const Atom> frameworkAtomPositions = spanOfFrameworkAtoms();
   std::span<Atom> moleculeAtomPositions = spanOfMoleculeAtoms();
 
-  if(forceField.computePolarization)
+  if (forceField.computePolarization)
   {
     std::span<double3> moleculeElectricField = spanOfMoleculeElectricField();
 
@@ -1481,8 +1483,8 @@ RunningEnergy System::computeTotalEnergies() noexcept
     RunningEnergy frameworkMoleculeEnergy = Interactions::computeFrameworkMoleculeElectricField(
         forceField, simulationBox, moleculeElectricField, frameworkAtomPositions, moleculeAtomPositions);
 
-    RunningEnergy intermolecularEnergy =
-        Interactions::computeInterMolecularElectricField(forceField, simulationBox, moleculeElectricField, moleculeAtomPositions);
+    RunningEnergy intermolecularEnergy = Interactions::computeInterMolecularElectricField(
+        forceField, simulationBox, moleculeElectricField, moleculeAtomPositions);
 
     RunningEnergy frameworkMoleculeTailEnergy = Interactions::computeFrameworkMoleculeTailEnergy(
         forceField, simulationBox, frameworkAtomPositions, moleculeAtomPositions);
@@ -1490,8 +1492,8 @@ RunningEnergy System::computeTotalEnergies() noexcept
         Interactions::computeInterMolecularTailEnergy(forceField, simulationBox, moleculeAtomPositions);
 
     RunningEnergy ewaldEnergy = Interactions::computeEwaldFourierElectricField(
-        eik_x, eik_y, eik_z, eik_xy, fixedFrameworkStoredEik, storedEik, forceField, simulationBox, moleculeElectricField,
-        components, numberOfMoleculesPerComponent, moleculeAtomPositions);
+        eik_x, eik_y, eik_z, eik_xy, fixedFrameworkStoredEik, storedEik, forceField, simulationBox,
+        moleculeElectricField, components, numberOfMoleculesPerComponent, moleculeAtomPositions);
 
     RunningEnergy polarizationEnergy = computePolarizationEnergy();
 
@@ -1526,7 +1528,7 @@ RunningEnergy System::computePolarizationEnergy() noexcept
   std::span<const Atom> moleculeAtomPositions = spanOfMoleculeAtoms();
   std::span<double3> moleculeElectricField = spanOfMoleculeElectricField();
 
-  for(size_t i = 0; i < moleculeAtomPositions.size(); ++i)
+  for (size_t i = 0; i < moleculeAtomPositions.size(); ++i)
   {
     size_t type = moleculeAtomPositions[i].type;
     double polarizability = forceField.pseudoAtoms[type].polarizability / Units::CoulombicConversionFactor;
@@ -1577,15 +1579,15 @@ void System::computeTotalElectricPotential() noexcept
 
   std::fill(moleculeElectricPotential.begin(), moleculeElectricPotential.end(), 0.0);
 
-  Interactions::computeInterMolecularElectricPotential(
-      forceField, simulationBox, moleculeElectricPotential, moleculeAtomPositions);
+  Interactions::computeInterMolecularElectricPotential(forceField, simulationBox, moleculeElectricPotential,
+                                                       moleculeAtomPositions);
 
-  Interactions::computeFrameworkMoleculeElectricPotential(
-      forceField, simulationBox, moleculeElectricPotential, frameworkAtomPositions, moleculeAtomPositions);
+  Interactions::computeFrameworkMoleculeElectricPotential(forceField, simulationBox, moleculeElectricPotential,
+                                                          frameworkAtomPositions, moleculeAtomPositions);
 
-  Interactions::computeEwaldFourierElectricPotential(
-      eik_x, eik_y, eik_z, eik_xy, fixedFrameworkStoredEik, moleculeElectricPotential, forceField, simulationBox, components,
-      numberOfMoleculesPerComponent, moleculeAtomPositions);
+  Interactions::computeEwaldFourierElectricPotential(eik_x, eik_y, eik_z, eik_xy, fixedFrameworkStoredEik,
+                                                     moleculeElectricPotential, forceField, simulationBox, components,
+                                                     numberOfMoleculesPerComponent, moleculeAtomPositions);
 }
 
 void System::computeTotalElectricField() noexcept
@@ -1601,20 +1603,16 @@ void System::computeTotalElectricField() noexcept
 
   std::fill(moleculeElectricField.begin(), moleculeElectricField.end(), double3(0.0, 0.0, 0.0));
 
-  Interactions::computeInterMolecularElectricField(
-      forceField, simulationBox, moleculeElectricField, moleculeAtomPositions);
+  Interactions::computeInterMolecularElectricField(forceField, simulationBox, moleculeElectricField,
+                                                   moleculeAtomPositions);
 
-  Interactions::computeFrameworkMoleculeElectricField(
-      forceField, simulationBox, moleculeElectricField, frameworkAtomPositions, moleculeAtomPositions);
+  Interactions::computeFrameworkMoleculeElectricField(forceField, simulationBox, moleculeElectricField,
+                                                      frameworkAtomPositions, moleculeAtomPositions);
 
-  Interactions::computeEwaldFourierElectricField(
-    eik_x, eik_y, eik_z, eik_xy, fixedFrameworkStoredEik, storedEik, forceField, simulationBox, moleculeElectricField,
-    components, numberOfMoleculesPerComponent, moleculeAtomPositions);
+  Interactions::computeEwaldFourierElectricField(eik_x, eik_y, eik_z, eik_xy, fixedFrameworkStoredEik, storedEik,
+                                                 forceField, simulationBox, moleculeElectricField, components,
+                                                 numberOfMoleculesPerComponent, moleculeAtomPositions);
 }
-
-
-
-
 
 std::pair<EnergyStatus, double3x3> System::computeMolecularPressure() noexcept
 {
@@ -2407,7 +2405,7 @@ void System::writeRestartFile()
   j["moleculePositions"] = moleculePositions;
 
   // use pretty print and indent of 2
-  //std::cout << std::setw(2) << j << std::endl;
+  // std::cout << std::setw(2) << j << std::endl;
 }
 
 void System::readRestartFile()

@@ -23,6 +23,18 @@ export struct MCMoveProbabilitiesParticles
 
   bool operator==(MCMoveProbabilitiesParticles const &) const = default;
 
+  MCMoveProbabilitiesParticles(){};
+  MCMoveProbabilitiesParticles(double probabilityTranslationMove, double probabilityRandomTranslationMove,
+                               double probabilityRotationMove, double probabilityRandomRotationMove,
+                               double probabilityVolumeMove, double probabilityReinsertionMove_CBMC,
+                               double probabilityIdentityChangeMove_CBMC, double probabilitySwapMove,
+                               double probabilitySwapMove_CBMC, double probabilitySwapMove_CFCMC,
+                               double probabilitySwapMove_CFCMC_CBMC, double probabilityGibbsVolumeMove,
+                               double probabilityGibbsSwapMove_CBMC, double probabilityGibbsSwapMove_CFCMC,
+                               double probabilityGibbsSwapMove_CFCMC_CBMC, double probabilityWidomMove,
+                               double probabilityWidomMove_CFCMC, double probabilityWidomMove_CFCMC_CBMC,
+                               double probabilityParallelTemperingSwap);
+
   double probabilityTranslationMove{0.0};
   double probabilityRandomTranslationMove{0.0};
   double probabilityRotationMove{0.0};
@@ -63,7 +75,7 @@ export struct MCMoveProbabilitiesParticles
   double accumulatedProbabilityWidomMove_CFCMC_CBMC{0.0};
   double accumulatedProbabilityParallelTemperingSwap{0.0};
 
-  void normalizeMoveProbabilties();
+  void normalizeMoveProbabilities();
 
   friend Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const MCMoveProbabilitiesParticles &p);
   friend Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, MCMoveProbabilitiesParticles &p);
