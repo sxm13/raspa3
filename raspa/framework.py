@@ -3,10 +3,21 @@ from .base import RaspaBase
 from .forcefield import ForceField
 from .simulationbox import SimulationBox
 from .atom import Atom
-from .utils import RaspaError,popSelf
+from .utils import popSelf
 
 
 class Framework(RaspaBase):
+    """
+    A class representing a framework in RASPA, managing the initialization and configuration
+    of a simulation framework.
+
+    Inherits from RaspaBase.
+
+    Attributes:
+        _settings (dict): A dictionary storing the settings for the framework.
+        _cpp_obj: A reference to the associated C++ object.
+    """
+
     def __init__(
         self,
         frameworkId: int,
@@ -18,7 +29,19 @@ class Framework(RaspaBase):
         definedAtoms: list[Atom] = None,
         numberOfUnitCells: list[int] = [1, 1, 1],
     ):
+        """
+        Initialize the Framework object with provided parameters.
 
+        Args:
+            frameworkId (int): The ID of the framework.
+            forceField (ForceField): The force field to be used.
+            componentName (str): The name of the component.
+            fileName (str, optional): The file name for framework initialization. Default is None.
+            simulationBox (SimulationBox, optional): The simulation box. Default is None.
+            spaceGroupHallNumber (int, optional): The space group Hall number. Default is None.
+            definedAtoms (list[Atom], optional): A list of defined atoms. Default is None.
+            numberOfUnitCells (list[int], optional): The number of unit cells in each dimension. Default is [1, 1, 1].
+        """
         super().__init__(**popSelf(locals()))
         self._settings["numberOfUnitCells"] = raspalib.int3(*self._settings["numberOfUnitCells"])
 

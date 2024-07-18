@@ -29,7 +29,7 @@ class System(RaspaBase):
 
     @property
     def atomPositions(self):
-        return self._cpp_obj.atomPositions
+        return np.array([[atom.position.x, atom.position.y, atom.position.z] for atom in self._cpp_obj.atomPositions])
 
     @atomPositions.setter
     def atomPositions(self, index_position_tuple: tuple[np.ndarray, np.ndarray]):

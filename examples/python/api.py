@@ -14,7 +14,7 @@ itq = raspa.Framework(
     0, ff, "ITQ-29", spaceGroupHallNumber=517, definedAtoms=fw_atoms, simulationBox=box, numberOfUnitCells=[1, 1, 1]
 )
 
-print(ff)
+#print(ff)
 
 mcmoves = raspa.MCMoveProbabilitiesParticles()
 co2_atoms = [

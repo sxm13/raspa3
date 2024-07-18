@@ -7,6 +7,15 @@ import os
 import json
 
 class PseudoAtom(RaspaBase):
+    """
+    A class representing a pseudo atom in RASPA.
+
+    Inherits from RaspaBase.
+
+    Attributes:
+        _settings (dict): A dictionary storing the settings for the pseudo atom.
+        _cpp_obj: A reference to the associated C++ object.
+    """
 
     def __init__(
         self,
@@ -18,28 +27,55 @@ class PseudoAtom(RaspaBase):
         printToPDB: bool = False,
         source: str = "-",
     ):
+        """
+        Initialize the PseudoAtom object with provided parameters.
+
+        Args:
+            name (str): The name of the pseudo atom. Default is "C".
+            mass (float): The mass of the pseudo atom. Default is 1.0.
+            charge (float): The charge of the pseudo atom. Default is 0.0.
+            polarizability (float): The polarizability of the pseudo atom. Default is 0.0.
+            atomicNumber (int): The atomic number of the pseudo atom. Default is 8.
+            printToPDB (bool): Whether to print to PDB. Default is False.
+            source (str): The source of the pseudo atom. Default is "-".
+        """
         super().__init__(**popSelf(locals()))
         self._cpp_obj = raspalib.PseudoAtom(**self.cpp_args())
 
-    @classmethod
-    def from_dict(cls, config: dict):
-        config.pop("element")
-        config.pop("print_as")
-        config["printToPDB"] = config.pop("print_to_output")
-        return cls(**config)
-
 
 class VDWParameter(RaspaBase):
+    """
+    A class representing Van der Waals parameters in RASPA.
+
+    Inherits from RaspaBase.
+
+    Attributes:
+        _settings (dict): A dictionary storing the settings for the Van der Waals parameters.
+        _cpp_obj: A reference to the associated C++ object.
+    """
+
     def __init__(self, epsilon: float, sigma: float):
+        """
+        Initialize the VDWParameter object with provided parameters.
+
+        Args:
+            epsilon (float): The epsilon parameter.
+            sigma (float): The sigma parameter.
+        """
         super().__init__(**popSelf(locals()))
         self._cpp_obj = raspalib.VDWParameters(**self.cpp_args())
 
-    @classmethod
-    def from_dict(cls, config: dict):
-        return cls(*config["parameters"])
-
 
 class ForceField(RaspaBase):
+    """
+    A class representing a force field in RASPA.
+
+    Inherits from RaspaBase.
+
+    Attributes:
+        _settings (dict): A dictionary storing the settings for the force field.
+        _cpp_obj: A reference to the associated C++ object.
+    """
 
     def __init__(
         self,
@@ -51,6 +87,18 @@ class ForceField(RaspaBase):
         shifted: bool = False,
         tailCorrections: bool = False,
     ):
+        """
+        Initialize the ForceField object with provided parameters.
+
+        Args:
+            fileName (str, optional): The file name for force field initialization. Default is None.
+            pseudoAtoms (list[PseudoAtom], optional): A list of pseudo atoms. Default is None.
+            parameters (list[VDWParameter], optional): A list of Van der Waals parameters. Default is None.
+            mixingRule (Literal["Lorentz_Berthelot"], optional): The mixing rule. Default is "Lorentz_Berthelot".
+            cutOff (float, optional): The cut-off distance. Default is 12.0.
+            shifted (bool, optional): Whether to use shifted potential. Default is False.
+            tailCorrections (bool, optional): Whether to apply tail corrections. Default is False.
+        """
         super().__init__(**popSelf(locals()))
 
         # handle double init
@@ -63,4 +111,10 @@ class ForceField(RaspaBase):
 
     @classmethod
     def exampleMoleculeForceField(cls):
+        """
+        Create an example molecule force field.
+
+        Returns:
+            ForceField: An instance of ForceField with example molecule force field settings.
+        """
         return cls(fileName=os.path.join(SHARE_DIR, "forcefields", "example_molecule_forcefield", "force_field.json"))

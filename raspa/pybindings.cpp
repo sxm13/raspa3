@@ -99,7 +99,6 @@ PYBIND11_MODULE(raspalib, m)
       .def("__repr__", &ForceField::repr)
       .def_readonly("pseudoAtoms", &ForceField::pseudoAtoms)
       .def_readonly("vdwParameters", &ForceField::data);
-  m.def("readForceField", &ForceField::readForceField, pybind11::return_value_policy::reference);
 
   pybind11::enum_<ForceField::MixingRule>(forceField, "MixingRule")
       .value("Lorentz_Berthelot", ForceField::MixingRule::Lorentz_Berthelot)
@@ -117,10 +116,39 @@ PYBIND11_MODULE(raspalib, m)
       .def("__repr__", &Framework::repr);
 
   pybind11::class_<MCMoveProbabilitiesParticles>(m, "MCMoveProbabilitiesParticles")
-      .def(pybind11::init<double, double>(), pybind11::arg("probabilityTranslationMove") = 0.0,
-           pybind11::arg("probabilityRotationMove") = 0.0)
+      .def(pybind11::init<double, double, double, double, double, double, double, double, double, double, double,
+                          double, double, double, double, double, double, double>(),
+           pybind11::arg("probabilityTranslationMove") = 0.0, pybind11::arg("probabilityRandomTranslationMove") = 0.0,
+           pybind11::arg("probabilityRotationMove") = 0.0, pybind11::arg("probabilityRandomRotationMove") = 0.0,
+           pybind11::arg("probabilityVolumeMove") = 0.0, pybind11::arg("probabilityIdentityChangeMove_CBMC") = 0.0,
+           pybind11::arg("probabilitySwapMove") = 0.0, pybind11::arg("probabilitySwapMove_CBMC") = 0.0,
+           pybind11::arg("probabilitySwapMove_CFCMC") = 0.0, pybind11::arg("probabilitySwapMove_CFCMC_CBMC") = 0.0,
+           pybind11::arg("probabilityGibbsVolumeMove") = 0.0, pybind11::arg("probabilityGibbsSwapMove_CBMC") = 0.0,
+           pybind11::arg("probabilityGibbsSwapMove_CFCMC") = 0.0,
+           pybind11::arg("probabilityGibbsSwapMove_CFCMC_CBMC") = 0.0, pybind11::arg("probabilityWidomMove") = 0.0,
+           pybind11::arg("probabilityWidomMove_CFCMC") = 0.0, pybind11::arg("probabilityWidomMove_CFCMC_CBMC") = 0.0,
+           pybind11::arg("probabilityParallelTemperingSwap") = 0.0)
       .def_readwrite("probabilityTranslationMove", &MCMoveProbabilitiesParticles::probabilityTranslationMove)
-      .def_readwrite("probabilityRotationMove", &MCMoveProbabilitiesParticles::probabilityRotationMove);
+      .def_readwrite("probabilityRandomTranslationMove",
+                     &MCMoveProbabilitiesParticles::probabilityRandomTranslationMove)
+      .def_readwrite("probabilityRotationMove", &MCMoveProbabilitiesParticles::probabilityRotationMove)
+      .def_readwrite("probabilityRandomRotationMove", &MCMoveProbabilitiesParticles::probabilityRandomRotationMove)
+      .def_readwrite("probabilityVolumeMove", &MCMoveProbabilitiesParticles::probabilityVolumeMove)
+      .def_readwrite("probabilityIdentityChangeMove_CBMC",
+                     &MCMoveProbabilitiesParticles::probabilityIdentityChangeMove_CBMC)
+      .def_readwrite("probabilitySwapMove", &MCMoveProbabilitiesParticles::probabilitySwapMove)
+      .def_readwrite("probabilitySwapMove_CBMC", &MCMoveProbabilitiesParticles::probabilitySwapMove_CBMC)
+      .def_readwrite("probabilitySwapMove_CFCMC", &MCMoveProbabilitiesParticles::probabilitySwapMove_CFCMC)
+      .def_readwrite("probabilitySwapMove_CFCMC_CBMC", &MCMoveProbabilitiesParticles::probabilitySwapMove_CFCMC_CBMC)
+      .def_readwrite("probabilityGibbsVolumeMove", &MCMoveProbabilitiesParticles::probabilityGibbsVolumeMove)
+      .def_readwrite("probabilityGibbsSwapMove_CBMC", &MCMoveProbabilitiesParticles::probabilityGibbsSwapMove_CBMC)
+      .def_readwrite("probabilityGibbsSwapMove_CFCMC", &MCMoveProbabilitiesParticles::probabilityGibbsSwapMove_CFCMC)
+      .def_readwrite("probabilityGibbsSwapMove_CFCMC_CBMC",
+                     &MCMoveProbabilitiesParticles::probabilityGibbsSwapMove_CFCMC_CBMC)
+      .def_readwrite("probabilityWidomMove", &MCMoveProbabilitiesParticles::probabilityWidomMove)
+      .def_readwrite("probabilityWidomMove_CFCMC", &MCMoveProbabilitiesParticles::probabilityWidomMove_CFCMC)
+      .def_readwrite("probabilityParallelTemperingSwap",
+                     &MCMoveProbabilitiesParticles::probabilityParallelTemperingSwap);
 
   pybind11::class_<MCMoveProbabilitiesSystem>(m, "MCMoveProbabilitiesSystem")
       .def(pybind11::init<double, double, double>(), pybind11::arg("probabilityVolumeMove"),
@@ -155,9 +183,9 @@ PYBIND11_MODULE(raspalib, m)
       .def(pybind11::init<size_t, std::optional<SimulationBox>, double, std::optional<double>, ForceField,
                           std::vector<Framework>, std::vector<Component>, std::vector<size_t>, size_t,
                           MCMoveProbabilitiesSystem>(),
-           pybind11::arg("systemId"), pybind11::arg("simulationBox"), pybind11::arg("temperature"), pybind11::arg("pressure"),
-           pybind11::arg("forceField"), pybind11::arg("frameworkComponents"), pybind11::arg("components"),
-           pybind11::arg("initialNumberOfMolecules"), pybind11::arg("numberOfBlocks"),
+           pybind11::arg("systemId"), pybind11::arg("simulationBox"), pybind11::arg("temperature"),
+           pybind11::arg("pressure"), pybind11::arg("forceField"), pybind11::arg("frameworkComponents"),
+           pybind11::arg("components"), pybind11::arg("initialNumberOfMolecules"), pybind11::arg("numberOfBlocks"),
            pybind11::arg("systemProbabilities"))
       .def("computeTotalEnergies", &System::computeTotalEnergies)
       .def_readwrite("atomPositions", &System::atomPositions)
