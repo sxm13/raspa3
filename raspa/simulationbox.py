@@ -20,7 +20,4 @@ class SimulationBox(RaspaBase):
 
     @property
     def boxType(self):
-        if self._cpp_obj.type == raspalib.SimulationBox.Type.Rectangular:
-            return "Rectangular"
-        elif self._cpp_obj.type == raspalib.SimulationBox.Type.Triclinic:
-            return "Triclinic"
+        return self._cpp_obj.type.name

@@ -22,4 +22,5 @@ mc = raspa.MonteCarlo(
     systems=[system],
 )
 print(mc)
-# mc.run()
+mc.run()
+mc.initialize()

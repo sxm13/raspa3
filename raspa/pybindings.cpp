@@ -200,5 +200,8 @@ PYBIND11_MODULE(raspalib, m)
            pybind11::arg("writeBinaryRestartEvery"), pybind11::arg("rescaleWangLandauEvery"),
            pybind11::arg("optimizeMCMovesEvery"), pybind11::arg("systems"), pybind11::arg("randomSeed"),
            pybind11::arg("numberOfBlocks"))
-      .def("run", &MonteCarlo::run);
+      .def("run", &MonteCarlo::run)
+      .def("initialize", &MonteCarlo::initialize)
+      .def("equilibrate", &MonteCarlo::equilibrate)
+      .def("production", &MonteCarlo::production);
 }

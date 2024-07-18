@@ -30,3 +30,12 @@ class MonteCarlo(RaspaBase):
 
     def run(self):
         self._cpp_obj.run()
+
+    def initialize(self):
+        self._cpp_obj.initialize()
+
+    def equilibrate(self):
+        self._cpp_obj.equilibrate()
+
+    def production(self):
+        self._cpp_obj.production()

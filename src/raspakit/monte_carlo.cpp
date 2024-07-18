@@ -116,7 +116,7 @@ MonteCarlo::MonteCarlo(size_t numberOfCycles, size_t numberOfInitializationCycle
       writeBinaryRestartEvery(writeBinaryRestartEvery),
       rescaleWangLandauEvery(rescaleWangLandauEvery),
       optimizeMCMovesEvery(optimizeMCMovesEvery),
-      systems(std::move(systems)),
+      systems(systems),
       random(randomSeed),
       outputJsons(systems.size()),
       estimation(numberOfBlocks, numberOfCycles)
@@ -331,7 +331,6 @@ void MonteCarlo::initialize()
 {
   if (simulationStage == SimulationStage::Initialization) goto continueInitializationStage;
   simulationStage = SimulationStage::Initialization;
-
   createOutputFiles();
 
   for (System& system : systems)
@@ -392,7 +391,6 @@ void MonteCarlo::initialize()
 
   continueInitializationStage:;
   }
-
   for (System& system : systems)
   {
     std::ofstream json(outputJsonFileNames[system.systemId]);
