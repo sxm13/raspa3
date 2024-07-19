@@ -29,7 +29,7 @@ class Component(RaspaBase):
         if self._settings["fileName"] is None:
             self.drop_args("fileName")
         else:
-            self._settings["type"] = raspalib.Component.Type.Adsorbate
+            self._settings["type"] = raspalib.Component.Adsorbate
             self.drop_args("criticalTemperature", "criticalPressure", "acentricFactor", "definedAtoms")
 
         self._cpp_obj = raspalib.Component(**self.cpp_args())
