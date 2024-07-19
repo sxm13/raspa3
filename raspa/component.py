@@ -46,7 +46,9 @@ class Component(RaspaBase):
         settings = locals()
         settings.pop("cls")
         return cls(
-            componentName="CO2", fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "co2"), **settings
+            componentName="CO2",
+            fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "co2.json"),
+            **settings,
         )
 
     @classmethod
@@ -62,7 +64,7 @@ class Component(RaspaBase):
         settings.pop("cls")
         return cls(
             componentName="CH4",
-            fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "methane"),
+            fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "methane.json"),
             **settings,
         )
 
@@ -78,5 +80,7 @@ class Component(RaspaBase):
         settings = locals()
         settings.pop("cls")
         return cls(
-            componentName="N2", fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "co2"), **settings
+            componentName="N2",
+            fileName=os.path.join(SHARE_DIR, "molecules", "example_definitions", "n2.json"),
+            **settings,
         )

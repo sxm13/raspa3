@@ -150,7 +150,7 @@ Component::Component(size_t componentId, const ForceField &forceField, std::stri
 // read the component from the molecule-file
 void Component::readComponent(const ForceField &forceField, const std::string &fileName)
 {
-  const std::string defaultMoleculeFileName = fileName + ".json";
+  const std::string defaultMoleculeFileName = addExtension(fileName, ".json");
 
   std::string moleculeFileName = defaultMoleculeFileName;
   if (!std::filesystem::exists(std::filesystem::path{moleculeFileName}))

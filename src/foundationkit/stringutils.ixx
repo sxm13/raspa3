@@ -47,3 +47,12 @@ export inline std::string trim(const std::string& s)
 
   return std::string(start, end + 1);
 }
+
+export inline std::string addExtension(const std::string& fileName, const std::string& extension) {
+    if (fileName.length() >= extension.length() &&
+        fileName.compare(fileName.length() - extension.length(), extension.length(), extension) == 0) {
+        return fileName;
+    } else {
+        return fileName + extension;
+    }
+}
