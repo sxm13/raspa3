@@ -141,7 +141,16 @@ void Framework::readFramework(const ForceField& forceField, const std::string& f
 {
   const char* env_p = std::getenv("RASPA_DIR");
 
-  const std::string frameworkFileName = fileName + ".cif";
+  std::string extension = ".cif";
+  std::string frameworkFileName;
+  if (fileName.compare(fileName.length() - extension.length(), extension.length(), extension) != 0)
+  {
+    frameworkFileName = fileName + extension;
+  }
+  else
+  {
+    frameworkFileName = fileName;
+  }
 
   std::filesystem::path frameworkPathfile = std::filesystem::path(frameworkFileName);
   if (!std::filesystem::exists(frameworkPathfile)) frameworkPathfile = std::filesystem::path(env_p) / frameworkFileName;
