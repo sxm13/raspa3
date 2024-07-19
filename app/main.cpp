@@ -35,7 +35,6 @@ import breakthrough_simulation;
 import mixture_prediction_simulation;
 import isotherm_fitting_simulation;
 import multi_site_isotherm;
-import parallel_tempering;
 
 int main()
 {  
@@ -106,12 +105,6 @@ int main()
       {
         IsothermFittingSimulation fitting(inputReader);
         fitting.run();
-        break;
-      }
-      case InputReader::SimulationType::ParallelTempering:
-      {
-        ParallelTempering pt(inputReader);
-        pt.run();
         break;
       }
       default:

@@ -1,5 +1,6 @@
 from raspa import raspalib
 
+
 atomTypes = [
     raspalib.PseudoAtom("Si", 28.0855, 2.05, 0.0, 14, False, "-"),
     raspalib.PseudoAtom("O", 15.999, -1.025, 0.0, 8, False, "-"),
@@ -14,51 +15,32 @@ parameters = [
     raspalib.VDWParameters(29.933, 2.745),
     raspalib.VDWParameters(85.671, 3.017),
 ]
+ff = raspalib.ForceField(atomTypes, parameters, raspalib.ForceField.MixingRule.Lorentz_Berthelot, 12.0, True, False)
 
-force_field = raspalib.ForceField(
-    atomTypes, parameters, raspalib.ForceField.MixingRule.Lorentz_Berthelot, 12.0, True, False
-)
+# ff2 = raspalib.ForceField("force_field.json")
 
-print(force_field)
 
-framework = raspalib.Framework(
+itq = raspalib.Framework(
     0,
-    force_field,
+    ff,
     "ITQ-29",
-    raspalib.SimulationBox(11.8671, 11.8671, 11.8671),
-    517,
-    [
-        raspalib.Atom(raspalib.double3(0.3683, 0.1847, 0), 2.05, 1.0, 0, 0, 0, 0),
-        raspalib.Atom(raspalib.double3(0.5, 0.2179, 0), -1.025, 1.0, 0, 1, 0, 0),
-        raspalib.Atom(raspalib.double3(0.2939, 0.2939, 0), -1.025, 1.0, 0, 1, 0, 0),
-        raspalib.Atom(raspalib.double3(0.3429, 0.1098, 0.1098), -1.025, 1.0, 0, 1, 0, 0),
-    ],
+    "ITQ-29.cif",
     raspalib.int3(1, 1, 1),
 )
 
-component = raspalib.Component(
+co2 = raspalib.Component(
+    raspalib.Component.Adsorbate,
     0,
-    force_field,
+    ff,
     "CO2",
-    304.1282,
-    7377300.0,
-    0.22394,
-    [
-        raspalib.Atom(raspalib.double3(0.0, 0.0, 1.149), -0.3256, 1.0, 0, 4, 1, 0),
-        raspalib.Atom(raspalib.double3(0.0, 0.0, 0.0), 0.6512, 1.0, 0, 3, 1, 0),
-        raspalib.Atom(raspalib.double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0),
-    ],
+    "CO2.json",
     5,
     21,
     raspalib.MCMoveProbabilitiesParticles(probabilityTranslationMove=1.0, probabilityRotationMove=1.0),
 )
 
-system = raspalib.System(0, None, 300.0, 1e4, force_field, [framework], [component], [2], 5)
-# mc = MonteCarlo(system,....)
-
-# mc.run(numberOfStep = 1000, )
-
-# print(mc)
+sysMC = raspalib.MCMoveProbabilitiesSystem(0.0, 0.0, 0.0)
+system = raspalib.System(0, None, 300.0, 1e4, ff, [itq], [co2], [2], 5, sysMC)
 
 system.atomPositions[72].position = raspalib.double3(5.93355, 7.93355, 5.93355 + 1.149)
 system.atomPositions[73].position = raspalib.double3(5.93355, 7.93355, 5.93355 + 0.0)
@@ -69,3 +51,19 @@ system.atomPositions[77].position = raspalib.double3(5.93355, 3.93355, 5.93355 -
 
 energy = system.computeTotalEnergies()
 print(1.2027242847 * energy.moleculeMoleculeVDW)
+
+random = raspalib.random(12)
+mc = raspalib.MonteCarlo(
+    numberOfCycles=10000,
+    numberOfInitializationCycles=10000,
+    numberOfEquilibrationCycles=0,
+    printEvery=1000,
+    writeBinaryRestartEvery=100,
+    rescaleWangLandauEvery=100,
+    optimizeMCMovesEvery=100,
+    systems=[system],
+    randomSeed=random,
+    numberOfBlocks=5,
+)
+
+mc.run()
