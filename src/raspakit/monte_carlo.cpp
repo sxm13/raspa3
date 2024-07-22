@@ -293,6 +293,10 @@ void MonteCarlo::cycle()
         system.propertyDensityGrid->writeOutput(system.systemId, system.simulationBox, system.forceField,
                                                 system.frameworkComponents, system.components, currentCycle);
       }
+      if (system.averageEnergyHistogram.has_value())
+      {
+        system.averageEnergyHistogram->writeOutput(system.systemId, currentCycle);
+      }
     }
   }
 

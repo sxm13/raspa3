@@ -1345,6 +1345,7 @@ void System::sampleProperties(size_t currentBlock, size_t currentCycle)
                               static_cast<double>(translationalDegreesOfFreedom + rotationalDegreesOfFreedom);
   averageTemperature.addSample(currentBlock, overallTemperature, w);
 
+
   loadings = Loadings(components.size(), numberOfIntegerMoleculesPerComponent, simulationBox);
   averageLoadings.addSample(currentBlock, loadings, w);
 
@@ -1387,6 +1388,15 @@ void System::sampleProperties(size_t currentBlock, size_t currentCycle)
     computeCenterOfMassAndQuaternionGradients();
     propertyRadialDistributionFunction->sample(simulationBox, spanOfFrameworkAtoms(), moleculePositions,
                                                spanOfMoleculeAtoms(), currentCycle, currentBlock);
+  }
+
+  if(averageEnergyHistogram.has_value())
+  {
+    averageEnergyHistogram->addSample(currentBlock, 
+        {runningEnergies.potentialEnergy(), 
+         runningEnergies.frameworkMoleculeVDW + runningEnergies.moleculeMoleculeVDW,
+         runningEnergies.frameworkMoleculeCharge + runningEnergies.moleculeMoleculeCharge + runningEnergies.ewald, 
+         runningEnergies.polarization}, w);
   }
 
   if (propertyDensityGrid.has_value())
@@ -2288,6 +2298,7 @@ Archive<std::ofstream>& operator<<(Archive<std::ofstream>& archive, const System
   archive << s.averageRotationalTemperature;
   archive << s.averagePressure;
   archive << s.averageSimulationBox;
+  archive << s.averageEnergyHistogram;
   archive << s.propertyConventionalRadialDistributionFunction;
   // archive << s.propertyRadialDistributionFunction;
   // archive << s.propertyDensityGrid;
@@ -2389,6 +2400,7 @@ Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, System& s)
   archive >> s.averageRotationalTemperature;
   archive >> s.averagePressure;
   archive >> s.averageSimulationBox;
+  archive >> s.averageEnergyHistogram;
   archive >> s.propertyConventionalRadialDistributionFunction;
   // archive >> s.propertyRadialDistributionFunction;
   // archive >> s.propertyDensityGrid;
