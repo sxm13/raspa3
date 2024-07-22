@@ -1,0 +1,61 @@
+name: publish pypi
+on:
+  workflow_dispatch:
+    branches: [ "main" ]
+
+jobs:
+  publish-to-pypi:
+    runs-on: ${{ matrix.os }}
+    environment:
+      name: pypi
+      url: https://pypi.org/p/<your-pypi-project-name>
+    permissions:
+      id-token: write
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, macos-13, macos-latest]
+        python-version: ["3.10"]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Ubuntu dependencies
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt-get update
+        DEBIAN_FRONTEND=noninteractive TZ=Europe/Amsterdam sudo apt-get -y install tzdata 
+        sudo apt-get install -y --no-install-recommends git ca-certificates cmake ninja-build
+        sudo apt-get install -y --no-install-recommends llvm lld clang clang-tools clang-tidy libc++-dev libc++abi-dev libomp-dev 
+        sudo apt-get install -y --no-install-recommends liblapack64-dev libblas64-dev 
+
+    - name: Install MacOS dependencies
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        brew install llvm cmake ninja libomp
+        echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
+
+    - name: Verify compiler is in PATH
+      run: |
+        echo $PATH
+        clang++ --version
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+
+    - name: Build package
+      run: python -m build -w
+
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.TWINE_PASSWORD }}
+        repository_url: https://test.pypi.org/legacy/

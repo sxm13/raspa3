@@ -52,10 +52,12 @@ execute_process (
 )
 
 add_subdirectory(src)
-add_subdirectory(app)
 add_subdirectory(data)
 add_subdirectory(examples)
 
+if(NOT DEFINED SKIP_EXECUTABLE)
+  add_subdirectory(app)
+endif()
 if(BUILD_DOXYGEN)
   add_subdirectory(docs)
 endif()

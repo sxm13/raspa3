@@ -25,7 +25,7 @@ readme = "README.md"
 cmake.version = ">=3.28"
 cmake.build-type = "Release"
 cmake.args = [
-    "--preset=macos-apple-silicon",
+    "--preset=python",
     "-DBUILD_TESTING=0",
     "-DBUILD_PYTHON=1",
 ]
