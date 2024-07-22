@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-24.04
     services:
       docker:
-        image: quay.io/pypa/manylinux2014_x86_64
+        image: quay.io/pypa/manylinux_2_28_x64_86
         options: --privileged
 
     strategy:
