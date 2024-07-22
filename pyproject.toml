@@ -15,8 +15,8 @@ authors = [
     { name = "Prof. Randall Q. Snurr, Northwestern University" },
     { name = "Dr. David Dubbeldam, University of Amsterdam", email = "d.dubbeldam@uva.nl" },
 ]
-dependencies = ["pybind11"]
-requires-python = ">=3.8"
+dependencies = ["pybind11", "numpy"]
+requires-python = ">=3.10"
 license = { file = "LICENSE.md" }
 readme = "README.md"
 
