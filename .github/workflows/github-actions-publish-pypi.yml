@@ -87,7 +87,9 @@ jobs:
 
   publish-to-pypi:
     runs-on: ubuntu-24.04
-    needs: build-packages
+    needs: 
+      - build-manylinux-packages
+      - build-macos-packages
     environment:
       name: pypi
       url: https://test.pypi.org/p/raspa
