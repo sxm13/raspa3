@@ -4,51 +4,6 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-manylinux-packages:
-    runs-on: ubuntu-24.04
-    services:
-      docker:
-        image: quay.io/pypa/manylinux_2_28_x64_86
-        options: --privileged
-
-    strategy:
-      matrix:
-        python-version: ["3.10"]
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install dependencies
-      run: |
-        sudo yum install -y clang llvm lld clang-tools-extra cmake ninja-build \
-                            libomp lapack-devel blas-devel
-        python -m pip install --upgrade pip
-        pip install build twine auditwheel
-
-    - name: Configure environment to use Clang
-      run: |
-        export CC=clang
-        export CXX=clang++
-
-    - name: Build package
-      run: python -m build -w
-
-    - name: Audit and repair wheels
-      run: |
-        auditwheel repair dist/*.whl -w dist/
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: python-package-distributions
-        path: dist/
-
   build-macos-packages:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -88,7 +43,6 @@ jobs:
   publish-to-pypi:
     runs-on: ubuntu-24.04
     needs: 
-      - build-manylinux-packages
       - build-macos-packages
     environment:
       name: pypi
