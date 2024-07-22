@@ -47,14 +47,30 @@ import json;
 #define ALWAYS_INLINE __forceinline
 #endif
 
+/**
+ * \brief Represents a simulation box used in simulations.
+ *
+ * The SimulationBox struct defines the dimensions and angles of the simulation box.
+ * It supports different types, such as rectangular and triclinic, and contains
+ * information about the cell matrix and its inverse, as well as the volume of the box.
+ */
 export struct SimulationBox
 {
+  /**
+   * \brief Enumeration for the type of the simulation box.
+   */
   enum class Type : int
   {
     Rectangular = 0,
     Triclinic = 1
   };
 
+  /**
+   * \brief Default constructor for the SimulationBox class.
+   *
+   * Initializes a SimulationBox with all lengths and angles set to zero,
+   * and sets the cell matrices to zero matrices.
+   */
   SimulationBox()
       : lengthA(0.0),
         lengthB(0.0),
@@ -68,9 +84,42 @@ export struct SimulationBox
 
   bool operator==(SimulationBox const&) const = default;
 
+  /**
+   * \brief Constructs a rectangular SimulationBox with given lengths.
+   *
+   * Initializes a SimulationBox with the specified lengths for the sides.
+   *
+   * \param a Length of side A.
+   * \param b Length of side B.
+   * \param c Length of side C.
+   * \param type The type of the simulation box (default is Rectangular).
+   */
   explicit SimulationBox(double a, double b, double c, Type type = Type::Rectangular);
+
+  /**
+   * \brief Constructs a SimulationBox with given lengths and angles.
+   *
+   * Initializes a SimulationBox with the specified lengths for the sides and angles.
+   *
+   * \param a Length of side A.
+   * \param b Length of side B.
+   * \param c Length of side C.
+   * \param alpha Angle between sides B and C.
+   * \param beta Angle between sides A and C.
+   * \param gamma Angle between sides A and B.
+   * \param type The type of the simulation box (default is Rectangular).
+   */
   explicit SimulationBox(double a, double b, double c, double alpha, double beta, double gamma,
                          Type type = Type::Rectangular);
+
+  /**
+   * \brief Constructs a SimulationBox with a given cell matrix.
+   *
+   * Initializes a SimulationBox with the specified cell matrix.
+   *
+   * \param m The cell matrix defining the box dimensions and angles.
+   * \param type The type of the simulation box (default is Rectangular).
+   */
   explicit SimulationBox(double3x3 m, Type type = Type::Rectangular);
 
   ALWAYS_INLINE inline double3 applyPeriodicBoundaryConditions(const double3& dr) const

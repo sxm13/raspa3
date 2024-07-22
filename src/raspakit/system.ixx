@@ -85,15 +85,40 @@ import transition_matrix;
 import equation_of_states;
 import json;
 
+/**
+ * \brief Represents the central system for simulations.
+ *
+ * The System struct holds all objects required for simulations, such as atom lists,
+ * frameworks, and simulation boxes. It is passed to various simulation methods,
+ * like MonteCarlo, to conduct simulations. The system can contain frameworks (zeolite/MOF)
+ * or a simulation box, and it manages various simulation parameters and states.
+ */
 export struct System
 {
+  /**
+   * \brief Default constructor for the System class.
+   *
+   * Initializes a System object with default values.
+   */
   System() = default;
 
-  // construct System programmatically
-  /*! \brief Brief description.
-   *         Brief description continued.
+  /**
+   * \brief Constructs a System object programmatically.
    *
-   *  Detailed description starts here.
+   * Initializes a System with the provided parameters, including system ID,
+   * simulation box, temperature, pressure, force field, framework components,
+   * and other simulation-related configurations.
+   *
+   * \param id The identifier for the system.
+   * \param box The optional simulation box for the system.
+   * \param T The temperature of the system.
+   * \param P The optional pressure of the system.
+   * \param forcefield The force field used in the simulation.
+   * \param frameworkComponents The list of framework components in the system.
+   * \param components The list of components in the system.
+   * \param initialNumberOfMolecules The initial number of molecules per component.
+   * \param numberOfBlocks The number of blocks in the simulation.
+   * \param systemProbabilities The move probabilities for the Monte Carlo simulation.
    */
   System(size_t id, std::optional<SimulationBox> box, double T, std::optional<double> P, ForceField forcefield,
          std::vector<Framework> frameworkComponents, std::vector<Component> components,
