@@ -1,5 +1,5 @@
 import re
-
+import sys
 
 def bump_version(file_path, pattern, new_version):
     with open(file_path, "r") as file:
@@ -11,7 +11,34 @@ def bump_version(file_path, pattern, new_version):
         file.write(new_content)
 
 
-def main(new_version):
+def read_current_version(file_path, pattern):
+    with open(file_path, "r") as file:
+        content = file.read()
+
+    match = re.search(pattern, content)
+    if match:
+        return match.group(0)
+    else:
+        raise ValueError(f"Version pattern not found in {file_path}")
+
+
+def increment_version(current_version, part):
+    major, minor, patch = map(int, re.findall(r"\d+", current_version))
+    if part == "major":
+        major += 1
+        minor = 0
+        patch = 0
+    elif part == "minor":
+        minor += 1
+        patch = 0
+    elif part == "patch":
+        patch += 1
+    else:
+        raise ValueError("Invalid part to increment. Choose 'major', 'minor', or 'patch'.")
+    return f"{major}.{minor}.{patch}"
+
+
+def main(new_version_or_part):
     # Define file paths
     python_file = "raspa/utils.py"
     pyproject_file = "pyproject.toml"
@@ -23,6 +50,18 @@ def main(new_version):
     pyproject_pattern = r'version\s*=\s*"\d+\.\d+\.\d+"'
     cmake_pattern = r"VERSION \d+\.\d+\.\d+"
     pkgbuild_pattern = r"pkgver=\d+\.\d+\.\d+"
+
+    # Read current version from pyproject.toml
+    current_version_match = re.search(r'"\d+\.\d+\.\d+"', read_current_version(pyproject_file, pyproject_pattern))
+    if not current_version_match:
+        raise ValueError("Current version not found in pyproject.toml")
+    current_version = current_version_match.group(0).strip('"')
+
+    # Determine the new version
+    if new_version_or_part in ["major", "minor", "patch"]:
+        new_version = increment_version(current_version, new_version_or_part)
+    else:
+        new_version = new_version_or_part
 
     # Define new version strings
     new_python_version = f'RASPA_VERSION = "{new_version}"'
@@ -38,9 +77,7 @@ def main(new_version):
 
 
 if __name__ == "__main__":
-    import sys
-
     if len(sys.argv) != 2:
-        print("Usage: python bump_version.py <new_version>")
+        print("Usage: python bump_version.py <new_version_or_part>")
     else:
         main(sys.argv[1])
