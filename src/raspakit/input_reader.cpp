@@ -69,6 +69,7 @@ import transition_matrix;
 import property_conventional_rdf;
 import property_rdf;
 import property_density_grid;
+import property_energy_histogram;
 
 int3 parseInt3(const std::string& item, auto json)
 {
@@ -798,6 +799,47 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
         systems[systemId].propertyRadialDistributionFunction =
             PropertyRadialDistributionFunction(jsonNumberOfBlocks, systems[systemId].forceField.pseudoAtoms.size(),
                                                numberOfBinsRDF, rangeRDF, sampleRDFEvery, writeRDFEvery);
+      }
+    }
+
+    if (value["ComputeEnergyHistogram"].is_boolean())
+    {
+      if (value["ComputeEnergyHistogram"].get<bool>())
+      {
+        size_t numberOfBinsEnergyHistogram{128};
+        if (value["NumberOfBinsEnergyHistogram"].is_number_unsigned())
+        {
+          numberOfBinsEnergyHistogram = value["NumberOfBinsEnergyHistogram"].get<size_t>();
+        }
+
+        double minimumRangeEnergyHistogram{-5000.0};
+        if (value["MininumRangeEnergyHistogram"].is_number_float())
+        {
+          minimumRangeEnergyHistogram = value["MininumRangeEnergyHistogram"].get<double>();
+        }
+
+        double maximumRangeEnergyHistogram{1000.0};
+        if (value["MaxinumRangeEnergyHistogram"].is_number_float())
+        {
+          maximumRangeEnergyHistogram = value["MaximumRangeEnergyHistogram"].get<double>();
+        }
+
+        size_t sampleEnergyHistogramEvery{10};
+        if (value["SampleEnergyHistogramEvery"].is_number_unsigned())
+        {
+          sampleEnergyHistogramEvery = value["SampleEnergyHistogramEvery"].get<size_t>();
+        }
+
+        size_t writeEnergyHistogramEvery{5000};
+        if (value["WriteEnergyHistogramEvery"].is_number_unsigned())
+        {
+          writeEnergyHistogramEvery = value["WriteEnergyHistogramEvery"].get<size_t>();
+        }
+
+        systems[systemId].averageEnergyHistogram = 
+          PropertyEnergyHistogram(jsonNumberOfBlocks, numberOfBinsEnergyHistogram,
+                                  {minimumRangeEnergyHistogram, maximumRangeEnergyHistogram}, 
+                                  sampleEnergyHistogramEvery, writeEnergyHistogramEvery);
       }
     }
 

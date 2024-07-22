@@ -79,6 +79,11 @@ export inline double4 operator+(const double4& a, const double4& b)
   return double4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 }
 
+export inline double4 operator-(const double4& a, const double4& b)
+{
+  return double4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
+}
+
 export inline double4 operator*(const double4& a, const double4& b)
 {
   return double4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
@@ -92,4 +97,14 @@ export inline double4 operator*(const double4& a, const double& b)
 export inline double4 operator*(const double& a, const double4& b)
 {
   return double4(a * b.x, a * b.y, a * b.z, a * b.w);
+}
+
+export inline double4 operator/(const double4& a, double b) 
+{ 
+  return double4(a.x / b, a.y / b, a.z / b, a.w / b);
+}
+
+export inline double4 sqrt(const double4& a) 
+{ 
+  return double4(std::sqrt(a.x), std::sqrt(a.y), std::sqrt(a.z), std::sqrt(a.w));
 }
