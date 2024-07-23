@@ -34,9 +34,11 @@ import archive;
 import units;
 
 
-void PropertyEnergyHistogram::addSample(size_t blockIndex, double4 energy, const double &weight)
+void PropertyEnergyHistogram::addSample(size_t blockIndex, size_t currentCycle, double4 energy, const double &weight)
 {
   size_t bin;
+
+  if (currentCycle % sampleEvery != 0uz) return;
 
   bin = static_cast<size_t>((energy.x - range.first) * static_cast<double>(numberOfBins) / std::fabs(range.second - range.first));
   if(bin >=0 && bin < numberOfBins)
@@ -122,9 +124,9 @@ std::pair<std::vector<double4>, std::vector<double4>> PropertyEnergyHistogram::a
 }
 
 
-void PropertyEnergyHistogram::writeOutput(int systemId, size_t currentCycle)
+void PropertyEnergyHistogram::writeOutput(size_t systemId, size_t currentCycle)
 {
-   if (currentCycle % writeEvery != 0uz) return;
+  if (currentCycle % writeEvery != 0uz) return;
 
   std::filesystem::create_directory("energy_histogram");
 
@@ -159,28 +161,41 @@ void PropertyEnergyHistogram::writeOutput(int systemId, size_t currentCycle)
 
 }
 
-Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const PropertyEnergyHistogram &temp)
+Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const PropertyEnergyHistogram &hist)
 {
-  archive << temp.versionNumber;
-  archive << temp.numberOfBlocks;
-  //archive << temp.bookKeepingTemperature;
+  archive << hist.versionNumber;
+
+  archive << hist.numberOfBlocks;
+  archive << hist.numberOfBins;
+  archive << hist.range;
+  archive << hist.sampleEvery;
+  archive << hist.writeEvery;
+  archive << hist.bookKeepingEnergyHistogram;
+  archive << hist.numberOfCounts;
+  archive << hist.totalNumberOfCounts;
 
   return archive;
 }
 
-Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, PropertyEnergyHistogram &temp)
+Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, PropertyEnergyHistogram &hist)
 {
   uint64_t versionNumber;
   archive >> versionNumber;
-  if (versionNumber > temp.versionNumber)
+  if (versionNumber > hist.versionNumber)
   {
     const std::source_location &location = std::source_location::current();
     throw std::runtime_error(std::format("Invalid version reading 'EnergyHistogram' at line {} in file {}\n",
                                          location.line(), location.file_name()));
   }
 
-  archive >> temp.numberOfBlocks;
-  //archive >> temp.bookKeepingTemperature;
+  archive >> hist.numberOfBlocks;
+  archive >> hist.numberOfBins;
+  archive >> hist.range;
+  archive >> hist.sampleEvery;
+  archive >> hist.writeEvery;
+  archive >> hist.bookKeepingEnergyHistogram;
+  archive >> hist.numberOfCounts;
+  archive >> hist.totalNumberOfCounts;
 
   return archive;
 }

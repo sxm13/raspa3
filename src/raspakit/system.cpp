@@ -1392,11 +1392,16 @@ void System::sampleProperties(size_t currentBlock, size_t currentCycle)
 
   if(averageEnergyHistogram.has_value())
   {
-    averageEnergyHistogram->addSample(currentBlock, 
+    averageEnergyHistogram->addSample(currentBlock, currentCycle,
         {runningEnergies.potentialEnergy(), 
          runningEnergies.frameworkMoleculeVDW + runningEnergies.moleculeMoleculeVDW,
          runningEnergies.frameworkMoleculeCharge + runningEnergies.moleculeMoleculeCharge + runningEnergies.ewald, 
          runningEnergies.polarization}, w);
+  }
+
+  if(averageNumberOfMoleculesHistogram.has_value())
+  {
+    averageNumberOfMoleculesHistogram->addSample(currentBlock, currentCycle, numberOfIntegerMoleculesPerComponent,  w);
   }
 
   if (propertyDensityGrid.has_value())

@@ -297,6 +297,10 @@ void MonteCarlo::cycle()
       {
         system.averageEnergyHistogram->writeOutput(system.systemId, currentCycle);
       }
+      if (system.averageNumberOfMoleculesHistogram.has_value())
+      {
+        system.averageNumberOfMoleculesHistogram->writeOutput(system.systemId, system.components, currentCycle);
+      }
     }
   }
 
