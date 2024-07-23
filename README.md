@@ -141,22 +141,18 @@ ctest --test-dir build/tests/raspakit-tests --verbose
 This package can also be built as a library for python. To build the python package the pip packaging system can be used. Note that due to compilation of the full package this might take a few minutes. To install, run the following command:
 
 ```bash
+export CMAKE_ARGS="--preset=python"
 pip install .
 ```
 
 This will install the package to the current python environment.
 
-We strongly advise users to use the CMakePresets.json preset for their given system. For building the python package with a given preset change the following line in pyproject.toml to reflect the given preset:
+We strongly advise users to use the CMakePresets.json preset for their given system. For building the python package with a given preset change the following line to reflect the given preset:
 
 ```
-cmake.args = ["--preset=python", "-DBUILD_TESTING=0", "-DBUILD_PYTHON=1"]
+export CMAKE_ARGS="--preset=macos-apple-silicon"
+pip install .
 ```
-
-to, for example:
-```
-cmake.args = ["--preset=macos-apple-silicon", "-DBUILD_TESTING=0", "-DBUILD_PYTHON=1"]
-```
-
 
 # How To Use
 

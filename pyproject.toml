@@ -25,9 +25,10 @@ readme = "README.md"
 cmake.version = ">=3.28"
 cmake.build-type = "Release"
 cmake.args = [
-    "--preset=python",
+    "${CMAKE_ARGS}",
     "-DBUILD_TESTING=0",
     "-DBUILD_PYTHON=1",
+    "-DSKIP_EXECUTABLE=1"
 ]
 wheel.cmake = true
 build-dir = "build/python"
