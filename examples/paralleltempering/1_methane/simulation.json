@@ -1,5 +1,5 @@
 {
-  "SimulationType": "ParallelTempering",
+  "SimulationType": "MonteCarlo",
   "NumberOfCycles": 10000,
   "NumberOfInitializationCycles": 10000,
   "PrintEvery": 100,
