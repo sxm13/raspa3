@@ -171,7 +171,7 @@ PYBIND11_MODULE(raspalib, m)
            pybind11::arg("particleProbabilities"), pybind11::arg("fugacityCoefficient") = std::nullopt,
            pybind11::arg("thermodynamicIntegration") = false)
       .def(pybind11::init<Component::Type, size_t, const ForceField &, std::string &, std::string, size_t, size_t,
-                          const MCMoveProbabilitiesParticles &, std::optional<double>, boo>(),
+                          const MCMoveProbabilitiesParticles &, std::optional<double>, bool>(),
            pybind11::arg("type"), pybind11::arg("componentId"), pybind11::arg("forceField"),
            pybind11::arg("componentName"), pybind11::arg("fileName"), pybind11::arg("numberOfBlocks"),
            pybind11::arg("numberOfLambdaBins"), pybind11::arg("particleProbabilities"),
@@ -199,17 +199,17 @@ PYBIND11_MODULE(raspalib, m)
 
   pybind11::class_<InputReader> inputReader(m, "InputReader");
   inputReader.def(pybind11::init<const std::string>(), pybind11::arg("fileName"))
-      .read_only("numberOfBlocks", &InputReader::NumberOfBlocks)
-      .read_only("numberOfCycles", &InputReader::NumberOfCycles)
-      .read_only("numberOfInitializationCycles", &InputReader::NumberOfInitializationCycles)
-      .read_only("numberOfEquilibrationCycles", &InputReader::NumberOfEquilibrationCycles)
-      .read_only("printEvery", &InputReader::printEvery)
-      .read_only("writeBinaryRestartEvery", &InputReader::writeBinaryRestartEvery)
-      .read_only("rescaleWangLandauEvery", &InputReader::rescaleWangLandauEvery)
-      .read_only("optimizeMCMovesEvery", &InputReader::optimizeMCMovesEvery)
-      .read_only("writeEvery", &InputReader::writeEvery)
-      .read_only("forceField", &InputReader::forceField)
-      .read_only("systems", &InputReader::systems);
+      .def_readonly("numberOfBlocks", &InputReader::numberOfBlocks)
+      .def_readonly("numberOfCycles", &InputReader::numberOfCycles)
+      .def_readonly("numberOfInitializationCycles", &InputReader::numberOfInitializationCycles)
+      .def_readonly("numberOfEquilibrationCycles", &InputReader::numberOfEquilibrationCycles)
+      .def_readonly("printEvery", &InputReader::printEvery)
+      .def_readonly("writeBinaryRestartEvery", &InputReader::writeBinaryRestartEvery)
+      .def_readonly("rescaleWangLandauEvery", &InputReader::rescaleWangLandauEvery)
+      .def_readonly("optimizeMCMovesEvery", &InputReader::optimizeMCMovesEvery)
+      .def_readonly("writeEvery", &InputReader::writeEvery)
+      .def_readonly("forceField", &InputReader::forceField)
+      .def_readonly("systems", &InputReader::systems);
 
   pybind11::enum_<InputReader::SimulationType>(inputReader, "SimulationType")
       .value("MonteCarlo", InputReader::SimulationType::MonteCarlo)
