@@ -31,8 +31,18 @@ jobs:
         python -m pip install --upgrade pip
         pip install build twine
 
+    - name: Set preset
+      shell: bash
+      run: |
+        if [[ "${{ matrix.os }}" == "macos-14" ]]; then
+          echo "CMAKE_PRESET=--preset=macos-apple-silicon" >> $GITHUB_ENV
+        else
+          echo "CMAKE_PRESET=--preset=macos-intel" >> $GITHUB_ENV
+        fi
+
     - name: Build package
-      run: python -m build -w
+      run: |
+        python -m build -w
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
