@@ -23,6 +23,8 @@ class Component(RaspaBase):
         numberOfBlocks: int = 5,
         numberOfLambdaBins: int = 21,
         particleProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
+        fugacityCoefficient: float = None,
+        thermodynamicIntegration: bool = False
     ):
         super().__init__(**popSelf(locals()))
 
