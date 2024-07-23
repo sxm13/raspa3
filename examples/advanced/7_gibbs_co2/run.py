@@ -30,7 +30,6 @@ system1 = raspa.System(
     forceField=ff,
     components=[co2],
     initialNumberOfMolecules=[256],
-    pressure=1e4,
     simulationBox=raspa.SimulationBox(30.0 * np.ones(3)),
     systemProbabilities=sysMoves
 )

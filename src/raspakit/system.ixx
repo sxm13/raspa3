@@ -121,11 +121,13 @@ export struct System
    * \param initialNumberOfMolecules The initial number of molecules per component.
    * \param numberOfBlocks The number of blocks in the simulation.
    * \param systemProbabilities The move probabilities for the Monte Carlo simulation.
+   * \param sampleMoviesEvery Interval in which movies are written to PDB.
    */
   System(size_t id, std::optional<SimulationBox> box, double T, std::optional<double> P, ForceField forcefield,
          std::vector<Framework> frameworkComponents, std::vector<Component> components,
          std::vector<size_t> initialNumberOfMolecules, size_t numberOfBlocks,
-         const MCMoveProbabilitiesSystem &systemProbabilities = MCMoveProbabilitiesSystem());
+         const MCMoveProbabilitiesSystem &systemProbabilities = MCMoveProbabilitiesSystem(),
+         std::optional<size_t> sampleMoviesEvery = std::nullopt);
 
   uint64_t versionNumber{1};
 

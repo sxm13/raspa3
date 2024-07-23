@@ -188,11 +188,11 @@ PYBIND11_MODULE(raspalib, m)
   pybind11::class_<System>(m, "System")
       .def(pybind11::init<size_t, std::optional<SimulationBox>, double, std::optional<double>, ForceField,
                           std::vector<Framework>, std::vector<Component>, std::vector<size_t>, size_t,
-                          MCMoveProbabilitiesSystem>(),
+                          MCMoveProbabilitiesSystem, std::optional<size_t>>(),
            pybind11::arg("systemId"), pybind11::arg("simulationBox"), pybind11::arg("temperature"),
            pybind11::arg("pressure"), pybind11::arg("forceField"), pybind11::arg("frameworkComponents"),
            pybind11::arg("components"), pybind11::arg("initialNumberOfMolecules"), pybind11::arg("numberOfBlocks"),
-           pybind11::arg("systemProbabilities"))
+           pybind11::arg("systemProbabilities"), pybind11::arg("sampleMoviesEvery"))
       .def("computeTotalEnergies", &System::computeTotalEnergies)
       .def_readwrite("atomPositions", &System::atomPositions)
       .def("__repr__", &System::repr);
@@ -231,6 +231,7 @@ PYBIND11_MODULE(raspalib, m)
            pybind11::arg("writeBinaryRestartEvery"), pybind11::arg("rescaleWangLandauEvery"),
            pybind11::arg("optimizeMCMovesEvery"), pybind11::arg("systems"), pybind11::arg("randomSeed"),
            pybind11::arg("numberOfBlocks"))
+      .def(pybind11::init<InputReader &>(), pybind11::arg("inputReader"))
       .def("run", &MonteCarlo::run)
       .def("initialize", &MonteCarlo::initialize)
       .def("equilibrate", &MonteCarlo::equilibrate)

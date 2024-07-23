@@ -13,6 +13,7 @@ system = raspa.System(
     components=[methane],
     initialNumberOfMolecules=[100],
     simulationBox=box,
+    sampleMoviesEvery=10
 )
 
 mc = raspa.MonteCarlo(

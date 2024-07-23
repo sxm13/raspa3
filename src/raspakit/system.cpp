@@ -123,7 +123,8 @@ import json;
  */
 System::System(size_t id, std::optional<SimulationBox> box, double T, std::optional<double> P, ForceField forcefield,
                std::vector<Framework> f, std::vector<Component> c, std::vector<size_t> initialNumberOfMolecules,
-               size_t numberOfBlocks, const MCMoveProbabilitiesSystem& systemProbabilities)
+               size_t numberOfBlocks, const MCMoveProbabilitiesSystem& systemProbabilities,
+               std::optional<size_t> sampleMoviesEvery)
     : systemId(id),
       temperature(T),
       pressure(P.value_or(0.0) / Units::PressureConversionFactor),
@@ -194,6 +195,11 @@ System::System(size_t id, std::optional<SimulationBox> box, double T, std::optio
                       P.value_or(0.0), simulationBox, HeliumVoidFraction, components);
 
   averageEnthalpiesOfAdsorption.resize(swappableComponents.size());
+
+  if (sampleMoviesEvery.has_value())
+  {
+    samplePDBMovie = SampleMovie(id, sampleMoviesEvery.value());
+  }
 }
 
 void System::createFrameworks()
@@ -1345,7 +1351,6 @@ void System::sampleProperties(size_t currentBlock, size_t currentCycle)
                               static_cast<double>(translationalDegreesOfFreedom + rotationalDegreesOfFreedom);
   averageTemperature.addSample(currentBlock, overallTemperature, w);
 
-
   loadings = Loadings(components.size(), numberOfIntegerMoleculesPerComponent, simulationBox);
   averageLoadings.addSample(currentBlock, loadings, w);
 
@@ -1390,18 +1395,19 @@ void System::sampleProperties(size_t currentBlock, size_t currentCycle)
                                                spanOfMoleculeAtoms(), currentCycle, currentBlock);
   }
 
-  if(averageEnergyHistogram.has_value())
+  if (averageEnergyHistogram.has_value())
   {
-    averageEnergyHistogram->addSample(currentBlock, currentCycle,
-        {runningEnergies.potentialEnergy(), 
-         runningEnergies.frameworkMoleculeVDW + runningEnergies.moleculeMoleculeVDW,
-         runningEnergies.frameworkMoleculeCharge + runningEnergies.moleculeMoleculeCharge + runningEnergies.ewald, 
-         runningEnergies.polarization}, w);
+    averageEnergyHistogram->addSample(
+        currentBlock, currentCycle,
+        {runningEnergies.potentialEnergy(), runningEnergies.frameworkMoleculeVDW + runningEnergies.moleculeMoleculeVDW,
+         runningEnergies.frameworkMoleculeCharge + runningEnergies.moleculeMoleculeCharge + runningEnergies.ewald,
+         runningEnergies.polarization},
+        w);
   }
 
-  if(averageNumberOfMoleculesHistogram.has_value())
+  if (averageNumberOfMoleculesHistogram.has_value())
   {
-    averageNumberOfMoleculesHistogram->addSample(currentBlock, currentCycle, numberOfIntegerMoleculesPerComponent,  w);
+    averageNumberOfMoleculesHistogram->addSample(currentBlock, currentCycle, numberOfIntegerMoleculesPerComponent, w);
   }
 
   if (propertyDensityGrid.has_value())
