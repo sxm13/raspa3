@@ -70,6 +70,7 @@ import property_conventional_rdf;
 import property_rdf;
 import property_density_grid;
 import property_energy_histogram;
+import property_number_of_molecules_histogram;
 
 int3 parseInt3(const std::string& item, auto json)
 {
@@ -805,31 +806,31 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
     {
       if (value["ComputeEnergyHistogram"].get<bool>())
       {
-        size_t numberOfBinsEnergyHistogram{128};
+        size_t numberOfBinsEnergyHistogram{ 128 };
         if (value["NumberOfBinsEnergyHistogram"].is_number_unsigned())
         {
           numberOfBinsEnergyHistogram = value["NumberOfBinsEnergyHistogram"].get<size_t>();
         }
 
-        double minimumRangeEnergyHistogram{-5000.0};
+        double minimumRangeEnergyHistogram{ -5000.0 };
         if (value["MininumRangeEnergyHistogram"].is_number_float())
         {
           minimumRangeEnergyHistogram = value["MininumRangeEnergyHistogram"].get<double>();
         }
 
-        double maximumRangeEnergyHistogram{1000.0};
-        if (value["MaxinumRangeEnergyHistogram"].is_number_float())
+        double maximumRangeEnergyHistogram{ 1000.0 };
+        if (value["MaximumRangeEnergyHistogram"].is_number_float())
         {
           maximumRangeEnergyHistogram = value["MaximumRangeEnergyHistogram"].get<double>();
         }
 
-        size_t sampleEnergyHistogramEvery{10};
+        size_t sampleEnergyHistogramEvery{ 1 };
         if (value["SampleEnergyHistogramEvery"].is_number_unsigned())
         {
           sampleEnergyHistogramEvery = value["SampleEnergyHistogramEvery"].get<size_t>();
         }
 
-        size_t writeEnergyHistogramEvery{5000};
+        size_t writeEnergyHistogramEvery{ 5000 };
         if (value["WriteEnergyHistogramEvery"].is_number_unsigned())
         {
           writeEnergyHistogramEvery = value["WriteEnergyHistogramEvery"].get<size_t>();
@@ -838,6 +839,42 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
         systems[systemId].averageEnergyHistogram = PropertyEnergyHistogram(
             jsonNumberOfBlocks, numberOfBinsEnergyHistogram, {minimumRangeEnergyHistogram, maximumRangeEnergyHistogram},
             sampleEnergyHistogramEvery, writeEnergyHistogramEvery);
+      }
+    }
+
+    if (value["ComputeNumberOfMoleculesHistogram"].is_boolean())
+    {
+      if (value["ComputeNumberOfMoleculesHistogram"].get<bool>())
+      {
+        size_t minimumRangeNumberOfMoleculesHistogram{ 0 };
+        if (value["MinimumRangeNumberOfMoleculesHistogram"].is_number_unsigned())
+        {
+          minimumRangeNumberOfMoleculesHistogram = value["MinimumRangeNumberOfMoleculesHistogram"].get<size_t>();
+        }
+
+        size_t maximumRangeNumberOfMoleculesHistogram{ 200 };
+        if (value["MaximumRangeNumberOfMoleculesHistogram"].is_number_unsigned())
+        {
+          maximumRangeNumberOfMoleculesHistogram = value["MaximumRangeNumberOfMoleculesHistogram"].get<size_t>();
+        }
+
+        size_t sampleNumberOfMoleculesHistogramEvery{ 10 };
+        if (value["SampleNumberOfMoleculesHistogramEvery"].is_number_unsigned())
+        {
+          sampleNumberOfMoleculesHistogramEvery = value["SampleNumberOfMoleculesHistogramEvery"].get<size_t>();
+        }
+
+        size_t writeNumberOfMoleculesHistogramEvery{ 5000 };
+        if (value["WriteNumberOfMoleculesHistogramEvery"].is_number_unsigned())
+        {
+          writeNumberOfMoleculesHistogramEvery = value["WriteNumberOfMoleculesHistogramEvery"].get<size_t>();
+        }
+
+        systems[systemId].averageNumberOfMoleculesHistogram = 
+          PropertyNumberOfMoleculesHistogram(jsonNumberOfBlocks, 
+                                  {minimumRangeNumberOfMoleculesHistogram, maximumRangeNumberOfMoleculesHistogram}, 
+                                  systems[systemId].components.size(),
+                                  sampleNumberOfMoleculesHistogramEvery, writeNumberOfMoleculesHistogramEvery);
       }
     }
 

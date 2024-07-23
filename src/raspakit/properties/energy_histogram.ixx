@@ -67,15 +67,15 @@ export struct PropertyEnergyHistogram
   std::vector<double> numberOfCounts;
   double totalNumberOfCounts{ 0.0 };
 
-  void addSample(size_t blockIndex, double4 energy, const double &weight);
+  void addSample(size_t blockIndex, size_t currentCycle, double4 energy, const double &weight);
 
   std::vector<double4> averagedProbabilityHistogram(size_t blockIndex) const;
   std::vector<double4> averagedProbabilityHistogram() const;
   std::pair<std::vector<double4>, std::vector<double4>> averageProbabilityHistogram() const;
 
-  void writeOutput(int systemId, size_t currentCycle);
+  void writeOutput(size_t systemId, size_t currentCycle);
 
 
-  friend Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const PropertyEnergyHistogram &temp);
-  friend Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, PropertyEnergyHistogram &temp);
+  friend Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const PropertyEnergyHistogram &hist);
+  friend Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, PropertyEnergyHistogram &hist);
 };
