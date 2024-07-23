@@ -10,7 +10,7 @@ mcmoves = raspa.MCMoveProbabilitiesParticles(
     probabilityWidomMove=1.0,
 )
 co2 = raspa.Component.exampleCO2(0, ff, particleProbabilities=mcmoves)
-cubtc = raspa.Framework(0, ff, "Cu-BTC", "Cu-BTC.cif", numberOfUnitCells=[1, 1, 1])
+mfi = raspa.Framework(0, ff, "MFI_SI", "MFI_SI.cif", numberOfUnitCells=[2, 2, 2])
 
 system = raspa.System(
     systemId=0,

@@ -1,6 +1,6 @@
 import raspa
 
-ff = raspa.ForceField.exampleMoleculeForceField()
+ff = raspa.ForceField.exampleMoleculeForceField(useCharge=False)
 
 mcmoves = raspa.MCMoveProbabilitiesParticles(
     probabilityTranslationMove=0.5,

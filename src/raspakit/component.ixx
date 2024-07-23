@@ -88,12 +88,16 @@ export struct Component
   Component(Component::Type type, size_t currentComponent, const ForceField &forceField,
             const std::string &componentName, std::optional<const std::string> fileName, size_t numberOfBlocks,
             size_t numberOfLambdaBins,
-            const MCMoveProbabilitiesParticles &systemProbabilities = MCMoveProbabilitiesParticles()) noexcept(false);
+            const MCMoveProbabilitiesParticles &systemProbabilities = MCMoveProbabilitiesParticles(),
+            std::optional<double> fugacityCoefficient = std::nullopt,
+            bool thermodynamicIntegration = false) noexcept(false);
 
   // Construct programmatically
   Component(size_t componentId, const ForceField &forceField, std::string componentName, double T_c, double P_c,
             double w, std::vector<Atom> definedAtoms, size_t numberOfBlocks, size_t numberOfLambdaBins,
-            const MCMoveProbabilitiesParticles &systemProbabilities = MCMoveProbabilitiesParticles()) noexcept(false);
+            const MCMoveProbabilitiesParticles &systemProbabilities = MCMoveProbabilitiesParticles(),
+            std::optional<double> fugacityCoefficient = std::nullopt,
+            bool thermodynamicIntegration = false) noexcept(false);
 
   uint64_t versionNumber{1};
 

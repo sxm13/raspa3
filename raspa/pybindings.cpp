@@ -38,6 +38,7 @@ import component;
 import system;
 import randomnumbers;
 import monte_carlo;
+import input_reader;
 
 PYBIND11_MODULE(raspalib, m)
 {
@@ -163,16 +164,18 @@ PYBIND11_MODULE(raspalib, m)
   pybind11::class_<Component> component(m, "Component");
   component
       .def(pybind11::init<size_t, const ForceField &, std::string, double, double, double, std::vector<Atom>, size_t,
-                          size_t, const MCMoveProbabilitiesParticles &>(),
+                          size_t, const MCMoveProbabilitiesParticles &, std::optional<double>, bool>(),
            pybind11::arg("componentId"), pybind11::arg("forceField"), pybind11::arg("componentName"),
            pybind11::arg("criticalTemperature"), pybind11::arg("criticalPressure"), pybind11::arg("acentricFactor"),
            pybind11::arg("definedAtoms"), pybind11::arg("numberOfBlocks"), pybind11::arg("numberOfLambdaBins"),
-           pybind11::arg("particleProbabilities"))
+           pybind11::arg("particleProbabilities"), pybind11::arg("fugacityCoefficient") = std::nullopt,
+           pybind11::arg("thermodynamicIntegration") = false)
       .def(pybind11::init<Component::Type, size_t, const ForceField &, std::string &, std::string, size_t, size_t,
-                          const MCMoveProbabilitiesParticles &>(),
+                          const MCMoveProbabilitiesParticles &, std::optional<double>, boo>(),
            pybind11::arg("type"), pybind11::arg("componentId"), pybind11::arg("forceField"),
            pybind11::arg("componentName"), pybind11::arg("fileName"), pybind11::arg("numberOfBlocks"),
-           pybind11::arg("numberOfLambdaBins"), pybind11::arg("particleProbabilities"))
+           pybind11::arg("numberOfLambdaBins"), pybind11::arg("particleProbabilities"),
+           pybind11::arg("fugacityCoefficient") = std::nullopt, pybind11::arg("thermodynamicIntegration") = false)
       .def_readonly("name", &Component::name)
       .def("__repr__", &Component::repr);
 
@@ -193,6 +196,32 @@ PYBIND11_MODULE(raspalib, m)
       .def("computeTotalEnergies", &System::computeTotalEnergies)
       .def_readwrite("atomPositions", &System::atomPositions)
       .def("__repr__", &System::repr);
+
+  pybind11::class_<InputReader> inputReader(m, "InputReader");
+  inputReader.def(pybind11::init<const std::string>(), pybind11::arg("fileName"))
+      .read_only("numberOfBlocks", &InputReader::NumberOfBlocks)
+      .read_only("numberOfCycles", &InputReader::NumberOfCycles)
+      .read_only("numberOfInitializationCycles", &InputReader::NumberOfInitializationCycles)
+      .read_only("numberOfEquilibrationCycles", &InputReader::NumberOfEquilibrationCycles)
+      .read_only("printEvery", &InputReader::printEvery)
+      .read_only("writeBinaryRestartEvery", &InputReader::writeBinaryRestartEvery)
+      .read_only("rescaleWangLandauEvery", &InputReader::rescaleWangLandauEvery)
+      .read_only("optimizeMCMovesEvery", &InputReader::optimizeMCMovesEvery)
+      .read_only("writeEvery", &InputReader::writeEvery)
+      .read_only("forceField", &InputReader::forceField)
+      .read_only("systems", &InputReader::systems);
+
+  pybind11::enum_<InputReader::SimulationType>(inputReader, "SimulationType")
+      .value("MonteCarlo", InputReader::SimulationType::MonteCarlo)
+      .value("MonteCarloTransitionMatrix", InputReader::SimulationType::MonteCarloTransitionMatrix)
+      .value("MolecularDynamics", InputReader::SimulationType::MolecularDynamics)
+      .value("Minimization", InputReader::SimulationType::Minimization)
+      .value("Test", InputReader::SimulationType::Test)
+      .value("Breakthrough", InputReader::SimulationType::Breakthrough)
+      .value("MixturePrediction", InputReader::SimulationType::MixturePrediction)
+      .value("Fitting", InputReader::SimulationType::Fitting)
+      .value("ParallelTempering", InputReader::SimulationType::ParallelTempering)
+      .export_values();
 
   pybind11::class_<MonteCarlo>(m, "MonteCarlo")
       .def(pybind11::init<size_t, size_t, size_t, size_t, size_t, size_t, size_t, std::vector<System> &, RandomNumber &,

@@ -104,11 +104,13 @@ Component::Component() {}
 // create Component in 'inputreader.cpp'
 Component::Component(Component::Type type, size_t currentComponent, const ForceField &forceField,
                      const std::string &componentName, std::optional<const std::string> fileName, size_t numberOfBlocks,
-                     size_t numberOfLambdaBins, const MCMoveProbabilitiesParticles &particleProbabilities) noexcept(false)
+                     size_t numberOfLambdaBins, const MCMoveProbabilitiesParticles &particleProbabilities,
+                     std::optional<double> fugacityCoefficient, bool thermodynamicIntegration) noexcept(false)
     : type(type),
       componentId(currentComponent),
       name(componentName),
       filenameData(fileName),
+      fugacityCoefficient(fugacityCoefficient),
       lambdaGC(numberOfBlocks, numberOfLambdaBins),
       lambdaGibbs(numberOfBlocks, numberOfLambdaBins),
       mc_moves_probabilities(particleProbabilities),
@@ -118,18 +120,21 @@ Component::Component(Component::Type type, size_t currentComponent, const ForceF
   {
     readComponent(forceField, filenameData.value());
   }
+  lambdaGC.computeDUdlambda = thermodynamicIntegration;
 }
 
 // create programmatically an 'adsorbate' component
 Component::Component(size_t componentId, const ForceField &forceField, std::string componentName, double T_c,
                      double P_c, double w, std::vector<Atom> atomList, size_t numberOfBlocks, size_t numberOfLambdaBins,
-                     const MCMoveProbabilitiesParticles &particleProbabilities) noexcept(false)
+                     const MCMoveProbabilitiesParticles &particleProbabilities,
+                     std::optional<double> fugacityCoefficient, bool thermodynamicIntegration) noexcept(false)
     : type(Type::Adsorbate),
       componentId(componentId),
       name(componentName),
       criticalTemperature(T_c),
       criticalPressure(P_c),
       acentricFactor(w),
+      fugacityCoefficient(fugacityCoefficient),
       lambdaGC(numberOfBlocks, numberOfLambdaBins),
       lambdaGibbs(numberOfBlocks, numberOfLambdaBins),
       mc_moves_probabilities(particleProbabilities),
@@ -145,6 +150,7 @@ Component::Component(size_t componentId, const ForceField &forceField, std::stri
   }
 
   computeRigidProperties();
+  lambdaGC.computeDUdlambda = thermodynamicIntegration;
 }
 
 // read the component from the molecule-file
