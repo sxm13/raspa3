@@ -15,7 +15,7 @@ system0 = raspa.System(
     temperature=300.0,
     forceField=ff,
     components=[co2, n2],
-    initialNumberOfMolecules=[100, 0],
+    initialNumberOfMolecules=[50, 25],
     simulationBox=raspa.SimulationBox(25.0 * np.ones(3)),
 )
 
@@ -24,7 +24,7 @@ system1 = raspa.System(
     temperature=500.0,
     forceField=ff,
     components=[co2, n2],
-    initialNumberOfMolecules=[0, 100],
+    initialNumberOfMolecules=[25, 50],
     simulationBox=raspa.SimulationBox(30.0 * np.ones(3)),
 )
 
