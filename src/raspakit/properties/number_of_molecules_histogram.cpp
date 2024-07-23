@@ -45,12 +45,6 @@ std::vector<double> operator+(const std::vector<double>& a, const std::vector<do
   return result;
 }
 
-std::vector<double>& operator+=(std::vector<double>& a, const std::vector<double>& b)
-{
-  a.insert(a.end(), b.begin(), b.end());
-  return a;
-}
-
 std::vector<double> operator-(const std::vector<double>& a, const std::vector<double>& b)
 {
   std::vector<double> result;
@@ -125,7 +119,7 @@ void PropertyNumberOfMoleculesHistogram::addSample(size_t blockIndex, size_t cur
 
 std::vector<std::vector<double>> PropertyNumberOfMoleculesHistogram::averagedProbabilityHistogram(size_t blockIndex) const
 {
-  std::vector<std::vector<double>> averagedData(numberOfBins);
+  std::vector<std::vector<double>> averagedData(numberOfBins, std::vector<double>(size));
   std::transform(bookKeepingEnergyHistogram[blockIndex].begin(),
                  bookKeepingEnergyHistogram[blockIndex].end(),
                  averagedData.begin(),
@@ -153,31 +147,40 @@ std::vector<std::vector<double>> PropertyNumberOfMoleculesHistogram::averagedPro
 
 std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>> PropertyNumberOfMoleculesHistogram::averageProbabilityHistogram() const
 {
-  size_t degreesOfFreedom = numberOfBlocks - 1;
-  double intermediateStandardNormalDeviate = standardNormalDeviates[degreesOfFreedom][chosenConfidenceLevel];
   std::vector<std::vector<double>> average = averagedProbabilityHistogram();
 
   std::vector<std::vector<double>> sumOfSquares(numberOfBins, std::vector<double>(size));
+  size_t numberOfSamples = 0;
   for (size_t blockIndex = 0; blockIndex != numberOfBlocks; ++blockIndex)
   {
     std::vector<std::vector<double>> blockAverage = averagedProbabilityHistogram(blockIndex);
-    for (size_t binIndex = 0; binIndex != numberOfBins; ++binIndex)
+
+    if(numberOfCounts[blockIndex] > 0.0)
     {
-      std::vector<double> value = blockAverage[binIndex] - average[binIndex];
-      sumOfSquares[binIndex] += value * value;
+      for (size_t binIndex = 0; binIndex != numberOfBins; ++binIndex)
+      {
+        std::vector<double> value = blockAverage[binIndex] - average[binIndex];
+        sumOfSquares[binIndex] = sumOfSquares[binIndex] + value * value;
+      }
+      ++numberOfSamples;
     }
   }
-  std::vector<std::vector<double>> standardDeviation(numberOfBins, std::vector<double>(size));
-  std::transform(sumOfSquares.cbegin(), sumOfSquares.cend(), standardDeviation.begin(), [&](const std::vector<double> &sumofsquares)
-                 { return sqrt(sumofsquares / static_cast<double>(degreesOfFreedom)); });
-
-  std::vector<std::vector<double>> standardError(numberOfBins, std::vector<double>(size));
-  std::transform(standardDeviation.cbegin(), standardDeviation.cend(), standardError.begin(),
-                 [&](const std::vector<double> &sigma) { return sigma / std::sqrt(static_cast<double>(numberOfBlocks)); });
-
   std::vector<std::vector<double>> confidenceIntervalError(numberOfBins, std::vector<double>(size));
-  std::transform(standardError.cbegin(), standardError.cend(), confidenceIntervalError.begin(),
-                 [&](const std::vector<double> &error) { return intermediateStandardNormalDeviate * error; });
+  if( numberOfSamples >= 3)
+  {
+    size_t degreesOfFreedom = numberOfBlocks - 1;
+    double intermediateStandardNormalDeviate = standardNormalDeviates[degreesOfFreedom][chosenConfidenceLevel];
+    std::vector<std::vector<double>> standardDeviation(numberOfBins, std::vector<double>(size));
+    std::transform(sumOfSquares.cbegin(), sumOfSquares.cend(), standardDeviation.begin(), [&](const std::vector<double> &sumofsquares)
+                   { return sqrt(sumofsquares / static_cast<double>(degreesOfFreedom)); });
+
+    std::vector<std::vector<double>> standardError(numberOfBins, std::vector<double>(size));
+    std::transform(standardDeviation.cbegin(), standardDeviation.cend(), standardError.begin(),
+                   [&](const std::vector<double> &sigma) { return sigma / std::sqrt(static_cast<double>(numberOfBlocks)); });
+
+    std::transform(standardError.cbegin(), standardError.cend(), confidenceIntervalError.begin(),
+                   [&](const std::vector<double> &error) { return intermediateStandardNormalDeviate * error; });
+  }
 
   return std::make_pair(average, confidenceIntervalError);
 }
