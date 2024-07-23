@@ -55,7 +55,7 @@ import threadpool;
 
   RunningEnergy energySum;
 
-  bool noCharges = forceField.noCharges;
+  bool useCharge = forceField.useCharge;
 
   const double overlapCriteria = forceField.overlapCriteria;
   const double cutOffVDWSquared = cutOffVDW * cutOffVDW;
@@ -100,7 +100,7 @@ import threadpool;
             energySum.moleculeMoleculeVDW += energyFactor.energy;
             energySum.dudlambdaVDW += energyFactor.dUdlambda;
           }
-          if (!noCharges && rr < cutOffChargeSquared)
+          if (useCharge && rr < cutOffChargeSquared)
           {
             double r = std::sqrt(rr);
             EnergyFactor energyFactor = potentialCoulombEnergy(forceField, groupIdA, groupIdB, scalingCoulombA,

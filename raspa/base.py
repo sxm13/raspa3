@@ -59,7 +59,7 @@ class RaspaBase:
         Check if the C++ object attribute can be written to.
 
         Args:
-            key (str): The attribute name to check.
+            key (str): The attribute key to check.
 
         Returns:
             bool: True if the attribute can be written to, False otherwise.
@@ -73,39 +73,40 @@ class RaspaBase:
                 return False
         return False
 
-    def __getattr__(self, name):
+    def __getattr__(self, key):
         """
         Retrieve the value of an attribute.
 
         Args:
-            name (str): The name of the attribute.
+            key (str): The key of the attribute.
 
         Returns:
             The value of the attribute if found, otherwise raises AttributeError.
         """
-        if name in self.__dict__:
-            return self.__dict__[name]
-        elif hasattr(self._cpp_obj, name):
-            return getattr(self._cpp_obj, name)
-        elif name in self._settings:
-            return self._settings[name]
-        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+        if key in self.__dict__:
+            return self.__dict__[key]
+        elif hasattr(self._cpp_obj, key):
+            return getattr(self._cpp_obj, key)
+        elif key in self._settings:
+            return self._settings[key]
+        raise AttributeError(f"'{self.__class__.__key__}' object has no attribute '{key}'")
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, key, value):
         """
         Set the value of an attribute.
 
         Args:
-            name (str): The name of the attribute.
+            key (str): The key of the attribute.
             value: The value to set the attribute to.
         """
-        if name in self.__dict__ or name in {"_settings", "_cpp_obj"}:
-            super().__setattr__(name, value)
-        elif name in self._settings:
-            self._settings[name] = value
-            setattr(self._cpp_obj, name, value)
+        if key in self.__dict__ or key in {"_settings", "_cpp_obj"}:
+            super().__setattr__(key, value)
+        elif self.attr_haswrite(key):
+            setattr(self._cpp_obj, key, value)
+            if key in self._settings:
+                self._settings[key] = value
         else:
-            super().__setattr__(name, value)
+            super().__setattr__(key, value)
 
     def __repr__(self) -> str:
         """

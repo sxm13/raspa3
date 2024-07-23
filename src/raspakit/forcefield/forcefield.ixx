@@ -68,7 +68,7 @@ export struct ForceField
   int3 numberOfWaveVectors{8, 8, 8};
   bool automaticEwald{true};
 
-  bool noCharges{false};
+  bool useCharge{true};
   bool omitEwaldFourier{false};
 
   double minimumRosenbluthFactor{1e-150};
@@ -79,7 +79,7 @@ export struct ForceField
 
   ForceField() noexcept = default;
   ForceField(std::vector<PseudoAtom> pseudoAtoms, std::vector<VDWParameters> parameters, MixingRule mixingRule,
-             double cutOff, bool shifted, bool tailCorrections) noexcept(false);
+             double cutOff, bool shifted, bool tailCorrections, bool useCharge) noexcept(false);
   ForceField(std::string filePath) noexcept(false);
 
   VDWParameters &operator()(size_t row, size_t col) { return data[row * numberOfPseudoAtoms + col]; }

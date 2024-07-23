@@ -596,7 +596,6 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
       forceFields[systemId]->computePolarization = value["ComputePolarization"].get<bool>();
     }
 
-
     if (value["ChargeMethod"].is_string())
     {
       if (!forceFields[systemId].has_value())
@@ -609,12 +608,12 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
       if (caseInSensStringCompare(chargeMethodString, "Ewald"))
       {
         forceFields[systemId]->chargeMethod = ForceField::ChargeMethod::Ewald;
-        forceFields[systemId]->noCharges = false;
+        forceFields[systemId]->useCharge = true;
       }
       if (caseInSensStringCompare(chargeMethodString, "None"))
       {
         forceFields[systemId]->chargeMethod = ForceField::ChargeMethod::Ewald;
-        forceFields[systemId]->noCharges = true;
+        forceFields[systemId]->useCharge = false;
       }
     }
 
@@ -836,10 +835,9 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
           writeEnergyHistogramEvery = value["WriteEnergyHistogramEvery"].get<size_t>();
         }
 
-        systems[systemId].averageEnergyHistogram = 
-          PropertyEnergyHistogram(jsonNumberOfBlocks, numberOfBinsEnergyHistogram,
-                                  {minimumRangeEnergyHistogram, maximumRangeEnergyHistogram}, 
-                                  sampleEnergyHistogramEvery, writeEnergyHistogramEvery);
+        systems[systemId].averageEnergyHistogram = PropertyEnergyHistogram(
+            jsonNumberOfBlocks, numberOfBinsEnergyHistogram, {minimumRangeEnergyHistogram, maximumRangeEnergyHistogram},
+            sampleEnergyHistogramEvery, writeEnergyHistogramEvery);
       }
     }
 

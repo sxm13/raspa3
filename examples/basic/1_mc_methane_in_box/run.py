@@ -2,10 +2,9 @@ import raspa
 import numpy as np
 
 ff = raspa.ForceField.exampleMoleculeForceField()
-mcmoves = raspa.MCMoveProbabilitiesParticles()
-methane = raspa.Component.exampleCH4(0, ff)
 
-
+mcmoves = raspa.MCMoveProbabilitiesParticles(probabilityTranslationMove=1.0)
+methane = raspa.Component.exampleCH4(0, ff, particleProbabilities=mcmoves)
 box = raspa.SimulationBox(30.0 * np.ones(3))
 system = raspa.System(
     systemId=0,
@@ -21,6 +20,4 @@ mc = raspa.MonteCarlo(
     numberOfInitializationCycles=1000,
     systems=[system],
 )
-print(mc)
 mc.run()
-mc.initialize()

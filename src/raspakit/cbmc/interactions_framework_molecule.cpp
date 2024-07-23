@@ -64,7 +64,7 @@ template <>
     const ForceField &forceField, const SimulationBox &simulationBox, std::span<const Atom> frameworkAtoms,
     double cutOffVDW, double cutOffCoulomb, std::span<Atom> atoms, std::make_signed_t<std::size_t> skip) noexcept
 {
-  bool noCharges = forceField.noCharges;
+  bool useCharge = forceField.useCharge;
   [[maybe_unused]] const double overlapCriteria = forceField.overlapCriteria;
   const double cutOffVDWSquared = cutOffVDW * cutOffVDW;
   const double cutOffChargeSquared = cutOffCoulomb * cutOffCoulomb;
@@ -105,7 +105,7 @@ template <>
           energySum.frameworkMoleculeVDW += energyFactor.energy;
           energySum.dudlambdaVDW += energyFactor.dUdlambda;
         }
-        if (!noCharges && rr < cutOffChargeSquared)
+        if (useCharge && rr < cutOffChargeSquared)
         {
           double r = std::sqrt(rr);
           EnergyFactor energyFactor = potentialCoulombEnergy(forceField, groupIdA, groupIdB, scalingCoulombA,
@@ -142,7 +142,7 @@ template <>
   {
     RunningEnergy energySum;
 
-    bool noCharges = forceField.noCharges;
+    bool useCharge = forceField.useCharge;
     const double overlapCriteria = forceField.overlapCriteria;
     const double cutOffVDWSquared = cutOffVDW * cutOffVDW;
     const double cutOffChargeSquared = cutOffCoulomb * cutOffCoulomb;
@@ -185,7 +185,7 @@ template <>
             energySum.frameworkMoleculeVDW += energyFactor.energy;
             energySum.dudlambdaVDW += energyFactor.dUdlambda;
           }
-          if (!noCharges && rr < cutOffChargeSquared)
+          if (useCharge && rr < cutOffChargeSquared)
           {
             double r = std::sqrt(rr);
             EnergyFactor energyFactor = potentialCoulombEnergy(forceField, groupIdA, groupIdB, scalingCoulombA,
@@ -246,7 +246,7 @@ template <>
     const ForceField &forceField, const SimulationBox &simulationBox, std::span<const Atom> frameworkAtoms,
     double cutOffVDW, double cutOffCoulomb, std::span<Atom> atoms, std::make_signed_t<std::size_t> skip) noexcept
 {
-  bool noCharges = forceField.noCharges;
+  bool useCharge = forceField.useCharge;
   [[maybe_unused]] const double overlapCriteria = forceField.overlapCriteria;
   const double cutOffVDWSquared = cutOffVDW * cutOffVDW;
   const double cutOffChargeSquared = cutOffCoulomb * cutOffCoulomb;
@@ -293,7 +293,7 @@ template <>
             energySum.frameworkMoleculeVDW += energyFactor.energy;
             energySum.dudlambdaVDW += energyFactor.dUdlambda;
           }
-          if (!noCharges && rr < cutOffChargeSquared)
+          if (useCharge && rr < cutOffChargeSquared)
           {
             double r = std::sqrt(rr);
             EnergyFactor energyFactor = potentialCoulombEnergy(forceField, groupIdA, groupIdB, scalingCoulombA,

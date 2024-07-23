@@ -148,7 +148,7 @@ void Interactions::precomputeEwaldFourierRigid(
   double3 ay = double3(inv_box.ay, inv_box.by, inv_box.cy);
   double3 az = double3(inv_box.az, inv_box.bz, inv_box.cz);
 
-  if (forceField.noCharges) return;
+  if (!forceField.useCharge) return;
   if (forceField.omitEwaldFourier) return;
 
   size_t numberOfAtoms = rigidFrameworkAtoms.size();
@@ -261,7 +261,7 @@ RunningEnergy Interactions::computeEwaldFourierEnergy(
   double3 az = double3(inv_box.az, inv_box.bz, inv_box.cz);
   RunningEnergy energySum{};
 
-  if (forceField.noCharges) return energySum;
+  if (!forceField.useCharge) return energySum;
   if (forceField.omitEwaldFourier) return energySum;
 
   size_t numberOfAtoms = moleculeAtomPositions.size();
@@ -454,7 +454,7 @@ RunningEnergy Interactions::computeEwaldFourierGradient(
 
   RunningEnergy energySum{};
 
-  if (forceField.noCharges) return energySum;
+  if (!forceField.useCharge) return energySum;
   if (forceField.omitEwaldFourier) return energySum;
 
   size_t numberOfAtoms = atomPositions.size();
@@ -656,7 +656,7 @@ RunningEnergy Interactions::energyDifferenceEwaldFourier(
 {
   RunningEnergy energy;
 
-  if (forceField.noCharges) return energy;
+  if (!forceField.useCharge) return energy;
   if (forceField.omitEwaldFourier) return energy;
 
   double alpha = forceField.EwaldAlpha;
@@ -879,7 +879,7 @@ void Interactions::acceptEwaldMove(const ForceField &forceField,
                                    std::vector<std::pair<std::complex<double>, std::complex<double>>> &storedEik,
                                    std::vector<std::pair<std::complex<double>, std::complex<double>>> &totalEik)
 {
-  if (forceField.noCharges) return;
+  if (!forceField.useCharge) return;
   if (forceField.omitEwaldFourier) return;
 
   storedEik = totalEik;
@@ -904,7 +904,7 @@ std::pair<EnergyStatus, double3x3> Interactions::computeEwaldFourierEnergyStrain
   EnergyStatus energy(1, frameworkComponents.size(), components.size());
   double3x3 strainDerivative;
 
-  if (forceField.noCharges || forceField.omitEwaldFourier) return std::make_pair(energy, strainDerivative);
+  if (!forceField.useCharge || forceField.omitEwaldFourier) return std::make_pair(energy, strainDerivative);
 
   size_t numberOfAtoms = atomPositions.size();
   size_t numberOfComponents = components.size();
@@ -1125,9 +1125,9 @@ void Interactions::computeEwaldFourierElectricPotential(
     std::vector<std::complex<double>> &eik_x, std::vector<std::complex<double>> &eik_y,
     std::vector<std::complex<double>> &eik_z, std::vector<std::complex<double>> &eik_xy,
     std::vector<std::pair<std::complex<double>, std::complex<double>>> &fixedFrameworkStoredEik,
-    std::span<double> electricPotentialMolecules, const ForceField &forceField,
-    const SimulationBox &simulationBox, const std::vector<Component> &components,
-    const std::vector<size_t> &numberOfMoleculesPerComponent, std::span<const Atom> moleculeAtomPositions)
+    std::span<double> electricPotentialMolecules, const ForceField &forceField, const SimulationBox &simulationBox,
+    const std::vector<Component> &components, const std::vector<size_t> &numberOfMoleculesPerComponent,
+    std::span<const Atom> moleculeAtomPositions)
 {
   double alpha = forceField.EwaldAlpha;
   double alpha_squared = alpha * alpha;
@@ -1137,7 +1137,7 @@ void Interactions::computeEwaldFourierElectricPotential(
   double3 az = double3(inv_box.az, inv_box.bz, inv_box.cz);
   RunningEnergy energySum{};
 
-  if (forceField.noCharges) return;
+  if (!forceField.useCharge) return;
   if (forceField.omitEwaldFourier) return;
 
   size_t numberOfAtoms = moleculeAtomPositions.size();
@@ -1155,7 +1155,7 @@ void Interactions::computeEwaldFourierElectricPotential(
   if (numberOfAtoms * (kz_max_unsigned + 1) > eik_z.size()) eik_z.resize(numberOfAtoms * (kz_max_unsigned + 1));
   if (numberOfAtoms > eik_xy.size()) eik_xy.resize(numberOfAtoms);
 
-  //size_t numberOfWaveVectors = (kx_max_unsigned + 1) * 2 * (ky_max_unsigned + 1) * 2 * (kz_max_unsigned + 1);
+  // size_t numberOfWaveVectors = (kx_max_unsigned + 1) * 2 * (ky_max_unsigned + 1) * 2 * (kz_max_unsigned + 1);
 
   // Construct exp(ik.r) for atoms and k-vectors kx, ky, kz = 0, 1 explicitly
   for (size_t i = 0; i != numberOfAtoms; ++i)
@@ -1241,8 +1241,8 @@ void Interactions::computeEwaldFourierElectricPotential(
             std::complex<double> eikz_temp = eik_z[i + numberOfAtoms * static_cast<size_t>(std::abs(kz))];
             eikz_temp.imag(kz >= 0 ? eikz_temp.imag() : -eikz_temp.imag());
             std::complex<double> cki = eik_xy[i] * eikz_temp;
-            electricPotentialMolecules[i] += 2.0 * temp * (cki.real() * cksum.real() + cki.imag() * cksum.imag())
-                                           + 2.0 * temp * (cki.real() * rigid.real() + cki.imag() * rigid.imag());
+            electricPotentialMolecules[i] += 2.0 * temp * (cki.real() * cksum.real() + cki.imag() * cksum.imag()) +
+                                             2.0 * temp * (cki.real() * rigid.real() + cki.imag() * rigid.imag());
           }
 
           ++nvec;
@@ -1274,7 +1274,7 @@ void Interactions::computeEwaldFourierElectricPotential(
         double3 posA = span[i].position;
         for (size_t j = 0; j != span.size(); j++)
         {
-          if(i != j)
+          if (i != j)
           {
             double chargeB = span[j].charge;
             double scalingB = span[j].scalingCoulomb;
@@ -1293,7 +1293,6 @@ void Interactions::computeEwaldFourierElectricPotential(
     }
   }
 
-
   // Handle net-charges
   // for(size_t i = 0; i != components.size(); ++i)
   //{
@@ -1308,8 +1307,8 @@ RunningEnergy Interactions::computeEwaldFourierElectricField(
     std::vector<std::complex<double>> &eik_x, std::vector<std::complex<double>> &eik_y,
     std::vector<std::complex<double>> &eik_z, std::vector<std::complex<double>> &eik_xy,
     std::vector<std::pair<std::complex<double>, std::complex<double>>> &fixedFrameworkStoredEik,
-    std::vector<std::pair<std::complex<double>, std::complex<double>>> &storedEik,
-    const ForceField &forceField, const SimulationBox &simulationBox, std::span<double3> electricFieldMolecules, 
+    std::vector<std::pair<std::complex<double>, std::complex<double>>> &storedEik, const ForceField &forceField,
+    const SimulationBox &simulationBox, std::span<double3> electricFieldMolecules,
     const std::vector<Component> &components, const std::vector<size_t> &numberOfMoleculesPerComponent,
     std::span<Atom> moleculeAtomPositions)
 {
@@ -1321,7 +1320,7 @@ RunningEnergy Interactions::computeEwaldFourierElectricField(
   double3 az = double3(inv_box.az, inv_box.bz, inv_box.cz);
   RunningEnergy energySum{};
 
-  if (forceField.noCharges) return energySum;
+  if (!forceField.useCharge) return energySum;
   if (forceField.omitEwaldFourier) return energySum;
 
   size_t numberOfAtoms = moleculeAtomPositions.size();
@@ -1407,7 +1406,6 @@ RunningEnergy Interactions::computeEwaldFourierElectricField(
           double3 rk = kvec_x + kvec_y + kvec_z;
           double rksq = rk.length_squared();
 
-
           std::pair<std::complex<double>, std::complex<double>> cksum;
           for (size_t i = 0; i != numberOfAtoms; ++i)
           {
@@ -1440,8 +1438,8 @@ RunningEnergy Interactions::computeEwaldFourierElectricField(
             eikz_temp.imag(kz >= 0 ? eikz_temp.imag() : -eikz_temp.imag());
             std::complex<double> cki = eik_xy[i] * eikz_temp;
             electricFieldMolecules[i] +=
-                2.0 * temp * (cki.imag() * cksum.first.real() - cki.real() * cksum.first.imag()) * rk
-                + 2.0 * temp * (cki.imag() * rigid.first.real() - cki.real() * rigid.first.imag()) * rk;
+                2.0 * temp * (cki.imag() * cksum.first.real() - cki.real() * cksum.first.imag()) * rk +
+                2.0 * temp * (cki.imag() * rigid.first.real() - cki.real() * rigid.first.imag()) * rk;
           }
 
           storedEik[nvec] = cksum;
@@ -1479,7 +1477,7 @@ RunningEnergy Interactions::computeEwaldFourierElectricField(
         double3 posA = span[i].position;
         for (size_t j = i + 1; j != span.size(); j++)
         {
-          if(i != j)
+          if (i != j)
           {
             double chargeB = span[j].charge;
             double scalingB = span[j].scalingCoulomb;

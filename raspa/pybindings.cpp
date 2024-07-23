@@ -92,13 +92,15 @@ PYBIND11_MODULE(raspalib, m)
   pybind11::class_<ForceField> forceField(m, "ForceField");
   forceField
       .def(pybind11::init<std::vector<PseudoAtom>, std::vector<VDWParameters>, ForceField::MixingRule, double, bool,
-                          bool>(),
+                          bool, bool>(),
            pybind11::arg("pseudoAtoms"), pybind11::arg("parameters"), pybind11::arg("mixingRule"),
-           pybind11::arg("cutOff"), pybind11::arg("shifted"), pybind11::arg("tailCorrections"))
+           pybind11::arg("cutOff"), pybind11::arg("shifted"), pybind11::arg("tailCorrections"),
+           pybind11::arg("useCharge"))
       .def(pybind11::init<std::string>(), pybind11::arg("fileName"))
       .def("__repr__", &ForceField::repr)
       .def_readonly("pseudoAtoms", &ForceField::pseudoAtoms)
-      .def_readonly("vdwParameters", &ForceField::data);
+      .def_readonly("vdwParameters", &ForceField::data)
+      .def_readwrite("useCharge", &ForceField::useCharge);
 
   pybind11::enum_<ForceField::MixingRule>(forceField, "MixingRule")
       .value("Lorentz_Berthelot", ForceField::MixingRule::Lorentz_Berthelot)

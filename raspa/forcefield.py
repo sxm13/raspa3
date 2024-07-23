@@ -87,6 +87,7 @@ class ForceField(RaspaBase):
         cutOff: float = 12.0,
         shifted: bool = False,
         tailCorrections: bool = False,
+        useCharge=True
     ):
         """
         Initialize the ForceField object with provided parameters.
@@ -107,15 +108,16 @@ class ForceField(RaspaBase):
             self.drop_args("fileName")
             self._settings["mixingRule"] = getattr(raspalib.ForceField.MixingRule, self._settings["mixingRule"])
         else:
-            self.drop_args("pseudoAtoms", "parameters", "mixingRule", "cutOff", "shifted", "tailCorrections")
+            self.drop_args("pseudoAtoms", "parameters", "mixingRule", "cutOff", "shifted", "tailCorrections", "useCharge")
         self._cpp_obj = raspalib.ForceField(**self.cpp_args())
+        self.useCharge = useCharge
 
     @classmethod
-    def exampleMoleculeForceField(cls):
+    def exampleMoleculeForceField(cls, useCharge=True):
         """
         Create an example molecule force field.
 
         Returns:
             ForceField: An instance of ForceField with example molecule force field settings.
         """
-        return cls(fileName=os.path.join(SHARE_DIR, "forcefields", "example_molecule_forcefield", "force_field.json"))
+        return cls(fileName=os.path.join(SHARE_DIR, "forcefields", "example_molecule_forcefield", "force_field.json"), useCharge=useCharge)

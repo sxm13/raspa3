@@ -65,15 +65,16 @@ import vdwparameters;
 import json;
 
 ForceField::ForceField(std::vector<PseudoAtom> pseudoAtoms, std::vector<VDWParameters> selfInteractions,
-                       [[maybe_unused]] MixingRule mixingRule, double cutOff, bool shifted,
-                       bool applyTailCorrections) noexcept(false)
+                       [[maybe_unused]] MixingRule mixingRule, double cutOff, bool shifted, bool applyTailCorrections,
+                       bool useCharge) noexcept(false)
     : data(pseudoAtoms.size() * pseudoAtoms.size(), VDWParameters(0.0, 0.0)),
       shiftPotentials(pseudoAtoms.size() * pseudoAtoms.size(), shifted),
       tailCorrections(pseudoAtoms.size() * pseudoAtoms.size(), applyTailCorrections),
       cutOffVDW(cutOff),
       cutOffCoulomb(cutOff),
       numberOfPseudoAtoms(pseudoAtoms.size()),
-      pseudoAtoms(pseudoAtoms)
+      pseudoAtoms(pseudoAtoms),
+      useCharge(useCharge)
 {
   for (size_t i = 0; i < selfInteractions.size(); ++i)
   {
@@ -146,7 +147,6 @@ ForceField::ForceField(std::string filePath)
         PseudoAtom(jsonName, jsonMass, jsonCharge, jsonPolarizibility, atomicNumber, jsonPrintToOutput, jsonSource));
   }
 
-
   // Read and set truncation methods
   bool shiftPotential = false;
   bool tailCorrection = false;
@@ -210,6 +210,9 @@ ForceField::ForceField(std::string filePath)
   {
     mixingRule = MixingRule::Lorentz_Berthelot;
   }
+
+  // Get charge method
+  useCharge = parsed_data.value("ChargeMethod", "Ewald") != "Ewald";
 
   cutOffVDW = parsed_data.value("CutOffVDW", 12.0);
   cutOffCoulomb = parsed_data.value("CutOffCoulomb", 12.0);
@@ -508,7 +511,7 @@ Archive<std::ofstream>& operator<<(Archive<std::ofstream>& archive, const ForceF
   archive << f.EwaldAlpha;
   archive << f.numberOfWaveVectors;
   archive << f.automaticEwald;
-  archive << f.noCharges;
+  archive << f.useCharge;
   archive << f.omitEwaldFourier;
   archive << f.minimumRosenbluthFactor;
   archive << f.energyOverlapCriteria;
@@ -546,7 +549,7 @@ Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, ForceField& 
   archive >> f.EwaldAlpha;
   archive >> f.numberOfWaveVectors;
   archive >> f.automaticEwald;
-  archive >> f.noCharges;
+  archive >> f.useCharge;
   archive >> f.omitEwaldFourier;
   archive >> f.minimumRosenbluthFactor;
   archive >> f.energyOverlapCriteria;
@@ -562,7 +565,7 @@ bool ForceField::operator==(const ForceField& other) const
       numberOfPseudoAtoms != other.numberOfPseudoAtoms || overlapCriteria != other.overlapCriteria ||
       EwaldPrecision != other.EwaldPrecision || EwaldAlpha != other.EwaldAlpha ||
       numberOfWaveVectors != other.numberOfWaveVectors || automaticEwald != other.automaticEwald ||
-      noCharges != other.noCharges || omitEwaldFourier != other.omitEwaldFourier ||
+      useCharge != other.useCharge || omitEwaldFourier != other.omitEwaldFourier ||
       minimumRosenbluthFactor != other.minimumRosenbluthFactor ||
       energyOverlapCriteria != other.energyOverlapCriteria || useDualCutOff != other.useDualCutOff ||
       chargeMethod != other.chargeMethod)

@@ -68,7 +68,7 @@ RunningEnergy Interactions::computeFrameworkMoleculeEnergy(const ForceField &for
   double rr;
   RunningEnergy energySum{};
 
-  bool noCharges = forceField.noCharges;
+  bool useCharge = forceField.useCharge;
   const double cutOffVDWSquared = forceField.cutOffVDW * forceField.cutOffVDW;
   const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
 
@@ -103,7 +103,7 @@ RunningEnergy Interactions::computeFrameworkMoleculeEnergy(const ForceField &for
         energySum.frameworkMoleculeVDW += energyFactor.energy;
         energySum.dudlambdaVDW += energyFactor.dUdlambda;
       }
-      if (!noCharges && rr < cutOffChargeSquared)
+      if (useCharge && rr < cutOffChargeSquared)
       {
         double r = std::sqrt(rr);
         EnergyFactor energyFactor =
@@ -158,7 +158,7 @@ RunningEnergy Interactions::computeFrameworkMoleculeTailEnergy(const ForceField 
 
   RunningEnergy energySum{};
 
-  bool noCharges = forceField.noCharges;
+  bool useCharge = forceField.useCharge;
   const double overlapCriteria = forceField.overlapCriteria;
   const double cutOffVDWSquared = forceField.cutOffVDW * forceField.cutOffVDW;
   const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
@@ -194,7 +194,7 @@ RunningEnergy Interactions::computeFrameworkMoleculeTailEnergy(const ForceField 
         energySum.frameworkMoleculeVDW += energyFactor.energy;
         energySum.dudlambdaVDW += energyFactor.dUdlambda;
       }
-      if (!noCharges && rr < cutOffChargeSquared)
+      if (useCharge && rr < cutOffChargeSquared)
       {
         double r = std::sqrt(rr);
         EnergyFactor energyFactor = potentialCoulombEnergy(forceField, groupIdA, groupIdB, scalingCoulombA,
@@ -226,7 +226,7 @@ RunningEnergy Interactions::computeFrameworkMoleculeTailEnergy(const ForceField 
         energySum.frameworkMoleculeVDW -= energyFactor.energy;
         energySum.dudlambdaVDW -= energyFactor.dUdlambda;
       }
-      if (!noCharges && rr < cutOffChargeSquared)
+      if (useCharge && rr < cutOffChargeSquared)
       {
         double r = std::sqrt(rr);
         EnergyFactor energyFactor = potentialCoulombEnergy(forceField, groupIdA, groupIdB, scalingCoulombA,
@@ -291,7 +291,7 @@ RunningEnergy Interactions::computeFrameworkMoleculeGradient(const ForceField &f
   double3 dr, posA, posB;
   double rr;
 
-  bool noCharges = forceField.noCharges;
+  bool useCharge = forceField.useCharge;
   const double cutOffVDWSquared = forceField.cutOffVDW * forceField.cutOffVDW;
   const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
 
@@ -331,7 +331,7 @@ RunningEnergy Interactions::computeFrameworkMoleculeGradient(const ForceField &f
         it1->gradient += f;
         it2->gradient -= f;
       }
-      if (!noCharges && rr < cutOffChargeSquared)
+      if (useCharge && rr < cutOffChargeSquared)
       {
         double r = std::sqrt(rr);
         ForceFactor forceFactor = potentialCoulombGradient(forceField, groupIdA, groupIdB, scalingCoulombA,
@@ -361,7 +361,7 @@ RunningEnergy Interactions::computeFrameworkMoleculeGradient(const ForceField &f
   double3x3 strainDerivativeTensor;
   EnergyStatus energy(1, frameworkComponents.size(), components.size());
 
-  bool noCharges = forceField.noCharges;
+  bool useCharge = forceField.useCharge;
   const double cutOffVDWSquared = forceField.cutOffVDW * forceField.cutOffVDW;
   const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
   const double preFactor = 2.0 * std::numbers::pi / simulationBox.volume;
@@ -419,7 +419,7 @@ RunningEnergy Interactions::computeFrameworkMoleculeGradient(const ForceField &f
         strainDerivativeTensor.bz += g.y * dr.z;
         strainDerivativeTensor.cz += g.z * dr.z;
       }
-      if (!noCharges && rr < cutOffChargeSquared)
+      if (useCharge && rr < cutOffChargeSquared)
       {
         double r = std::sqrt(rr);
 
@@ -451,7 +451,6 @@ RunningEnergy Interactions::computeFrameworkMoleculeGradient(const ForceField &f
   return std::make_pair(energy, strainDerivativeTensor);
 }
 
-
 void Interactions::computeFrameworkMoleculeElectricPotential(const ForceField &forceField,
                                                              const SimulationBox &simulationBox,
                                                              std::span<double> electricPotentialMolecules,
@@ -461,10 +460,10 @@ void Interactions::computeFrameworkMoleculeElectricPotential(const ForceField &f
   double3 dr, posA, posB, f;
   double rr;
 
-  bool noCharges = forceField.noCharges;
+  bool useCharge = forceField.useCharge;
   const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
 
-  if (noCharges) return;
+  if (!useCharge) return;
   if (moleculeAtoms.empty()) return;
 
   for (std::span<const Atom>::iterator it1 = frameworkAtoms.begin(); it1 != frameworkAtoms.end(); ++it1)
@@ -493,21 +492,21 @@ void Interactions::computeFrameworkMoleculeElectricPotential(const ForceField &f
 }
 
 RunningEnergy Interactions::computeFrameworkMoleculeElectricField(const ForceField &forceField,
-                                                         const SimulationBox &simulationBox,
-                                                         std::span<double3> electricFieldMolecules,
-                                                         std::span<const Atom> frameworkAtoms,
-                                                         std::span<const Atom> moleculeAtoms) noexcept
+                                                                  const SimulationBox &simulationBox,
+                                                                  std::span<double3> electricFieldMolecules,
+                                                                  std::span<const Atom> frameworkAtoms,
+                                                                  std::span<const Atom> moleculeAtoms) noexcept
 {
   double3 dr, posA, posB, f;
   double rr;
 
   RunningEnergy energySum{};
 
-  bool noCharges = forceField.noCharges;
+  bool useCharge = forceField.useCharge;
   const double cutOffVDWSquared = forceField.cutOffVDW * forceField.cutOffVDW;
   const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
 
-  if (noCharges) return energySum;
+  if (!useCharge) return energySum;
   if (moleculeAtoms.empty()) return energySum;
 
   for (std::span<const Atom>::iterator it1 = frameworkAtoms.begin(); it1 != frameworkAtoms.end(); ++it1)
@@ -540,16 +539,17 @@ RunningEnergy Interactions::computeFrameworkMoleculeElectricField(const ForceFie
         energySum.frameworkMoleculeVDW += energyFactor.energy;
         energySum.dudlambdaVDW += energyFactor.dUdlambda;
       }
-      if (!noCharges && rr < cutOffChargeSquared)
+      if (useCharge && rr < cutOffChargeSquared)
       {
         double r = std::sqrt(rr);
-        EnergyFactor energyFactor =
-            potentialCoulombEnergy(forceField, groupIdA, groupIdB, scalingCoulombA, scalingCoulombB, r, chargeA, chargeB);
+        EnergyFactor energyFactor = potentialCoulombEnergy(forceField, groupIdA, groupIdB, scalingCoulombA,
+                                                           scalingCoulombB, r, chargeA, chargeB);
 
         energySum.frameworkMoleculeCharge += energyFactor.energy;
         energySum.dudlambdaCharge += energyFactor.dUdlambda;
 
-        ForceFactor forceFactor = scalingCoulombA * chargeA * potentialCoulombGradient(forceField, groupIdA, groupIdB, 1.0, 1.0, r, 1.0, 1.0);
+        ForceFactor forceFactor =
+            scalingCoulombA * chargeA * potentialCoulombGradient(forceField, groupIdA, groupIdB, 1.0, 1.0, r, 1.0, 1.0);
         size_t index = static_cast<size_t>(std::distance(moleculeAtoms.begin(), it2));
         electricFieldMolecules[index] += 2.0 * forceFactor.forceFactor * dr;
       }
@@ -561,15 +561,14 @@ RunningEnergy Interactions::computeFrameworkMoleculeElectricField(const ForceFie
 
 std::optional<RunningEnergy> Interactions::computeFrameworkMoleculeElectricFieldDifference(
     const ForceField &forceField, const SimulationBox &simulationBox, std::span<const Atom> frameworkAtoms,
-    std::span<double3> electricFieldMolecule, std::span<const Atom> newatoms,
-    std::span<const Atom> oldatoms) noexcept
+    std::span<double3> electricFieldMolecule, std::span<const Atom> newatoms, std::span<const Atom> oldatoms) noexcept
 {
   double3 dr, s, t;
   double rr;
 
   RunningEnergy energySum{};
 
-  bool noCharges = forceField.noCharges;
+  bool useCharge = forceField.useCharge;
   const double overlapCriteria = forceField.overlapCriteria;
   const double cutOffVDWSquared = forceField.cutOffVDW * forceField.cutOffVDW;
   const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
@@ -606,7 +605,7 @@ std::optional<RunningEnergy> Interactions::computeFrameworkMoleculeElectricField
         energySum.frameworkMoleculeVDW += energyFactor.energy;
         energySum.dudlambdaVDW += energyFactor.dUdlambda;
       }
-      if (!noCharges && rr < cutOffChargeSquared)
+      if (useCharge && rr < cutOffChargeSquared)
       {
         double r = std::sqrt(rr);
         EnergyFactor energyFactor = potentialCoulombEnergy(forceField, groupIdA, groupIdB, scalingCoulombA,
@@ -615,7 +614,8 @@ std::optional<RunningEnergy> Interactions::computeFrameworkMoleculeElectricField
         energySum.frameworkMoleculeCharge += energyFactor.energy;
         energySum.dudlambdaCharge += energyFactor.dUdlambda;
 
-        ForceFactor forceFactor = scalingCoulombA * chargeA * potentialCoulombGradient(forceField, groupIdA, groupIdB, 1.0, 1.0, r, 1.0, 1.0);
+        ForceFactor forceFactor =
+            scalingCoulombA * chargeA * potentialCoulombGradient(forceField, groupIdA, groupIdB, 1.0, 1.0, r, 1.0, 1.0);
         electricFieldMolecule[indexB] += 2.0 * forceFactor.forceFactor * dr;
       }
     }
@@ -642,7 +642,7 @@ std::optional<RunningEnergy> Interactions::computeFrameworkMoleculeElectricField
         energySum.frameworkMoleculeVDW -= energyFactor.energy;
         energySum.dudlambdaVDW -= energyFactor.dUdlambda;
       }
-      if (!noCharges && rr < cutOffChargeSquared)
+      if (useCharge && rr < cutOffChargeSquared)
       {
         double r = std::sqrt(rr);
         EnergyFactor energyFactor = potentialCoulombEnergy(forceField, groupIdA, groupIdB, scalingCoulombA,
@@ -651,7 +651,8 @@ std::optional<RunningEnergy> Interactions::computeFrameworkMoleculeElectricField
         energySum.frameworkMoleculeCharge -= energyFactor.energy;
         energySum.dudlambdaCharge -= energyFactor.dUdlambda;
 
-        ForceFactor forceFactor = scalingCoulombA * chargeA * potentialCoulombGradient(forceField, groupIdA, groupIdB, 1.0, 1.0, r, 1.0, 1.0);
+        ForceFactor forceFactor =
+            scalingCoulombA * chargeA * potentialCoulombGradient(forceField, groupIdA, groupIdB, 1.0, 1.0, r, 1.0, 1.0);
         electricFieldMolecule[indexB] -= 2.0 * forceFactor.forceFactor * dr;
       }
     }

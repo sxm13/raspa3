@@ -72,7 +72,7 @@ class System(RaspaBase):
         """
         indices, position = index_position_tuple
         for i, idx in enumerate(indices):
-            self._cpp_obj.atomPositions[idx].position = raspalib.double3(*position[i])
+            setattr(self.atomPositions[idx], "position", raspalib.double3(*position[i]))
 
     def computeTotalEnergies(self):
         """
