@@ -73,9 +73,6 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::insertionMoveCBMC(Ran
   Component::GrowType growType = system.components[selectedComponent].growType;
 
   time_begin = std::chrono::system_clock::now();
-  // std::vector<Atom> atoms =
-  //   system.components[selectedComponent].recenteredCopy(1.0,
-  //   system.numberOfMoleculesPerComponent[selectedComponent]);
   std::optional<ChainData> growData = CBMC::growMoleculeSwapInsertion(
       random, system.hasExternalField, system.components, system.forceField, system.simulationBox,
       system.spanOfFrameworkAtoms(), system.spanOfMoleculeAtoms(), system.beta, growType, cutOffVDW, cutOffCoulomb,
@@ -86,6 +83,11 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::insertionMoveCBMC(Ran
   if (!growData) return {std::nullopt, double3(0.0, 1.0, 0.0)};
 
   std::span<const Atom> newMolecule = std::span(growData->atom.begin(), growData->atom.end());
+
+  if(system.insideBlockedPockets(system.components[selectedComponent], newMolecule))
+  {
+    return {std::nullopt, double3(0.0, 1.0, 0.0)};
+  }
 
   system.components[selectedComponent].mc_moves_statistics.swapInsertionMove_CBMC.constructed += 1;
   system.components[selectedComponent].mc_moves_statistics.swapInsertionMove_CBMC.totalConstructed += 1;

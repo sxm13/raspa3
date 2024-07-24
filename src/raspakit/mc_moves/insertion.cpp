@@ -120,7 +120,6 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::insertionMove(RandomN
   // get the total difference in energy
   RunningEnergy energyDifference = externalFieldMolecule.value() + frameworkMolecule.value() + interMolecule.value() +
                                    energyFourierDifference + tailEnergyDifference;
-  ;
 
   double fugacity = system.components[selectedComponent].fugacityCoefficient.value_or(1.0) * system.pressure;
   double preFactor = system.beta * system.components[selectedComponent].molFraction * fugacity *

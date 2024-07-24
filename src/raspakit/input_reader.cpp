@@ -55,6 +55,7 @@ import component;
 import simulationbox;
 import forcefield;
 import double3;
+import double4;
 import units;
 import sample_movies;
 import threadpool;
@@ -546,6 +547,29 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
         jsonComponents[i][componentId].lambdaGC.computeDUdlambda = thermodynamic_integration;
       }
     }
+
+    for (auto &[_, block_pockets_item] : item["BlockingPockets"].items())
+    {
+      if (!block_pockets_item.is_array())
+      {
+        throw std::runtime_error(std::format("[Component reader]: item {} must be an array\n", block_pockets_item.dump()));
+      }
+
+      if (block_pockets_item.size() != 4)
+      {
+        throw std::runtime_error(
+            std::format("[Component reader]: item {} must be an array with four elements, "
+                        "an array with the x,y,z positions, and a radius\n",
+                        block_pockets_item.dump()));
+      }
+
+      std::vector<double> data = block_pockets_item.is_array() ? block_pockets_item.get<std::vector<double>>() : std::vector<double>{};
+      for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+      {
+        jsonComponents[i][componentId].blockingPockets.push_back(double4(data[0], data[1], data[2], data[3]));
+      }
+    }
+
 
     componentId++;
   }

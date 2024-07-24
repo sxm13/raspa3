@@ -401,6 +401,9 @@ export struct System
   std::vector<Atom> randomConfiguration(RandomNumber &random, size_t selectedComponent,
                                         const std::span<const Atom> atoms);
 
+
+  bool insideBlockedPockets(const Component &component, std::span<const Atom> molecule_atoms) const;
+
   void sampleProperties(size_t currentBlock, size_t currentCycle);
 
   void writeCPUTimeStatistics(std::ostream &stream) const;

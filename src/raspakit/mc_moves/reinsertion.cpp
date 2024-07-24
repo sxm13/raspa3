@@ -90,6 +90,11 @@ std::optional<RunningEnergy> MC_Moves::reinsertionMove(RandomNumber &random, Sys
 
   std::span<const Atom> newMolecule = std::span(growData->atom.begin(), growData->atom.end());
 
+  if(system.insideBlockedPockets(system.components[selectedComponent], newMolecule))
+  {
+    return std::nullopt;
+  }
+
   system.components[selectedComponent].mc_moves_statistics.reinsertionMove_CBMC.constructed += 1;
   system.components[selectedComponent].mc_moves_statistics.reinsertionMove_CBMC.totalConstructed += 1;
 

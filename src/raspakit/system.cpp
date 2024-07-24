@@ -429,7 +429,6 @@ void System::createInitialMolecules([[maybe_unused]] RandomNumber& random)
               this->spanOfFrameworkAtoms(), this->spanOfMoleculeAtoms(), this->beta, growType, forceField.cutOffVDW,
               forceField.cutOffCoulomb, componentId, numberOfMoleculesPerComponent[componentId], 0.0, 1uz,
               numberOfTrialDirections);
-
         } while (!growData || growData->energies.potentialEnergy() > forceField.overlapCriteria);
 
         insertFractionalMolecule(componentId, growData->molecule, growData->atom, i);
@@ -439,22 +438,56 @@ void System::createInitialMolecules([[maybe_unused]] RandomNumber& random)
     for (size_t i = 0; i < initialNumberOfMolecules[componentId]; ++i)
     {
       std::optional<ChainData> growData = std::nullopt;
+      bool inside_blocked_pocket{ false };
       do
       {
-        Component::GrowType growType = components[componentId].growType;
-        growData = CBMC::growMoleculeSwapInsertion(
-            random, this->hasExternalField, this->components, this->forceField, this->simulationBox,
-            this->spanOfFrameworkAtoms(), this->spanOfMoleculeAtoms(), this->beta, growType, forceField.cutOffVDW,
-            forceField.cutOffCoulomb, componentId, numberOfMoleculesPerComponent[componentId], 1.0, 0uz,
-            numberOfTrialDirections);
+        do
+        {
+          Component::GrowType growType = components[componentId].growType;
+          growData = CBMC::growMoleculeSwapInsertion(
+              random, this->hasExternalField, this->components, this->forceField, this->simulationBox,
+              this->spanOfFrameworkAtoms(), this->spanOfMoleculeAtoms(), this->beta, growType, forceField.cutOffVDW,
+              forceField.cutOffCoulomb, componentId, numberOfMoleculesPerComponent[componentId], 1.0, 0uz,
+              numberOfTrialDirections);
 
-      } while (!growData || growData->energies.potentialEnergy() > forceField.overlapCriteria);
+        } while (!growData || growData->energies.potentialEnergy() > forceField.overlapCriteria);
+
+        std::span<const Atom> newMolecule = std::span(growData->atom.begin(), growData->atom.end());
+        inside_blocked_pocket = insideBlockedPockets(components[componentId], newMolecule);
+
+      } while (inside_blocked_pocket);
+
 
       insertMolecule(componentId, growData->molecule, growData->atom);
     }
     componentId++;
   }
 }
+
+bool System::insideBlockedPockets(const Component &component, std::span<const Atom> molecule_atoms) const
+{
+  for(const Framework &framework: frameworkComponents)
+  {
+    for(size_t i = 0; i != component.blockingPockets.size(); ++i)
+    {
+      double radius_squared = component.blockingPockets[i].w * component.blockingPockets[i].w;
+      double3 pos = framework.simulationBox.cell * double3(component.blockingPockets[i].x, component.blockingPockets[i].y, component.blockingPockets[i].z);
+      for(const Atom &atom : molecule_atoms)
+      {
+        double3 dr = atom.position - pos;
+        dr = framework.simulationBox.applyPeriodicBoundaryConditions(dr);
+        if(dr.length_squared() < radius_squared) 
+        {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+
+
 size_t System::randomMoleculeOfComponent(RandomNumber& random, size_t selectedComponent)
 {
   return size_t(random.uniform() * static_cast<double>(numberOfMoleculesPerComponent[selectedComponent]));
@@ -1262,6 +1295,14 @@ std::string System::writeSystemStatus() const
   std::print(stream, "Pressure:    {} [Pa]\n\n", pressure * Units::PressureConversionFactor);
 
   stream << simulationBox.printStatus();
+  std::print(stream, "\n\n\n");
+
+  std::print(stream, "Property measurement settings\n");
+  std::print(stream, "===============================================================================\n\n");
+  if(averageEnergyHistogram.has_value())
+  {
+    stream << averageEnergyHistogram->printSettings();
+  }
   std::print(stream, "\n\n\n");
 
   return stream.str();
