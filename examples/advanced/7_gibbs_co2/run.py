@@ -21,7 +21,7 @@ system0 = raspa.System(
     initialNumberOfMolecules=[256],
     pressure=1e4,
     simulationBox=raspa.SimulationBox(30.0 * np.ones(3)),
-    systemProbabilities=sysMoves
+    systemProbabilities=sysMoves,
 )
 
 system1 = raspa.System(
@@ -31,7 +31,7 @@ system1 = raspa.System(
     components=[co2],
     initialNumberOfMolecules=[256],
     simulationBox=raspa.SimulationBox(30.0 * np.ones(3)),
-    systemProbabilities=sysMoves
+    systemProbabilities=sysMoves,
 )
 
 mc = raspa.MonteCarlo(

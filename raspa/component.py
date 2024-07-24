@@ -41,9 +41,11 @@ class Component(RaspaBase):
         cls,
         componentId: int,
         forceField: ForceField,
+        particleProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
         numberOfBlocks: int = 5,
         numberOfLambdaBins: int = 21,
-        particleProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
+        fugacityCoefficient: float = None,
+        thermodynamicIntegration: bool = False
     ):
         settings = locals()
         settings.pop("cls")
@@ -58,9 +60,11 @@ class Component(RaspaBase):
         cls,
         componentId: int,
         forceField: ForceField,
+        particleProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
         numberOfBlocks: int = 5,
         numberOfLambdaBins: int = 21,
-        particleProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
+        fugacityCoefficient: float = None,
+        thermodynamicIntegration: bool = False
     ):
         settings = locals()
         settings.pop("cls")
@@ -75,9 +79,11 @@ class Component(RaspaBase):
         cls,
         componentId: int,
         forceField: ForceField,
+        particleProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
         numberOfBlocks: int = 5,
         numberOfLambdaBins: int = 21,
-        particleProbabilities: MCMoveProbabilitiesParticles = MCMoveProbabilitiesParticles(),
+        fugacityCoefficient: float = None,
+        thermodynamicIntegration: bool = False
     ):
         settings = locals()
         settings.pop("cls")

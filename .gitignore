@@ -28,7 +28,7 @@ _deps
 # raspa test-executables
 test_*
 restart_data.bin
-**/run
+examples/*/*/run
 
 dependencies.sh
 examples/*/*/output/

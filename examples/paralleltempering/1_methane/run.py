@@ -15,7 +15,7 @@ systems = [
         components=[methane],
         initialNumberOfMolecules=[100],
         systemProbabilities=sysmoves,
-        simulationBox=raspa.SimulationBox(30.0 * np.ones(3))
+        simulationBox=raspa.SimulationBox(30.0 * np.ones(3)),
     )
     for i in range(8)
 ]
