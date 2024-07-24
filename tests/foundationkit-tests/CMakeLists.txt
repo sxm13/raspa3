@@ -9,6 +9,7 @@ if (LINUX)
                         libs::raspakit
                         ${BLAS_LIBRARIES}
                         ${LAPACK_LIBRARIES}
+                        ${HDF5_CXX_LIBRARIES}
                         OpenMP::OpenMP_CXX
                         GTest::gtest
                         GTest::gtest_main
@@ -28,6 +29,7 @@ elseif (Win32)
                         -static-libstdc++
                         ${BLAS_LIBRARIES}
                         ${LAPACK_LIBRARIES}
+                        ${HDF5_CXX_LIBRARIES}
                         OpenMP::OpenMP_CXX
                         -l:libc++.a
                         -l:libc++abi.a
@@ -39,6 +41,7 @@ target_link_libraries(unit_tests_foundationkit PRIVATE
                       libs::raspakit
                       ${BLAS_LIBRARIES}
                       ${LAPACK_LIBRARIES}
+                      ${HDF5_CXX_LIBRARIES}
                       GTest::gtest
                       GTest::gtest_main
                       GTest::gmock

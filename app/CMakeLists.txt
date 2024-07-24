@@ -11,6 +11,7 @@ if (LINUX)
         -static-libgcc
         ${BLAS_LIBRARIES}
         ${LAPACK_LIBRARIES}
+        ${HDF5_CXX_LIBRARIES}
         OpenMP::OpenMP_CXX
         -nostdlib++
         -l:libc++.a
@@ -26,6 +27,7 @@ elseif (Win32)
         -static-libstdc++
         ${BLAS_LIBRARIES}
         ${LAPACK_LIBRARIES}
+        ${HDF5_CXX_LIBRARIES}
         OpenMP::OpenMP_CXX
         -nostdlib++
         -l:libc++.a
@@ -39,6 +41,7 @@ elseif (APPLE)
         libs::raspakit
         ${BLAS_LIBRARIES}
         ${LAPACK_LIBRARIES}
+        ${HDF5_CXX_LIBRARIES}
         -nostdlib++
         ${LLVM_LIBS}/c++/libc++experimental.a
         ${LLVM_LIBS}/c++/libc++.a
@@ -48,6 +51,5 @@ elseif (APPLE)
         -lpthread
 )
 endif()
-
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin COMPONENT app)
