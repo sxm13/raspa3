@@ -379,6 +379,9 @@ void MonteCarlo::initialize()
         system.forceField.jsonPseudoAtomStatus();
     outputJsons[system.systemId]["initialization"]["components"] = system.jsonComponentStatus();
     outputJsons[system.systemId]["initialization"]["reactions"] = system.reactions.jsonStatus();
+
+    std::ofstream json(outputJsonFileNames[system.systemId]);
+    json << outputJsons[system.systemId].dump(4);
   }
 
   for (System& system : systems)
@@ -398,11 +401,6 @@ void MonteCarlo::initialize()
     cycle();
 
   continueInitializationStage:;
-  }
-  for (System& system : systems)
-  {
-    std::ofstream json(outputJsonFileNames[system.systemId]);
-    json << outputJsons[system.systemId].dump(4);
   }
 }
 
