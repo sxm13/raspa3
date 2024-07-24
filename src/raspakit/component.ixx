@@ -42,6 +42,7 @@ import archive;
 import randomnumbers;
 import int3;
 import double3;
+import double4;
 import simd_quatd;
 import averages;
 import atom;
@@ -108,6 +109,8 @@ export struct Component
   std::string name{};
   std::optional<std::string> filenameData{};
   std::string filename{};
+
+  std::vector<double4> blockingPockets{};
 
   bool rigid{true};
   size_t translationalDegreesOfFreedom{};
