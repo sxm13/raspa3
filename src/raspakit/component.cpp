@@ -226,6 +226,26 @@ void Component::readComponent(const ForceField &forceField, const std::string &f
                     parsed_data["AcentricFactor"].dump(), ex.what()));
   }
 
+  for (auto &[_, item] : parsed_data["BlockingPockets"].items())
+  {
+    if (!item.is_array())
+    {
+      throw std::runtime_error(std::format("[Component reader]: item {} must be an array\n", item.dump()));
+    }
+
+    if (item.size() != 4)
+    {
+      throw std::runtime_error(
+          std::format("[Component reader]: item {} must be an array with four elements, "
+                      "an array with the x,y,z positions, and a radius\n",
+                      item.dump()));
+    }
+
+    std::vector<double> data = item.is_array() ? item.get<std::vector<double>>() : std::vector<double>{};
+    blockingPockets.push_back(double4(data[0], data[1], data[2], data[3]));
+  }
+
+
   size_t jsonNumberOfPseudoAtoms = parsed_data["PseudoAtoms"].size();
 
   definedAtoms.clear();
@@ -532,6 +552,14 @@ std::string Component::printStatus(const ForceField &forceField) const
   std::print(stream, "    Parallel Tempering Swap:                  {} [-]\n", mc.probabilityParallelTemperingSwap);
   std::print(stream, "\n");
 
+  std::print(stream, "    number of blocking-pockets: {}\n", blockingPockets.size());
+  for (size_t i = 0; i < blockingPockets.size(); ++i)
+  {
+    std::print(stream, "        fractional s_x,s_y,s_z: {},{},{} radius: {}\n", 
+               blockingPockets[i].x, blockingPockets[i].y, blockingPockets[i].z, blockingPockets[i].w);
+  }
+  std::print(stream, "\n");
+
   std::print(stream, "    number of bonds: {}\n", bonds.size());
   for (size_t i = 0; i < bonds.size(); ++i)
   {
@@ -736,6 +764,8 @@ Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const Compon
   archive << c.filenameData;
   archive << c.filename;
 
+  archive << c.blockingPockets;
+
   archive << c.rigid;
 
   archive << c.criticalTemperature;
@@ -825,6 +855,8 @@ Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, Component &c
   archive >> c.name;
   archive >> c.filenameData;
   archive >> c.filename;
+
+  archive >> c.blockingPockets;
 
   archive >> c.rigid;
 
