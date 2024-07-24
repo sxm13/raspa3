@@ -23,15 +23,15 @@ export struct MCMoveProbabilitiesParticles
 
   bool operator==(MCMoveProbabilitiesParticles const &) const = default;
 
-  MCMoveProbabilitiesParticles(double probabilityTranslationMove = 0.0, double probabilityRandomTranslationMove=0.0,
-                               double probabilityRotationMove = 0.0, double probabilityRandomRotationMove=0.0,
-                               double probabilityVolumeMove = 0.0, double probabilityReinsertionMove_CBMC=0.0,
-                               double probabilityIdentityChangeMove_CBMC = 0.0, double probabilitySwapMove=0.0,
-                               double probabilitySwapMove_CBMC = 0.0, double probabilitySwapMove_CFCMC=0.0,
-                               double probabilitySwapMove_CFCMC_CBMC = 0.0, double probabilityGibbsVolumeMove=0.0,
-                               double probabilityGibbsSwapMove_CBMC = 0.0, double probabilityGibbsSwapMove_CFCMC=0.0,
-                               double probabilityGibbsSwapMove_CFCMC_CBMC = 0.0, double probabilityWidomMove=0.0,
-                               double probabilityWidomMove_CFCMC = 0.0, double probabilityWidomMove_CFCMC_CBMC=0.0,
+  MCMoveProbabilitiesParticles(double probabilityTranslationMove = 0.0, double probabilityRandomTranslationMove = 0.0,
+                               double probabilityRotationMove = 0.0, double probabilityRandomRotationMove = 0.0,
+                               double probabilityVolumeMove = 0.0, double probabilityReinsertionMove_CBMC = 0.0,
+                               double probabilityIdentityChangeMove_CBMC = 0.0, double probabilitySwapMove = 0.0,
+                               double probabilitySwapMove_CBMC = 0.0, double probabilitySwapMove_CFCMC = 0.0,
+                               double probabilitySwapMove_CFCMC_CBMC = 0.0, double probabilityGibbsVolumeMove = 0.0,
+                               double probabilityGibbsSwapMove_CBMC = 0.0, double probabilityGibbsSwapMove_CFCMC = 0.0,
+                               double probabilityGibbsSwapMove_CFCMC_CBMC = 0.0, double probabilityWidomMove = 0.0,
+                               double probabilityWidomMove_CFCMC = 0.0, double probabilityWidomMove_CFCMC_CBMC = 0.0,
                                double probabilityParallelTemperingSwap = 0.0);
 
   double probabilityTranslationMove;

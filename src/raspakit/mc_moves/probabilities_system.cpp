@@ -38,6 +38,14 @@ import archive;
 import double3;
 import stringutils;
 
+MCMoveProbabilitiesSystem::MCMoveProbabilitiesSystem(double probabilityVolumeMove, double probabilityGibbsVolumeMove,
+                                                     double probabilityParallelTemperingSwap)
+    : probabilityVolumeMove(probabilityVolumeMove),
+      probabilityGibbsVolumeMove(probabilityGibbsVolumeMove),
+      probabilityParallelTemperingSwap(probabilityParallelTemperingSwap)
+{
+}
+
 Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const MCMoveProbabilitiesSystem &p)
 {
   archive << p.versionNumber;
