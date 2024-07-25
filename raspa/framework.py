@@ -30,7 +30,9 @@ class Framework(RaspaBase):
         numberOfUnitCells: list[int] = [1, 1, 1],
     ):
         """
-        Initialize the Framework object with provided parameters.
+        Initialize the Framework object with provided parameters. There are two methods to initialize the framework.
+        Either from .cif file passing it through fileName or from explicit definition of simulation box and atoms.
+        Either way a framework needs an id, force field and number of unit cells.
 
         Args:
             frameworkId (int): The ID of the framework.

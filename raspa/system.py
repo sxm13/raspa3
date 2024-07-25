@@ -33,7 +33,7 @@ class System(RaspaBase):
         frameworkComponents: list[Framework] = [],
         simulationBox: SimulationBox = None,
         systemProbabilities: MCMoveProbabilitiesSystem = MCMoveProbabilitiesSystem(),
-        sampleMoviesEvery: int = None
+        sampleMoviesEvery: int = None,
     ):
         """
         Initialize the System object with provided parameters.

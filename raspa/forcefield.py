@@ -87,10 +87,13 @@ class ForceField(RaspaBase):
         cutOff: float = 12.0,
         shifted: bool = False,
         tailCorrections: bool = False,
-        useCharge=True
+        useCharge=True,
     ):
         """
-        Initialize the ForceField object with provided parameters.
+        Initialize the ForceField object with provided parameters. There are two methods of initializing an object.
+        First, there is the initialization via a force field json file. When a file is used in the constructor all
+        other parameters are ignored. The other method is via explicit definition of pseudoAtoms, parameters and mixing
+        rule.
 
         Args:
             fileName (str, optional): The file name for force field initialization. Default is None.
@@ -108,7 +111,9 @@ class ForceField(RaspaBase):
             self.drop_args("fileName")
             self._settings["mixingRule"] = getattr(raspalib.ForceField.MixingRule, self._settings["mixingRule"])
         else:
-            self.drop_args("pseudoAtoms", "parameters", "mixingRule", "cutOff", "shifted", "tailCorrections", "useCharge")
+            self.drop_args(
+                "pseudoAtoms", "parameters", "mixingRule", "cutOff", "shifted", "tailCorrections", "useCharge"
+            )
         self._cpp_obj = raspalib.ForceField(**self.cpp_args())
         self.useCharge = useCharge
 
@@ -120,4 +125,7 @@ class ForceField(RaspaBase):
         Returns:
             ForceField: An instance of ForceField with example molecule force field settings.
         """
-        return cls(fileName=os.path.join(SHARE_DIR, "forcefields", "example_molecule_forcefield", "force_field.json"), useCharge=useCharge)
+        return cls(
+            fileName=os.path.join(SHARE_DIR, "forcefields", "example_molecule_forcefield", "force_field.json"),
+            useCharge=useCharge,
+        )
