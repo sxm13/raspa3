@@ -91,6 +91,8 @@ export struct MonteCarlo
   void output();
   System &randomSystem();
 
+  std::string repr() const;
+
   friend Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const MonteCarlo &mc);
   friend Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, MonteCarlo &mc);
 };

@@ -59,6 +59,8 @@ export struct RunningEnergy
 
   std::string printMC() const;
   std::string printMD() const;
+  std::string printMCDiff(RunningEnergy& other) const;
+  std::string printMDDiff(RunningEnergy& other) const;
   std::string printMC(const std::string& label) const;
   std::string printMD(const std::string& label, double referenceEnergy) const;
 

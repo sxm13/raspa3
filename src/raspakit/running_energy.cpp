@@ -71,6 +71,35 @@ std::string RunningEnergy::printMC() const
   return stream.str();
 }
 
+std::string RunningEnergy::printMCDiff(RunningEnergy& other) const
+{
+  std::ostringstream stream;
+  RunningEnergy drift = *this - other;
+  double conv = Units::EnergyToKelvin;
+
+  std::print(stream, "Energy statistics           | unit |    Energy     |  Recomputed   |     Drift     |\n");
+  std::print(stream, "====================================================================================\n");
+  std::print(stream, "Total potential energy      | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * potentialEnergy(), conv * other.potentialEnergy(), conv * drift.potentialEnergy());
+  std::print(stream, "    external field VDW      | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * externalFieldVDW, conv * other.externalFieldVDW, conv * drift.externalFieldVDW);
+  std::print(stream, "    external field Real     | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * externalFieldCharge, conv * other.externalFieldCharge, conv * drift.externalFieldCharge);
+  std::print(stream, "    framework-molecule VDW  | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * frameworkMoleculeVDW, conv * other.frameworkMoleculeVDW, conv * drift.frameworkMoleculeVDW);
+  std::print(stream, "    framework-molecule Real | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * frameworkMoleculeCharge, conv * other.frameworkMoleculeCharge, conv * drift.frameworkMoleculeCharge);
+  std::print(stream, "    molecule-molecule VDW   | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * moleculeMoleculeVDW, conv * other.moleculeMoleculeVDW, conv * drift.moleculeMoleculeVDW);
+  std::print(stream, "    molecule-molecule Real  | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * moleculeMoleculeCharge, conv * other.moleculeMoleculeCharge, conv * drift.moleculeMoleculeCharge);
+  std::print(stream, "    Van der Waals (Tail):   | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * tail, conv * other.tail, conv * drift.tail);
+  std::print(stream, "    Coulombic Ewald         | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * ewald, conv * other.ewald, conv * drift.ewald);
+  std::print(stream, "    intra VDW               | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * intraVDW, conv * other.intraVDW, conv * drift.intraVDW);
+  std::print(stream, "    intra Coulombic         | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * intraCoul, conv * other.intraCoul, conv * drift.intraCoul);
+  std::print(stream, "    polarization            | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * polarization, conv * other.polarization, conv * drift.polarization);
+  std::print(stream, "    dU/dlambda VDW          | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * dudlambdaVDW, conv * other.dudlambdaVDW, conv * drift.dudlambdaVDW);
+  std::print(stream, "    dU/dlambda Real         | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * dudlambdaCharge, conv * other.dudlambdaCharge, conv * drift.dudlambdaCharge);
+  std::print(stream, "    dU/dlambda Ewald        | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * dudlambdaEwald, conv * other.dudlambdaEwald, conv * drift.dudlambdaEwald);
+  std::print(stream, "------------------------------------------------------------------------------------\n");
+
+  return stream.str();
+
+}
+
 std::string RunningEnergy::printMD() const
 {
   std::ostringstream stream;

@@ -500,16 +500,19 @@ void MonteCarlo::output()
   {
     std::ostream stream(streams[system.systemId].rdbuf());
 
-    stream << system.runningEnergies.printMC("Running energies");
-    std::print(stream, "\n\n\n\n");
+    // stream << system.runningEnergies.printMC("Running energies");
+    // std::print(stream, "\n\n\n\n");
+
+    // RunningEnergy recomputedEnergies = system.computeTotalEnergies();
+    // stream << recomputedEnergies.printMC("Recomputed from scratch");
+    // std::print(stream, "\n\n\n\n");
+
+    // stream << drift.printMC("Monte-Carlo energy drift");
+    // std::print(stream, "\n\n\n\n");
 
     RunningEnergy recomputedEnergies = system.computeTotalEnergies();
-    stream << recomputedEnergies.printMC("Recomputed from scratch");
-    std::print(stream, "\n\n\n\n");
-
     RunningEnergy drift = system.runningEnergies - recomputedEnergies;
-    stream << drift.printMC("Monte-Carlo energy drift");
-    std::print(stream, "\n\n\n\n");
+    stream << system.runningEnergies.printMCDiff(recomputedEnergies);
 
     std::print(stream, "\n\n");
 

@@ -387,4 +387,30 @@ Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, Framework& c
   return archive;
 }
 
-std::string Framework::repr() const { return std::string("Framework test"); }
+std::string Framework::repr() const {
+    std::ostringstream stream;
+
+  std::print(stream, "Framework {} [{}]\n\n", frameworkId, name);
+
+  std::print(stream, "    number Of Atoms:  {}\n", unitCellAtoms.size());
+  std::print(stream, "    net charge:       {:12.5f} [e]\n", netCharge);
+  std::print(stream, "    mass:             {:12.5f} [amu]\n", mass);
+
+    for (size_t i = 0; i != definedAtoms.size(); ++i)
+  {
+    size_t atomType = static_cast<size_t>(definedAtoms[i].type);
+
+    std::print(stream, "    {:3d}: type {:3d} position {:8.5f} {:8.5f} {:8.5f}, charge {:8.5f}\n", i, atomType,
+               definedAtoms[i].position.x, definedAtoms[i].position.y, definedAtoms[i].position.z,
+               definedAtoms[i].charge);
+  }
+
+  std::print(stream, "    number of bonds: {}\n", bonds.size());
+  for (size_t i = 0; i < bonds.size(); ++i)
+  {
+    std::print(stream, "        {}", bonds[i].print());
+  }
+  std::print(stream, "\n");
+
+  return stream.str();
+}
