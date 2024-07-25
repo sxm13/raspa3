@@ -124,10 +124,12 @@ Framework::Framework(size_t frameworkId, const ForceField& forceField, std::stri
   }
 
   mass = 0.0;
+  netCharge = 0.0;
   for (const Atom& atom : atoms)
   {
     size_t atomType = static_cast<size_t>(atom.type);
     mass += forceField.pseudoAtoms[atomType].mass;
+    netCharge += atom.charge;
   }
 
   for (size_t i = 0; i < unitCellAtoms.size(); ++i)
@@ -170,10 +172,12 @@ void Framework::readFramework(const ForceField& forceField, const std::string& f
   }
 
   mass = 0.0;
+  netCharge = 0.0;
   for (const Atom& atom : atoms)
   {
     size_t atomType = static_cast<size_t>(atom.type);
     mass += forceField.pseudoAtoms[atomType].mass;
+    netCharge += atom.charge;
   }
 
   for (size_t i = 0; i < unitCellAtoms.size(); ++i)
@@ -251,7 +255,8 @@ std::string Framework::printStatus(const ForceField& forceField) const
   std::print(stream, "Framework {} [{}]\n\n", frameworkId, name);
 
   std::print(stream, "    number Of Atoms:  {}\n", unitCellAtoms.size());
-  std::print(stream, "    Mass:             {} [amu]\n", mass);
+  std::print(stream, "    net charge:       {:12.5f} [e]\n", netCharge);
+  std::print(stream, "    mass:             {:12.5f} [amu]\n", mass);
 
   for (size_t i = 0; i != definedAtoms.size(); ++i)
   {

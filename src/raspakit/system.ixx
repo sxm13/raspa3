@@ -219,8 +219,11 @@ export struct System
   std::vector<std::pair<std::complex<double>, std::complex<double>>> storedEik{};
   std::vector<std::pair<std::complex<double>, std::complex<double>>> fixedFrameworkStoredEik{};
   std::vector<std::pair<std::complex<double>, std::complex<double>>> totalEik{};
-  double CoulombicFourierEnergySingleIon{0.0};
-  std::vector<double> netCharge;
+  double CoulombicFourierEnergySingleIon{ 0.0 };
+  double netCharge{ 0.0 };
+  double netChargeFramework{ 0.0 };
+  double netChargeAdsorbates{ 0.0 };
+  std::vector<double> netChargePerComponent;
 
   MCMoveProbabilitiesSystem mc_moves_probabilities;
   MCMoveStatisticsSystem mc_moves_statistics;
