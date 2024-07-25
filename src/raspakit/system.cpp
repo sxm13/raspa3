@@ -151,7 +151,7 @@ System::System(size_t id, std::optional<SimulationBox> box, double T, std::optio
       moleculePositions({}),
       runningEnergies(),
       currentEnergyStatus(1, f.size(), c.size()),
-      netCharge(c.size()),
+      netChargePerComponent(c.size()),
       mc_moves_probabilities(systemProbabilities),
       mc_moves_statistics(),
       reactions(),
@@ -184,8 +184,9 @@ System::System(size_t id, std::optional<SimulationBox> box, double T, std::optio
   double3 perpendicularWidths = simulationBox.perpendicularWidths();
   forceField.initializeEwaldParameters(perpendicularWidths);
 
-  Interactions::computeEwaldFourierEnergySingleIon(eik_x, eik_y, eik_z, eik_xy, forceField, simulationBox,
-                                                   double3(0.0, 0.0, 0.0), 1.0);
+  CoulombicFourierEnergySingleIon =
+    Interactions::computeEwaldFourierEnergySingleIon(eik_x, eik_y, eik_z, eik_xy, forceField, simulationBox,
+                                                     double3(0.0, 0.0, 0.0), 1.0);
 
   RandomNumber random(1400);
   createInitialMolecules(random);
@@ -204,6 +205,7 @@ System::System(size_t id, std::optional<SimulationBox> box, double T, std::optio
 
 void System::createFrameworks()
 {
+  netChargeFramework = 0.0;
   for (Framework& framework : frameworkComponents)
   {
     const std::vector<Atom>& atoms = framework.atoms;
@@ -216,6 +218,7 @@ void System::createFrameworks()
     }
     numberOfFrameworkAtoms += atoms.size();
     numberOfRigidFrameworkAtoms += atoms.size();
+    netChargeFramework += framework.netCharge;
   }
 }
 
@@ -249,6 +252,10 @@ void System::insertFractionalMolecule(size_t selectedComponent, [[maybe_unused]]
   electricFieldNew.resize(electricFieldNew.size() + atoms.size());
 
   numberOfMoleculesPerComponent[selectedComponent] += 1;
+
+  netCharge += components[selectedComponent].netCharge;
+  netChargeAdsorbates += components[selectedComponent].netCharge;
+  netChargePerComponent[selectedComponent] += components[selectedComponent].netCharge;
 
   // set moleculesIds
   size_t index = numberOfFrameworkAtoms;  // indexOfFirstMolecule(selectedComponent);
@@ -291,6 +298,10 @@ void System::insertMolecule(size_t selectedComponent, [[maybe_unused]] const Mol
 
   numberOfMoleculesPerComponent[selectedComponent] += 1;
   numberOfIntegerMoleculesPerComponent[selectedComponent] += 1;
+
+  netCharge += components[selectedComponent].netCharge;
+  netChargeAdsorbates += components[selectedComponent].netCharge;
+  netChargePerComponent[selectedComponent] += components[selectedComponent].netCharge;
 
   translationalDegreesOfFreedom += components[selectedComponent].translationalDegreesOfFreedom;
   rotationalDegreesOfFreedom += components[selectedComponent].rotationalDegreesOfFreedom;
@@ -338,6 +349,10 @@ void System::deleteMolecule(size_t selectedComponent, size_t selectedMolecule, c
 
   numberOfMoleculesPerComponent[selectedComponent] -= 1;
   numberOfIntegerMoleculesPerComponent[selectedComponent] -= 1;
+
+  netCharge -= components[selectedComponent].netCharge;
+  netChargeAdsorbates -= components[selectedComponent].netCharge;
+  netChargePerComponent[selectedComponent] -= components[selectedComponent].netCharge;
 
   translationalDegreesOfFreedom -= components[selectedComponent].translationalDegreesOfFreedom;
   rotationalDegreesOfFreedom -= components[selectedComponent].rotationalDegreesOfFreedom;
@@ -429,7 +444,6 @@ void System::createInitialMolecules([[maybe_unused]] RandomNumber& random)
               this->spanOfFrameworkAtoms(), this->spanOfMoleculeAtoms(), this->beta, growType, forceField.cutOffVDW,
               forceField.cutOffCoulomb, componentId, numberOfMoleculesPerComponent[componentId], 0.0, 1uz,
               numberOfTrialDirections);
-
         } while (!growData || growData->energies.potentialEnergy() > forceField.overlapCriteria);
 
         insertFractionalMolecule(componentId, growData->molecule, growData->atom, i);
@@ -439,22 +453,56 @@ void System::createInitialMolecules([[maybe_unused]] RandomNumber& random)
     for (size_t i = 0; i < initialNumberOfMolecules[componentId]; ++i)
     {
       std::optional<ChainData> growData = std::nullopt;
+      bool inside_blocked_pocket{ false };
       do
       {
-        Component::GrowType growType = components[componentId].growType;
-        growData = CBMC::growMoleculeSwapInsertion(
-            random, this->hasExternalField, this->components, this->forceField, this->simulationBox,
-            this->spanOfFrameworkAtoms(), this->spanOfMoleculeAtoms(), this->beta, growType, forceField.cutOffVDW,
-            forceField.cutOffCoulomb, componentId, numberOfMoleculesPerComponent[componentId], 1.0, 0uz,
-            numberOfTrialDirections);
+        do
+        {
+          Component::GrowType growType = components[componentId].growType;
+          growData = CBMC::growMoleculeSwapInsertion(
+              random, this->hasExternalField, this->components, this->forceField, this->simulationBox,
+              this->spanOfFrameworkAtoms(), this->spanOfMoleculeAtoms(), this->beta, growType, forceField.cutOffVDW,
+              forceField.cutOffCoulomb, componentId, numberOfMoleculesPerComponent[componentId], 1.0, 0uz,
+              numberOfTrialDirections);
 
-      } while (!growData || growData->energies.potentialEnergy() > forceField.overlapCriteria);
+        } while (!growData || growData->energies.potentialEnergy() > forceField.overlapCriteria);
+
+        std::span<const Atom> newMolecule = std::span(growData->atom.begin(), growData->atom.end());
+        inside_blocked_pocket = insideBlockedPockets(components[componentId], newMolecule);
+
+      } while (inside_blocked_pocket);
+
 
       insertMolecule(componentId, growData->molecule, growData->atom);
     }
     componentId++;
   }
 }
+
+bool System::insideBlockedPockets(const Component &component, std::span<const Atom> molecule_atoms) const
+{
+  for(const Framework &framework: frameworkComponents)
+  {
+    for(size_t i = 0; i != component.blockingPockets.size(); ++i)
+    {
+      double radius_squared = component.blockingPockets[i].w * component.blockingPockets[i].w;
+      double3 pos = framework.simulationBox.cell * double3(component.blockingPockets[i].x, component.blockingPockets[i].y, component.blockingPockets[i].z);
+      for(const Atom &atom : molecule_atoms)
+      {
+        double3 dr = atom.position - pos;
+        dr = framework.simulationBox.applyPeriodicBoundaryConditions(dr);
+        if(dr.length_squared() < radius_squared) 
+        {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+
+
 size_t System::randomMoleculeOfComponent(RandomNumber& random, size_t selectedComponent)
 {
   return size_t(random.uniform() * static_cast<double>(numberOfMoleculesPerComponent[selectedComponent]));
@@ -852,10 +900,11 @@ std::string System::writeInitializationStatusReport(size_t currentCycle, size_t 
   std::print(stream, "Initialization: Current cycle: {} out of {}\n", currentCycle, numberOfCycles);
   std::print(stream, "===============================================================================\n\n");
 
-  std::print(stream, "{}", simulationBox.printStatus());
+  std::print(stream, "{}\n", simulationBox.printStatus());
+  std::print(stream, "net charge: {:12.8f}\n", netCharge);
   std::print(stream, "\n");
 
-  for (const Component& c : components)
+  for (size_t i = 0; const Component& c : components)
   {
     double occupancy = static_cast<double>(containsTheFractionalMolecule);
     double averageOccupancy = c.lambdaGC.occupancy();
@@ -863,14 +912,16 @@ std::string System::writeInitializationStatusReport(size_t currentCycle, size_t 
 
     if (c.lambdaGC.computeDUdlambda)
     {
-      std::print(stream, "component {} ({}) lambda: {: g} dUdlambda: {: g} occupancy: {: g} ({:3f})\n", c.componentId,
+      std::print(stream, "component {:3d} ({}) lambda: {: g} dUdlambda: {: g} occupancy: {: g} ({:3f})\n", c.componentId,
                  c.name, lambda, runningEnergies.dudlambda(lambda), occupancy, averageOccupancy);
     }
     else
     {
-      std::print(stream, "component {} ({}) lambda: {: g} occupancy: {: g} ({:3f})\n", c.componentId, c.name,
+      std::print(stream, "component {:3d} ({}) lambda: {: g} occupancy: {: g} ({:3f})\n", c.componentId, c.name,
                  c.lambdaGC.lambdaValue(), occupancy, averageOccupancy);
     }
+    std::print(stream, "    net charge: {:12.8f} [e]\n", netChargePerComponent[i]);
+    ++i;
   }
   std::print(stream, "\n");
 
@@ -896,10 +947,11 @@ std::string System::writeEquilibrationStatusReportMC(size_t currentCycle, size_t
   std::print(stream, "Equilibration: Current cycle: {} out of {}\n", currentCycle, numberOfCycles);
   std::print(stream, "===============================================================================\n\n");
 
-  std::print(stream, "{}", simulationBox.printStatus());
+  std::print(stream, "{}\n", simulationBox.printStatus());
+  std::print(stream, "net charge: {:12.8f}\n", netCharge);
   std::print(stream, "\n");
 
-  for (const Component& c : components)
+  for (size_t i = 0; const Component& c : components)
   {
     double occupancy = static_cast<double>(containsTheFractionalMolecule);
     double averageOccupancy = c.lambdaGC.occupancy();
@@ -915,6 +967,8 @@ std::string System::writeEquilibrationStatusReportMC(size_t currentCycle, size_t
       std::print(stream, "component {} ({}) lambda: {: g} occupancy: {: g} ({:3f})\n", c.componentId, c.name,
                  c.lambdaGC.lambdaValue(), occupancy, averageOccupancy);
     }
+    std::print(stream, "    net charge: {:12.8f} [e]\n", netChargePerComponent[i]);
+    ++i;
   }
   std::print(stream, "\n");
 
@@ -940,7 +994,8 @@ std::string System::writeEquilibrationStatusReportMD(size_t currentCycle, size_t
   std::print(stream, "Equilibration: Current cycle: {} out of {}\n", currentCycle, numberOfCycles);
   std::print(stream, "===============================================================================\n\n");
 
-  std::print(stream, "{}", simulationBox.printStatus());
+  std::print(stream, "{}\n", simulationBox.printStatus());
+  std::print(stream, "net charge: {:12.8f}\n", netCharge);
   std::print(stream, "\n");
 
   double translationalKineticEnergy = computeTranslationalKineticEnergy();
@@ -963,7 +1018,7 @@ std::string System::writeEquilibrationStatusReportMD(size_t currentCycle, size_t
 
   std::print(stream, "\n");
 
-  for (const Component& c : components)
+  for (size_t i = 0; const Component& c : components)
   {
     double occupancy = static_cast<double>(containsTheFractionalMolecule);
     double averageOccupancy = c.lambdaGC.occupancy();
@@ -979,6 +1034,8 @@ std::string System::writeEquilibrationStatusReportMD(size_t currentCycle, size_t
       std::print(stream, "component {} ({}) lambda: {: g} occupancy: {: g} ({:3f})\n", c.componentId, c.name,
                  c.lambdaGC.lambdaValue(), occupancy, averageOccupancy);
     }
+    std::print(stream, "    net charge: {:12.8f} [e]\n", netChargePerComponent[i]);
+    ++i;
   }
   std::print(stream, "\n");
 
@@ -1001,10 +1058,11 @@ std::string System::writeProductionStatusReportMC(size_t currentCycle, size_t nu
   std::print(stream, "===============================================================================\n\n");
 
   std::pair<SimulationBox, SimulationBox> simulationBoxData = averageSimulationBox.averageSimulationBox();
-  std::print(stream, "{}", simulationBox.printStatus(simulationBoxData.first, simulationBoxData.second));
+  std::print(stream, "{}\n", simulationBox.printStatus(simulationBoxData.first, simulationBoxData.second));
+  std::print(stream, "net charge: {:12.8f}\n", netCharge);
   std::print(stream, "\n");
 
-  for (const Component& c : components)
+  for (size_t i = 0; const Component& c : components)
   {
     double occupancy = static_cast<double>(containsTheFractionalMolecule);
     double averageOccupancy = c.lambdaGC.occupancy();
@@ -1020,6 +1078,8 @@ std::string System::writeProductionStatusReportMC(size_t currentCycle, size_t nu
       std::print(stream, "component {} ({}) lambda: {: g} occupancy: {: g} ({:3f})\n", c.componentId, c.name,
                  c.lambdaGC.lambdaValue(), occupancy, averageOccupancy);
     }
+    std::print(stream, "    net charge: {:12.8f} [e]\n", netChargePerComponent[i]);
+    ++i;
   }
   std::print(stream, "\n");
 
@@ -1116,6 +1176,7 @@ std::string System::writeProductionStatusReportMD(size_t currentCycle, size_t nu
   std::print(stream, "Current cycle: {} out of {}\n", currentCycle, numberOfCycles);
   std::print(stream, "===============================================================================\n\n");
 
+  std::print(stream, "Net charge: {:12.8f}\n", netCharge);
   std::print(stream, "Time run: {:g} [ps]  {:g} [ns]\n\n", static_cast<double>(currentCycle) * timeStep,
              static_cast<double>(currentCycle) * timeStep / 1000.0);
 
@@ -1196,7 +1257,7 @@ std::string System::writeProductionStatusReportMD(size_t currentCycle, size_t nu
              conv * energyData.second.intraEnergy.total().energy);
 
   std::print(stream, "\n");
-  for (const Component& c : components)
+  for (size_t i = 0; const Component& c : components)
   {
     double occupancy = static_cast<double>(containsTheFractionalMolecule);
     double averageOccupancy = c.lambdaGC.occupancy();
@@ -1212,6 +1273,8 @@ std::string System::writeProductionStatusReportMD(size_t currentCycle, size_t nu
       std::print(stream, "component {} ({}) lambda: {: g} occupancy: {: g} ({:3f})\n", c.componentId, c.name,
                  c.lambdaGC.lambdaValue(), occupancy, averageOccupancy);
     }
+    std::print(stream, "    net charge: {:12.8f} [e]\n", netChargePerComponent[i]);
+    ++i;
   }
   std::print(stream, "\n");
 
@@ -1262,6 +1325,14 @@ std::string System::writeSystemStatus() const
   std::print(stream, "Pressure:    {} [Pa]\n\n", pressure * Units::PressureConversionFactor);
 
   stream << simulationBox.printStatus();
+  std::print(stream, "\n\n\n");
+
+  std::print(stream, "Property measurement settings\n");
+  std::print(stream, "===============================================================================\n\n");
+  if(averageEnergyHistogram.has_value())
+  {
+    stream << averageEnergyHistogram->printSettings();
+  }
   std::print(stream, "\n\n\n");
 
   return stream.str();
@@ -1651,7 +1722,8 @@ std::pair<EnergyStatus, double3x3> System::computeMolecularPressure() noexcept
   pressureInfo = pair_acc(
       pressureInfo, Interactions::computeEwaldFourierEnergyStrainDerivative(
                         eik_x, eik_y, eik_z, eik_xy, fixedFrameworkStoredEik, storedEik, forceField, simulationBox,
-                        frameworkComponents, components, numberOfMoleculesPerComponent, spanOfMoleculeAtoms()));
+                        frameworkComponents, components, numberOfMoleculesPerComponent, spanOfMoleculeAtoms(),
+                        CoulombicFourierEnergySingleIon, netChargeFramework, netChargePerComponent));
 
   pressureInfo.first.sumTotal();
 
@@ -2279,6 +2351,9 @@ Archive<std::ofstream>& operator<<(Archive<std::ofstream>& archive, const System
   archive << s.totalEik;
   archive << s.CoulombicFourierEnergySingleIon;
   archive << s.netCharge;
+  archive << s.netChargeFramework;
+  archive << s.netChargeAdsorbates;
+  archive << s.netChargePerComponent;
   archive << s.mc_moves_probabilities;
   archive << s.mc_moves_statistics;
   archive << s.mc_moves_cputime;
@@ -2381,6 +2456,9 @@ Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, System& s)
   archive >> s.totalEik;
   archive >> s.CoulombicFourierEnergySingleIon;
   archive >> s.netCharge;
+  archive >> s.netChargeFramework;
+  archive >> s.netChargeAdsorbates;
+  archive >> s.netChargePerComponent;
   archive >> s.mc_moves_probabilities;
   archive >> s.mc_moves_statistics;
   archive >> s.mc_moves_cputime;

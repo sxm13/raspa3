@@ -75,6 +75,7 @@ export struct PropertyEnergyHistogram
 
   void writeOutput(size_t systemId, size_t currentCycle);
 
+  std::string printSettings() const;
 
   friend Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const PropertyEnergyHistogram &hist);
   friend Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, PropertyEnergyHistogram &hist);

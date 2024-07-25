@@ -219,8 +219,11 @@ export struct System
   std::vector<std::pair<std::complex<double>, std::complex<double>>> storedEik{};
   std::vector<std::pair<std::complex<double>, std::complex<double>>> fixedFrameworkStoredEik{};
   std::vector<std::pair<std::complex<double>, std::complex<double>>> totalEik{};
-  double CoulombicFourierEnergySingleIon{0.0};
-  std::vector<double> netCharge;
+  double CoulombicFourierEnergySingleIon{ 0.0 };
+  double netCharge{ 0.0 };
+  double netChargeFramework{ 0.0 };
+  double netChargeAdsorbates{ 0.0 };
+  std::vector<double> netChargePerComponent;
 
   MCMoveProbabilitiesSystem mc_moves_probabilities;
   MCMoveStatisticsSystem mc_moves_statistics;
@@ -400,6 +403,9 @@ export struct System
 
   std::vector<Atom> randomConfiguration(RandomNumber &random, size_t selectedComponent,
                                         const std::span<const Atom> atoms);
+
+
+  bool insideBlockedPockets(const Component &component, std::span<const Atom> molecule_atoms) const;
 
   void sampleProperties(size_t currentBlock, size_t currentCycle);
 

@@ -72,7 +72,7 @@ std::pair<EnergyStatus, double3x3> computeEwaldFourierEnergyStrainDerivative(
     std::vector<std::pair<std::complex<double>, std::complex<double>>> &storedEik, const ForceField &forceField,
     const SimulationBox &simulationBox, const std::vector<Framework> &frameworkComponents,
     const std::vector<Component> &components, const std::vector<size_t> &numberOfMoleculesPerComponent,
-    std::span<Atom> atomPositions) noexcept;
+    std::span<Atom> atomPositions, double UIon, double netChargeFramework, std::vector<double> netChargePerComponent) noexcept;
 
 void acceptEwaldMove(const ForceField &forceField,
                      std::vector<std::pair<std::complex<double>, std::complex<double>>> &storedEik,

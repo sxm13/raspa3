@@ -892,7 +892,7 @@ std::pair<EnergyStatus, double3x3> Interactions::computeEwaldFourierEnergyStrain
     [[maybe_unused]] std::vector<std::pair<std::complex<double>, std::complex<double>>> &storedEik,
     const ForceField &forceField, const SimulationBox &simulationBox, const std::vector<Framework> &frameworkComponents,
     const std::vector<Component> &components, const std::vector<size_t> &numberOfMoleculesPerComponent,
-    std::span<Atom> atomPositions) noexcept
+    std::span<Atom> atomPositions, double UIon, double netChargeFramework, std::vector<double> netChargePerComponent) noexcept
 {
   double alpha = forceField.EwaldAlpha;
   double alpha_squared = alpha * alpha;
@@ -1109,12 +1109,18 @@ std::pair<EnergyStatus, double3x3> Interactions::computeEwaldFourierEnergyStrain
   }
 
   // Handle net-charges
-  for (size_t i = 0; i != numberOfComponents; ++i)
+  for (size_t i = 0; i != components.size(); ++i)
   {
-    for (size_t j = 0; j != numberOfComponents; ++j)
+    energy.frameworkComponentEnergy(0, i).CoulombicFourier += 
+      EnergyFactor(2.0 * UIon * netChargeFramework * netChargePerComponent[i], 0.0);
+  }
+
+  for (size_t i = 0; i != components.size(); ++i)
+  {
+    for (size_t j = 0; j != components.size(); ++j)
     {
-      // energy(i,j).CoulombicFourier += EnergyFactor(CoulombicFourierEnergySingleIon * netCharge[i] *
-      // netCharge[j], 0.0);
+      energy.componentEnergy(i,j).CoulombicFourier += 
+         EnergyFactor(UIon * netChargePerComponent[i] * netChargePerComponent[j], 0.0);
     }
   }
 

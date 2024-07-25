@@ -141,11 +141,13 @@ Component::Component(size_t componentId, const ForceField &forceField, std::stri
       averageRosenbluthWeights(numberOfBlocks)
 {
   totalMass = 0.0;
+  netCharge = 0.0;
   for (const Atom &atom : atomList)
   {
     size_t atomType = static_cast<size_t>(atom.type);
     double mass = forceField.pseudoAtoms[atomType].mass;
     totalMass += mass;
+    netCharge += atom.charge;
     definedAtoms.push_back({atom, mass});
   }
 
@@ -330,9 +332,11 @@ void Component::readComponent(const ForceField &forceField, const std::string &f
   }
 
   totalMass = 0.0;
-  for (auto [_, mass] : definedAtoms)
+  netCharge = 0.0;
+  for (auto [atom, mass] : definedAtoms)
   {
     totalMass += mass;
+    netCharge += atom.charge;
   }
 
   computeRigidProperties();
@@ -528,7 +532,7 @@ std::string Component::printStatus(const ForceField &forceField) const
       std::print(stream, "    Shape of the molecule is: 'Point-particle'\n");
       break;
   }
-  std::print(stream, "    Net-charge:      {:10.8f}\n", netCharge);
+  std::print(stream, "    Net-charge:      {:12.8f} [e]\n", netCharge);
   std::print(stream, "\n");
 
   const MCMoveProbabilitiesParticles &mc = mc_moves_probabilities;
