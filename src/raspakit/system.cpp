@@ -94,6 +94,7 @@ import property_enthalpy;
 import property_lambda_probability_histogram;
 import property_widom;
 import property_temperature;
+import property_msd;
 import energy_factor;
 import running_energy;
 import threadpool;
@@ -1479,6 +1480,11 @@ void System::sampleProperties(size_t currentBlock, size_t currentCycle)
   if (averageNumberOfMoleculesHistogram.has_value())
   {
     averageNumberOfMoleculesHistogram->addSample(currentBlock, currentCycle, numberOfIntegerMoleculesPerComponent, w);
+  }
+
+  if (propertyMSD.has_value())
+  {
+    propertyMSD->addSample( currentCycle, components, numberOfMoleculesPerComponent, moleculePositions);
   }
 
   if (propertyDensityGrid.has_value())

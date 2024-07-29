@@ -72,6 +72,7 @@ import property_rdf;
 import property_density_grid;
 import property_energy_histogram;
 import property_number_of_molecules_histogram;
+import property_msd;
 
 int3 parseInt3(const std::string& item, auto json)
 {
@@ -899,6 +900,27 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
                                   {minimumRangeNumberOfMoleculesHistogram, maximumRangeNumberOfMoleculesHistogram}, 
                                   systems[systemId].components.size(),
                                   sampleNumberOfMoleculesHistogramEvery, writeNumberOfMoleculesHistogramEvery);
+      }
+    }
+
+    if (value["ComputeMSD"].is_boolean())
+    {
+      if (value["ComputeMSD"].get<bool>())
+      {
+        size_t sampleMSDEvery{ 10 };
+        if (value["SampleMSDEvery"].is_number_unsigned())
+        {
+          sampleMSDEvery = value["SampleMSDEvery"].get<size_t>();
+        }
+
+        size_t writeMSDEvery{ 5000 };
+        if (value["WriteMSDEvery"].is_number_unsigned())
+        {
+          writeMSDEvery = value["WriteMSDEvery"].get<size_t>();
+        }
+
+        systems[systemId].propertyMSD = 
+          PropertyMeanSquaredDisplacement(systems[systemId].components.size(), systems[systemId].moleculePositions.size(), sampleMSDEvery, writeMSDEvery);
       }
     }
 

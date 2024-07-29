@@ -517,6 +517,11 @@ Archive<std::ofstream>& operator<<(Archive<std::ofstream>& archive, const ForceF
   archive << f.energyOverlapCriteria;
   archive << f.useDualCutOff;
 
+  archive << f.omitInterInteractions;
+
+  archive << f.computePolarization;
+  archive << f.omitInterPolarization;
+
   return archive;
 }
 
@@ -554,6 +559,11 @@ Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, ForceField& 
   archive >> f.minimumRosenbluthFactor;
   archive >> f.energyOverlapCriteria;
   archive >> f.useDualCutOff;
+
+  archive >> f.omitInterInteractions;
+
+  archive >> f.computePolarization;
+  archive >> f.omitInterPolarization;
 
   return archive;
 }

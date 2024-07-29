@@ -71,6 +71,7 @@ import property_density_grid;
 import property_temperature;
 import property_energy_histogram;
 import property_number_of_molecules_histogram;
+import property_msd;
 import multi_site_isotherm;
 import pressure_range;
 import units;
@@ -267,6 +268,7 @@ export struct System
   std::optional<PropertyDensityGrid> propertyDensityGrid;
   std::optional<PropertyEnergyHistogram> averageEnergyHistogram;
   std::optional<PropertyNumberOfMoleculesHistogram> averageNumberOfMoleculesHistogram;
+  std::optional<PropertyMeanSquaredDisplacement> propertyMSD;
 
   /// The fractional molecule for grand-canonical is stored first
   inline size_t indexOfGCFractionalMoleculesPerComponent_CFCMC([[maybe_unused]] size_t selectedComponent) { return 0; }

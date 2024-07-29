@@ -65,11 +65,10 @@
         "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=lld",
         "CMAKE_INSTALL_PREFIX": "/usr/local",
         "CMAKE_CXX_FLAGS_DEBUG": "-stdlib=libc++ -fvisibility=hidden -fexperimental-library -Xclang -fopenmp -g3 -O0 -DDEBUG -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address -fsanitize=leak -fsanitize=undefined",
-        "OpenMP_CXX_FLAGS": "-Xclang -fopenmp",
-        "OpenMP_libomp_LIBRARY": "/usr/local/Cellar/libomp/18.1.7/lib/libomp.a",
+        "OpenMP_CXX_FLAGS": "-Xclang -fopenmp=libomp",
         "CMAKE_BUILD_WITH_INSTALL_RPATH": true,
-        "BUILD_MAC_PACKAGE": true,
-        "BUILD_TESTING": true
+        "BUILD_MAC_PACKAGE": false,
+        "BUILD_TESTING": false
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {

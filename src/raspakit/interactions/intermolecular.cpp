@@ -58,6 +58,7 @@ RunningEnergy Interactions::computeInterMolecularEnergy(const ForceField &forceF
   const double cutOffVDWSquared = forceField.cutOffVDW * forceField.cutOffVDW;
   const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
 
+  if (forceField.omitInterInteractions) return energySum;
   if (moleculeAtoms.empty()) return energySum;
 
   for (std::span<const Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end() - 1; ++it1)
@@ -119,6 +120,8 @@ RunningEnergy Interactions::computeInterMolecularTailEnergy(const ForceField &fo
 {
   RunningEnergy energySum{};
 
+  if (forceField.omitInterInteractions) return energySum;
+
   double preFactor = 2.0 * std::numbers::pi / simulationBox.volume;
   for (std::span<const Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end(); ++it1)
   {
@@ -164,6 +167,8 @@ RunningEnergy Interactions::computeInterMolecularTailEnergy(const ForceField &fo
   double rr;
 
   RunningEnergy energySum{};
+
+  if (forceField.omitInterInteractions) return energySum;
 
   bool useCharge = forceField.useCharge;
   const double overlapCriteria = forceField.overlapCriteria;
@@ -268,6 +273,8 @@ RunningEnergy Interactions::computeInterMolecularTailEnergy(const ForceField &fo
 {
   RunningEnergy energySum{};
 
+  if (forceField.omitInterInteractions) return energySum;
+
   double preFactor = 2.0 * std::numbers::pi / simulationBox.volume;
 
   if (moleculeAtoms.empty()) return energySum;
@@ -370,6 +377,7 @@ RunningEnergy Interactions::computeInterMolecularGradient(const ForceField &forc
   const double cutOffVDWSquared = forceField.cutOffVDW * forceField.cutOffVDW;
   const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
 
+  if (forceField.omitInterInteractions) return energySum;
   if (moleculeAtoms.empty()) return energySum;
 
   for (std::span<Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end() - 1; ++it1)
@@ -451,6 +459,7 @@ std::pair<EnergyStatus, double3x3> Interactions::computeInterMolecularEnergyStra
   EnergyStatus energy(1, 1, components.size());
   double3x3 strainDerivativeTensor{};
 
+  if (forceField.omitInterInteractions) return {energy, strainDerivativeTensor};
   if (moleculeAtoms.empty()) return {energy, strainDerivativeTensor};
 
   for (std::span<Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end() - 1; ++it1)
@@ -558,6 +567,8 @@ void Interactions::computeInterMolecularElectricPotential(const ForceField &forc
   const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
 
   if (!useCharge) return;
+  if (forceField.omitInterInteractions) return;
+  if (forceField.omitInterPolarization) return;
   if (moleculeAtoms.empty()) return;
 
   for (std::span<const Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end() - 1; ++it1)
@@ -614,6 +625,8 @@ RunningEnergy Interactions::computeInterMolecularElectricField(const ForceField 
   const double cutOffChargeSquared = forceField.cutOffCoulomb * forceField.cutOffCoulomb;
 
   if (!useCharge) return energySum;
+  if (forceField.omitInterInteractions) return energySum;
+  if (forceField.omitInterPolarization) return energySum;
   if (moleculeAtoms.empty()) return energySum;
 
   for (std::span<const Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end() - 1; ++it1)
@@ -688,6 +701,9 @@ std::optional<RunningEnergy> Interactions::computeInterMolecularElectricFieldDif
   double rr;
 
   RunningEnergy energySum{};
+
+  if (forceField.omitInterInteractions) return energySum;
+  if (forceField.omitInterPolarization) return energySum;
 
   bool useCharge = forceField.useCharge;
   const double overlapCriteria = forceField.overlapCriteria;

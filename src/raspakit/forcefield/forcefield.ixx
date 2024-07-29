@@ -59,23 +59,27 @@ export struct ForceField
   size_t numberOfPseudoAtoms{0};
   std::vector<PseudoAtom> pseudoAtoms{};
 
-  ChargeMethod chargeMethod{ChargeMethod::Ewald};
+  ChargeMethod chargeMethod{ ChargeMethod::Ewald };
 
-  double overlapCriteria{1e5};
+  double overlapCriteria{ 1e5 };
 
-  double EwaldPrecision{1e-6};
-  double EwaldAlpha{0.265058};
-  int3 numberOfWaveVectors{8, 8, 8};
-  bool automaticEwald{true};
+  double EwaldPrecision{ 1e-6 };
+  double EwaldAlpha{ 0.265058 };
+  int3 numberOfWaveVectors{ 8, 8, 8 };
+  bool automaticEwald{ true };
 
-  bool useCharge{true};
-  bool omitEwaldFourier{false};
+  bool useCharge{ true };
+  bool omitEwaldFourier{ false };
 
-  double minimumRosenbluthFactor{1e-150};
-  double energyOverlapCriteria{1e6};
+  double minimumRosenbluthFactor{ 1e-150 };
+  double energyOverlapCriteria{ 1e6 };
 
-  bool useDualCutOff{false};
-  bool computePolarization{false};
+  bool useDualCutOff{ false };
+
+  bool omitInterInteractions { false };
+
+  bool computePolarization{ false };
+  bool omitInterPolarization{ true };
 
   ForceField() noexcept = default;
   ForceField(std::vector<PseudoAtom> pseudoAtoms, std::vector<VDWParameters> parameters, MixingRule mixingRule,

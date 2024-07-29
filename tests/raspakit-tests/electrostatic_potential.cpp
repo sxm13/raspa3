@@ -39,6 +39,7 @@ TEST(electrostatic_potential, Test_reference_system_1)
       },
       {VDWParameters(0.0, 1.0)}, ForceField::MixingRule::Lorentz_Berthelot, 500.0, true, false, true);
   forceField.computePolarization = true;
+  forceField.omitInterPolarization = false;
   Component c1 = Component(0, forceField, "t1", 0.0, 0.0, 0.0,
                            {
                                // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type,
@@ -128,6 +129,7 @@ TEST(electrostatic_potential, Test_reference_system_2)
       },
       {VDWParameters(0.0, 1.0)}, ForceField::MixingRule::Lorentz_Berthelot, 500.0, true, false, true);
   forceField.computePolarization = true;
+  forceField.omitInterPolarization = false;
   Component c1 = Component(
       0, forceField, "t1", 0.0, 0.0, 0.0,
       {// double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId,
@@ -204,6 +206,8 @@ TEST(electrostatic_potential, Test_2_CO2_in_ITQ_29_2x2x2)
        VDWParameters(85.671, 3.017)},
       ForceField::MixingRule::Lorentz_Berthelot, 11.8, true, false, true);
   forceField.computePolarization = true;
+  forceField.omitInterPolarization = true;
+  forceField.omitInterInteractions = true;
   Framework f = Framework(
       0, forceField, "ITQ-29", SimulationBox(11.8671, 11.8671, 11.8671), 517,
       {// double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId,
@@ -248,7 +252,6 @@ TEST(electrostatic_potential, Test_2_CO2_in_ITQ_29_2x2x2)
   }
 
   RunningEnergy energy =
-      Interactions::computeInterMolecularEnergy(system.forceField, system.simulationBox, spanOfMoleculeAtoms) +
       Interactions::computeFrameworkMoleculeEnergy(system.forceField, system.simulationBox, frameworkAtomPositions,
                                                    spanOfMoleculeAtoms) +
       Interactions::computeEwaldFourierEnergy(system.eik_x, system.eik_y, system.eik_z, system.eik_xy,

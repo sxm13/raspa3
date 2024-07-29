@@ -40,6 +40,9 @@ TEST(electrostatic_polarization, Test_2_CO2_in_ITQ_29_2x2x2)
       {VDWParameters(22.0, 2.30), VDWParameters(53.0, 3.3), VDWParameters(158.5, 3.72), VDWParameters(29.933, 2.745),
        VDWParameters(85.671, 3.017)},
       ForceField::MixingRule::Lorentz_Berthelot, 11.8, true, false, true);
+  forceField.computePolarization = true;
+  forceField.omitInterPolarization = false;
+  forceField.omitInterInteractions = false;
   Framework f = Framework(
       0, forceField, "ITQ-29", SimulationBox(11.8671, 11.8671, 11.8671), 517,
       {// double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId,
@@ -59,8 +62,6 @@ TEST(electrostatic_polarization, Test_2_CO2_in_ITQ_29_2x2x2)
   System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
   system.forceField.EwaldAlpha = 0.25;
   system.forceField.numberOfWaveVectors = int3(8, 8, 8);
-  system.forceField.computePolarization = true;
-  // system.forceField.omitEwaldFourier = true;
 
   std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
   spanOfMoleculeAtoms[0].position = double3(5.93355, 7.93355, 5.93355 + 1.149);

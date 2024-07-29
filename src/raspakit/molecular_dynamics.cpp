@@ -488,6 +488,11 @@ void MolecularDynamics::production()
         system.propertyDensityGrid->writeOutput(system.systemId, system.simulationBox, system.forceField,
                                                 system.frameworkComponents, system.components, currentCycle);
       }
+
+      if (system.propertyMSD.has_value())
+      {
+        system.propertyMSD->writeOutput(system.systemId, system.components, system.timeStep, currentCycle);
+      }
     }
 
     // write binary-restart file
