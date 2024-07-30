@@ -73,6 +73,7 @@ import property_density_grid;
 import property_energy_histogram;
 import property_number_of_molecules_histogram;
 import property_msd;
+import thermostat;
 
 int3 parseInt3(const std::string& item, auto json)
 {
@@ -977,6 +978,20 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
         }
 
         systems[systemId].samplePDBMovie = SampleMovie(systemId, sampleMovieEvery);
+      }
+    }
+
+
+    if (value["Ensemble"].is_string())
+    {
+      size_t thermostatChainLength{ 5 };
+      size_t numberOfYoshidaSuzukiSteps{ 5 };
+
+      std::string ensembleString = value["Ensemble"].get<std::string>();
+      if (caseInSensStringCompare(ensembleString, "NVT"))
+      {
+        systems[systemId].thermostat = Thermostat(systems[systemId].temperature, thermostatChainLength, numberOfYoshidaSuzukiSteps, 
+            systems[systemId].timeStep, systems[systemId].translationalDegreesOfFreedom, systems[systemId].rotationalDegreesOfFreedom);
       }
     }
 

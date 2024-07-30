@@ -124,6 +124,7 @@ std::string RunningEnergy::printMD() const
   std::print(stream, "Total kinetic energy:        {: .6e} [K]\n", conv * kineticEnergy());
   std::print(stream, "    translational:           {: .6e} [K]\n", conv * translationalKineticEnergy);
   std::print(stream, "    rotational:              {: .6e} [K]\n", conv * rotationalKineticEnergy);
+  std::print(stream, "Baro/Thermostat energy:      {: .6e} [K]\n", conv * NoseHooverEnergy);
   std::print(stream, "\n");
 
   return stream.str();
@@ -184,6 +185,7 @@ std::string RunningEnergy::printMD(const std::string &label, double referenceEne
   std::print(stream, "Total kinetic energy:        {: .6e} [K]\n", conv * kineticEnergy());
   std::print(stream, "    translation kinetic:     {: .6e} [K]\n", conv * translationalKineticEnergy);
   std::print(stream, "    rotational kinetic:      {: .6e} [K]\n", conv * rotationalKineticEnergy);
+  std::print(stream, "Baro/thermostat energy:      {: .6e} [K]\n", conv * NoseHooverEnergy);
   std::print(stream, "\n");
 
   return stream.str();
@@ -243,6 +245,7 @@ Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const Runnin
   archive << e.dudlambdaEwald;
   archive << e.translationalKineticEnergy;
   archive << e.rotationalKineticEnergy;
+  archive << e.NoseHooverEnergy;
 
   return archive;
 }
@@ -273,7 +276,7 @@ Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, RunningEnerg
   archive >> e.dudlambdaCharge;
   archive >> e.dudlambdaEwald;
   archive >> e.translationalKineticEnergy;
-  archive >> e.rotationalKineticEnergy;
+  archive >> e.NoseHooverEnergy;
 
   return archive;
 }

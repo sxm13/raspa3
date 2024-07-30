@@ -53,7 +53,8 @@ export struct RunningEnergy
         dudlambdaCharge(0.0),
         dudlambdaEwald(0.0),
         translationalKineticEnergy(0.0),
-        rotationalKineticEnergy(0.0)
+        rotationalKineticEnergy(0.0),
+        NoseHooverEnergy(0.0)
   {
   }
 
@@ -79,7 +80,7 @@ export struct RunningEnergy
   {
     return externalFieldVDW + frameworkMoleculeVDW + moleculeMoleculeVDW + externalFieldCharge +
            frameworkMoleculeCharge + moleculeMoleculeCharge + ewald + intraVDW + intraCoul + tail + polarization +
-           translationalKineticEnergy + rotationalKineticEnergy;
+           translationalKineticEnergy + rotationalKineticEnergy + NoseHooverEnergy;
   }
 
   inline double dudlambda(double lambda) const
@@ -106,6 +107,7 @@ export struct RunningEnergy
     dudlambdaEwald = 0.0;
     translationalKineticEnergy = 0.0;
     rotationalKineticEnergy = 0.0;
+    NoseHooverEnergy = 0.0;
   }
 
   inline RunningEnergy& operator+=(const RunningEnergy& b)
@@ -126,6 +128,7 @@ export struct RunningEnergy
     dudlambdaEwald += b.dudlambdaEwald;
     translationalKineticEnergy += b.translationalKineticEnergy;
     rotationalKineticEnergy += b.rotationalKineticEnergy;
+    NoseHooverEnergy += b.NoseHooverEnergy;
 
     return *this;
   }
@@ -148,6 +151,7 @@ export struct RunningEnergy
     dudlambdaEwald -= b.dudlambdaEwald;
     translationalKineticEnergy -= b.translationalKineticEnergy;
     rotationalKineticEnergy -= b.rotationalKineticEnergy;
+    NoseHooverEnergy -= b.NoseHooverEnergy;
 
     return *this;
   }
@@ -171,6 +175,7 @@ export struct RunningEnergy
     v.dudlambdaEwald = -dudlambdaEwald;
     v.translationalKineticEnergy = -translationalKineticEnergy;
     v.rotationalKineticEnergy = -rotationalKineticEnergy;
+    v.NoseHooverEnergy = -NoseHooverEnergy;
 
     return v;
   }
@@ -193,6 +198,7 @@ export struct RunningEnergy
   double dudlambdaEwald;
   double translationalKineticEnergy;
   double rotationalKineticEnergy;
+  double NoseHooverEnergy;
 
   friend Archive<std::ofstream>& operator<<(Archive<std::ofstream>& archive, const RunningEnergy& c);
   friend Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, RunningEnergy& c);
@@ -217,6 +223,7 @@ export inline RunningEnergy operator+(const RunningEnergy& a, const RunningEnerg
   m.dudlambdaEwald = a.dudlambdaEwald + b.dudlambdaEwald;
   m.translationalKineticEnergy = a.translationalKineticEnergy + b.translationalKineticEnergy;
   m.rotationalKineticEnergy = a.rotationalKineticEnergy + b.rotationalKineticEnergy;
+  m.NoseHooverEnergy = a.NoseHooverEnergy + b.NoseHooverEnergy;
 
   return m;
 }
@@ -240,6 +247,7 @@ export inline RunningEnergy operator-(const RunningEnergy& a, const RunningEnerg
   m.dudlambdaEwald = a.dudlambdaEwald - b.dudlambdaEwald;
   m.translationalKineticEnergy = a.translationalKineticEnergy - b.translationalKineticEnergy;
   m.rotationalKineticEnergy = a.rotationalKineticEnergy - b.rotationalKineticEnergy;
+  m.NoseHooverEnergy = a.NoseHooverEnergy - b.NoseHooverEnergy;
   return m;
 }
 
@@ -262,6 +270,7 @@ export inline RunningEnergy operator*(double a, const RunningEnergy b)
   m.dudlambdaEwald = a * b.dudlambdaEwald;
   m.translationalKineticEnergy = a * b.translationalKineticEnergy;
   m.rotationalKineticEnergy = a * b.rotationalKineticEnergy;
+  m.NoseHooverEnergy = a * b.NoseHooverEnergy;
 
   return m;
 }
@@ -285,6 +294,7 @@ export inline RunningEnergy operator*(const RunningEnergy a, double b)
   m.dudlambdaEwald = b * a.dudlambdaEwald;
   m.translationalKineticEnergy = b * a.translationalKineticEnergy;
   m.rotationalKineticEnergy = b * a.rotationalKineticEnergy;
+  m.NoseHooverEnergy = b * a.NoseHooverEnergy;
 
   return m;
 }

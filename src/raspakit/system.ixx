@@ -86,6 +86,7 @@ import reaction;
 import reactions;
 import transition_matrix;
 import equation_of_states;
+import thermostat;
 import json;
 
 /**
@@ -149,6 +150,7 @@ export struct System
   std::vector<Component> components;
 
   EquationOfState equationOfState;
+  std::optional<Thermostat> thermostat;
 
   Loadings loadings;
 
@@ -207,6 +209,7 @@ export struct System
   double accumulatedDrift{};
   RunningEnergy rigidEnergies;
   RunningEnergy runningEnergies;
+
 
   double3x3 currentExcessPressureTensor;
   EnergyStatus currentEnergyStatus;
@@ -296,6 +299,7 @@ export struct System
   double computeTranslationalKineticEnergy() const;
   double computeRotationalKineticEnergy() const;
   void integrate();
+  void scaleVelocities(std::pair<double, double> scaling);
   void updatePositions();
   void updateVelocities();
   void createCartesianPositions();

@@ -282,6 +282,11 @@ void MolecularDynamics::equilibrate()
     system.runningEnergies = system.computeTotalGradients();
     system.runningEnergies.translationalKineticEnergy = system.computeTranslationalKineticEnergy();
     system.runningEnergies.rotationalKineticEnergy = system.computeRotationalKineticEnergy();
+    if(system.thermostat.has_value())
+    {
+      system.thermostat->initializeVelocities(random);
+      system.runningEnergies.NoseHooverEnergy = system.thermostat->getEnergy();
+    }
     system.referenceEnergy = system.runningEnergies.conservedEnergy();
 
     stream << system.runningEnergies.printMD("Recomputed from scratch", system.referenceEnergy);
@@ -293,6 +298,7 @@ void MolecularDynamics::equilibrate()
                                              system.containsTheFractionalMolecule);
       component.lambdaGC.clear();
     }
+
   };
 
   for (currentCycle = 0uz; currentCycle != numberOfEquilibrationCycles; ++currentCycle)
@@ -373,6 +379,10 @@ void MolecularDynamics::production()
     system.runningEnergies = system.computeTotalGradients();
     system.runningEnergies.translationalKineticEnergy = system.computeTranslationalKineticEnergy();
     system.runningEnergies.rotationalKineticEnergy = system.computeRotationalKineticEnergy();
+    if(system.thermostat.has_value())
+    {
+      system.runningEnergies.NoseHooverEnergy = system.thermostat->getEnergy();
+    }
     system.referenceEnergy = system.runningEnergies.conservedEnergy();
 
     stream << system.runningEnergies.printMD("Recomputed from scratch", system.referenceEnergy);

@@ -114,6 +114,7 @@ import interactions_framework_molecule;
 import interactions_intermolecular;
 import interactions_ewald;
 import equation_of_states;
+import thermostat;
 import json;
 
 // construct System programmatically
@@ -257,6 +258,9 @@ void System::insertFractionalMolecule(size_t selectedComponent, [[maybe_unused]]
   netCharge += components[selectedComponent].netCharge;
   netChargeAdsorbates += components[selectedComponent].netCharge;
   netChargePerComponent[selectedComponent] += components[selectedComponent].netCharge;
+
+  translationalDegreesOfFreedom += components[selectedComponent].translationalDegreesOfFreedom;
+  rotationalDegreesOfFreedom += components[selectedComponent].rotationalDegreesOfFreedom;
 
   // set moleculesIds
   size_t index = numberOfFrameworkAtoms;  // indexOfFirstMolecule(selectedComponent);
@@ -1001,11 +1005,11 @@ std::string System::writeEquilibrationStatusReportMD(size_t currentCycle, size_t
 
   double translationalKineticEnergy = computeTranslationalKineticEnergy();
   double translationalTemperature =
-      2.0 * translationalKineticEnergy / static_cast<double>(translationalDegreesOfFreedom);
+      2.0 * translationalKineticEnergy / (Units::KB * static_cast<double>(translationalDegreesOfFreedom));
   double rotationalKineticEnergy = computeRotationalKineticEnergy();
-  double rotationalTemperature = 2.0 * rotationalKineticEnergy / static_cast<double>(rotationalDegreesOfFreedom);
+  double rotationalTemperature = 2.0 * rotationalKineticEnergy / (Units::KB * static_cast<double>(rotationalDegreesOfFreedom));
   double overallTemperature = 2.0 * (translationalKineticEnergy + rotationalKineticEnergy) /
-                              static_cast<double>(translationalDegreesOfFreedom + rotationalDegreesOfFreedom);
+                              (Units::KB * static_cast<double>(translationalDegreesOfFreedom + rotationalDegreesOfFreedom));
   std::print(stream, "Temperature: {: .6e}\n", overallTemperature);
   std::print(stream, "Translational temperature: {: .6e}\n", translationalTemperature);
   std::print(stream, "Rotational temperature: {: .6e}\n\n", rotationalTemperature);
@@ -1187,11 +1191,11 @@ std::string System::writeProductionStatusReportMD(size_t currentCycle, size_t nu
 
   double translational_kinetic_energy = computeTranslationalKineticEnergy();
   double translational_temperature =
-      2.0 * translational_kinetic_energy / static_cast<double>(translationalDegreesOfFreedom);
+      2.0 * translational_kinetic_energy / (Units::KB * static_cast<double>(translationalDegreesOfFreedom));
   double rotational_kinetic_energy = computeRotationalKineticEnergy();
-  double rotational_temperature = 2.0 * rotational_kinetic_energy / static_cast<double>(rotationalDegreesOfFreedom);
+  double rotational_temperature = 2.0 * rotational_kinetic_energy / (Units::KB * static_cast<double>(rotationalDegreesOfFreedom));
   double overall_temperature = 2.0 * (translational_kinetic_energy + rotational_kinetic_energy) /
-                               static_cast<double>(translationalDegreesOfFreedom + rotationalDegreesOfFreedom);
+                               (Units::KB * static_cast<double>(translationalDegreesOfFreedom + rotationalDegreesOfFreedom));
   std::pair<double, double> average_temperature = averageTemperature.averageTemperature();
   std::pair<double, double> average_translational_temperature = averageTranslationalTemperature.averageTemperature();
   std::pair<double, double> average_rotational_temperature = averageRotationalTemperature.averageTemperature();
@@ -1412,15 +1416,15 @@ void System::sampleProperties(size_t currentBlock, size_t currentCycle)
 
   double translationalKineticEnergy = computeTranslationalKineticEnergy();
   double translationalTemperature =
-      2.0 * translationalKineticEnergy / static_cast<double>(translationalDegreesOfFreedom);
+      2.0 * translationalKineticEnergy / (Units::KB * static_cast<double>(translationalDegreesOfFreedom));
   averageTranslationalTemperature.addSample(currentBlock, translationalTemperature, w);
 
   double rotationalKineticEnergy = computeRotationalKineticEnergy();
-  double rotationalTemperature = 2.0 * rotationalKineticEnergy / static_cast<double>(rotationalDegreesOfFreedom);
+  double rotationalTemperature = 2.0 * rotationalKineticEnergy / (Units::KB * static_cast<double>(rotationalDegreesOfFreedom));
   averageRotationalTemperature.addSample(currentBlock, rotationalTemperature, w);
 
   double overallTemperature = 2.0 * (translationalKineticEnergy + rotationalKineticEnergy) /
-                              static_cast<double>(translationalDegreesOfFreedom + rotationalDegreesOfFreedom);
+                              (Units::KB * static_cast<double>(translationalDegreesOfFreedom + rotationalDegreesOfFreedom));
   averageTemperature.addSample(currentBlock, overallTemperature, w);
 
   loadings = Loadings(components.size(), numberOfIntegerMoleculesPerComponent, simulationBox);
@@ -1867,14 +1871,20 @@ double System::computeRotationalKineticEnergy() const
 
 void System::integrate()
 {
+  // apply thermo for temperature control
+  if(thermostat.has_value())
+  {
+    double UKineticTranslation = computeTranslationalKineticEnergy();
+    double UKineticRotation = computeRotationalKineticEnergy();
+    std::pair<double, double> scaling = thermostat->NoseHooverNVT(UKineticTranslation, UKineticRotation);
+    scaleVelocities(scaling);
+  }
+
   // evolve the positions a half timestep
   updateVelocities();
 
   // evolve the positions a full timestep
   updatePositions();
-
-  // first part of bond-constraints
-  // RattleStageOne();
 
   // evolve the part of rigid bodies involving free rotation
   noSquishFreeRotorOrderTwo();
@@ -1891,11 +1901,37 @@ void System::integrate()
   // evolve the positions a half timestep
   updateVelocities();
 
-  // second part of bond-constraints
-  // RattleStageTwo();
+  // apply thermo for temperature control
+  if(thermostat.has_value())
+  {
+    double UKineticTranslation = computeTranslationalKineticEnergy();
+    double UKineticRotation = computeRotationalKineticEnergy();
+    std::pair<double, double> scaling = thermostat->NoseHooverNVT(UKineticTranslation, UKineticRotation);
+    scaleVelocities(scaling);
+  }
 
   runningEnergies.translationalKineticEnergy = computeTranslationalKineticEnergy();
   runningEnergies.rotationalKineticEnergy = computeRotationalKineticEnergy();
+  if(thermostat.has_value())
+  {
+    runningEnergies.NoseHooverEnergy = thermostat->getEnergy();
+  }
+}
+
+void System::scaleVelocities(std::pair<double, double> scaling)
+{
+  size_t moleculeIndex{};
+
+  for (size_t l = 0; l != components.size(); ++l)
+  {
+    for (size_t m = 0; m != numberOfMoleculesPerComponent[l]; ++m)
+    {
+      moleculePositions[moleculeIndex].velocity = scaling.first * moleculePositions[moleculeIndex].velocity;
+      moleculePositions[moleculeIndex].orientationMomentum = scaling.second * moleculePositions[moleculeIndex].orientationMomentum;
+
+      ++moleculeIndex;
+    }
+  }
 }
 
 void System::updatePositions()
@@ -2316,6 +2352,7 @@ Archive<std::ofstream>& operator<<(Archive<std::ofstream>& archive, const System
   archive << s.frameworkComponents;
   archive << s.components;
   archive << s.equationOfState;
+  archive << s.thermostat;
   archive << s.loadings;
   archive << s.swappableComponents;
   archive << s.initialNumberOfMolecules;
@@ -2421,6 +2458,7 @@ Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, System& s)
   archive >> s.frameworkComponents;
   archive >> s.components;
   archive >> s.equationOfState;
+  archive >> s.thermostat;
   archive >> s.loadings;
   archive >> s.swappableComponents;
   archive >> s.initialNumberOfMolecules;

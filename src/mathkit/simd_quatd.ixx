@@ -61,6 +61,16 @@ export inline simd_quatd operator+(const simd_quatd& a, const simd_quatd& b)
   return simd_quatd(a.ix + b.ix, a.iy + b.iy, a.iz + b.iz, a.r + b.r);
 }
 
+export inline simd_quatd operator*(const double& a, const simd_quatd& b)
+{
+  return simd_quatd(a * b.ix, a * b.iy, a * b.iz, a * b.r);
+}
+
+export inline simd_quatd operator*(const simd_quatd& a, const double& b)
+{
+  return simd_quatd(a.ix * b, a.iy * b, a.iz * b, a.r * b);
+}
+
 export inline simd_quatd operator/(const simd_quatd& a, const double& b)
 {
   return simd_quatd(a.ix / b, a.iy / b, a.iz / b, a.r / b);

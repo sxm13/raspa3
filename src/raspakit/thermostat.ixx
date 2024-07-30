@@ -19,18 +19,24 @@ import <print>;
 import archive;
 import units;
 import randomnumbers;
+import molecule;
 
 export struct Thermostat
 {
-  Thermostat(double temperature, size_t thermostatChainLength, size_t numberOfYoshidaSuzukiSteps);
+  Thermostat() {}
+  Thermostat(double temperature, size_t thermostatChainLength, size_t numberOfYoshidaSuzukiSteps, double deltaT,
+             size_t translation_degrees_of_freedom, size_t rotational_degrees_of_freedom);
 
-  void initialize(RandomNumber &random, size_t translation_degrees_of_freedom, size_t rotational_degrees_of_freedom);
-  void NoseHooverNVT();
+  uint64_t versionNumber{1};
 
   double temperature;
   size_t thermostatChainLength;
-  double timeScaleParameterThermostat{0.15};
-  size_t numberOfYoshidaSuzukiSteps{5};
+  double timeScaleParameterThermostat{ 0.15 };
+  size_t numberOfRespaSteps{ 5 };
+  size_t numberOfYoshidaSuzukiSteps{ 5 };
+  double deltaT{};
+  size_t translation_degrees_of_freedom;
+  size_t rotational_degrees_of_freedom;
 
   std::vector<double> thermostatDegreesOfFreedomTranslation;
   std::vector<double> thermostatForceTranslation;
@@ -45,4 +51,13 @@ export struct Thermostat
   std::vector<double> thermostatMassRotation;
 
   std::vector<double> w;
+
+  void initializeVelocities(RandomNumber &random);
+
+  std::pair<double, double> NoseHooverNVT(double UKineticTranslation, double UKineticRotation);
+
+  double getEnergy();
+
+  friend Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const Thermostat &s);
+  friend Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, Thermostat &s);
 };
