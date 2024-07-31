@@ -191,6 +191,11 @@ System::System(size_t id, std::optional<SimulationBox> box, double T, std::optio
                                                      double3(0.0, 0.0, 0.0), 1.0);
 
   RandomNumber random(1400);
+
+  translationalCenterOfMassConstraint = 0;
+  translationalDegreesOfFreedom = 0;
+  rotationalDegreesOfFreedom = 0;
+
   createInitialMolecules(random);
 
   equationOfState =
@@ -1000,19 +1005,30 @@ std::string System::writeEquilibrationStatusReportMD(size_t currentCycle, size_t
   std::print(stream, "===============================================================================\n\n");
 
   std::print(stream, "{}\n", simulationBox.printStatus());
-  std::print(stream, "net charge: {:12.8f}\n", netCharge);
+  double3 linear_momentum = computeLinearMomentum();
+  std::print(stream, "Linear momentum: {:12.8f} {:12.8f} {:12.8f}\n", linear_momentum.x, linear_momentum.y, linear_momentum.z);
+  double3 com_velocity = computeCenterOfMassVelocity();
+  std::print(stream, "Center of mass velocity: {:12.8f} {:12.8f} {:12.8f}\n", com_velocity.x, com_velocity.y, com_velocity.z);
+  double3 com = computeCenterOfMass();
+  std::print(stream, "Center of mass: {:12.8f} {:12.8f} {:12.8f}\n", com.x, com.y, com.z);
+  std::print(stream, "Net charge: {:12.8f}\n", netCharge);
   std::print(stream, "\n");
 
   double translationalKineticEnergy = computeTranslationalKineticEnergy();
   double translationalTemperature =
-      2.0 * translationalKineticEnergy / (Units::KB * static_cast<double>(translationalDegreesOfFreedom));
+      2.0 * translationalKineticEnergy / (Units::KB * static_cast<double>(translationalDegreesOfFreedom - translationalCenterOfMassConstraint));
   double rotationalKineticEnergy = computeRotationalKineticEnergy();
   double rotationalTemperature = 2.0 * rotationalKineticEnergy / (Units::KB * static_cast<double>(rotationalDegreesOfFreedom));
   double overallTemperature = 2.0 * (translationalKineticEnergy + rotationalKineticEnergy) /
-                              (Units::KB * static_cast<double>(translationalDegreesOfFreedom + rotationalDegreesOfFreedom));
+                              (Units::KB * static_cast<double>(translationalDegreesOfFreedom - translationalCenterOfMassConstraint + rotationalDegreesOfFreedom));
   std::print(stream, "Temperature: {: .6e}\n", overallTemperature);
   std::print(stream, "Translational temperature: {: .6e}\n", translationalTemperature);
   std::print(stream, "Rotational temperature: {: .6e}\n\n", rotationalTemperature);
+
+  std::print(stream, "Translational constraint degrees of freedom center of mass: {}\n", translationalCenterOfMassConstraint);
+  std::print(stream, "Translational degrees of freedom molecules: {}\n", translationalDegreesOfFreedom);
+  std::print(stream, "Total translational degrees of freedom molecules: {}\n", translationalDegreesOfFreedom - translationalCenterOfMassConstraint);
+  std::print(stream, "Rotational degrees of freedom molecules: {}\n\n", rotationalDegreesOfFreedom);
 
   std::print(stream, "Conserved energy: {: .6e}\n", conservedEnergy);
   double drift = std::abs(Units::EnergyToKelvin * (conservedEnergy - referenceEnergy) / referenceEnergy);
@@ -1181,21 +1197,28 @@ std::string System::writeProductionStatusReportMD(size_t currentCycle, size_t nu
   std::print(stream, "Current cycle: {} out of {}\n", currentCycle, numberOfCycles);
   std::print(stream, "===============================================================================\n\n");
 
-  std::print(stream, "Net charge: {:12.8f}\n", netCharge);
-  std::print(stream, "Time run: {:g} [ps]  {:g} [ns]\n\n", static_cast<double>(currentCycle) * timeStep,
-             static_cast<double>(currentCycle) * timeStep / 1000.0);
-
   std::pair<SimulationBox, SimulationBox> simulationBoxData = averageSimulationBox.averageSimulationBox();
   std::print(stream, "{}", simulationBox.printStatus(simulationBoxData.first, simulationBoxData.second));
   std::print(stream, "\n");
 
+  double3 linear_momentum = computeLinearMomentum();
+  std::print(stream, "Linear momentum: {:12.8f} {:12.8f} {:12.8f}\n", linear_momentum.x, linear_momentum.y, linear_momentum.z);
+  double3 com_velocity = computeCenterOfMassVelocity();
+  std::print(stream, "Center of mass velocity: {:12.8f} {:12.8f} {:12.8f}\n", com_velocity.x, com_velocity.y, com_velocity.z);
+  double3 com = computeCenterOfMass();
+  std::print(stream, "Center of mass: {:12.8f} {:12.8f} {:12.8f}\n", com.x, com.y, com.z);
+  std::print(stream, "Net charge: {:12.8f}\n", netCharge);
+  std::print(stream, "Time run: {:g} [ps]  {:g} [ns]\n\n", static_cast<double>(currentCycle) * timeStep,
+             static_cast<double>(currentCycle) * timeStep / 1000.0);
+
+
   double translational_kinetic_energy = computeTranslationalKineticEnergy();
   double translational_temperature =
-      2.0 * translational_kinetic_energy / (Units::KB * static_cast<double>(translationalDegreesOfFreedom));
+      2.0 * translational_kinetic_energy / (Units::KB * static_cast<double>(translationalDegreesOfFreedom - translationalCenterOfMassConstraint));
   double rotational_kinetic_energy = computeRotationalKineticEnergy();
   double rotational_temperature = 2.0 * rotational_kinetic_energy / (Units::KB * static_cast<double>(rotationalDegreesOfFreedom));
   double overall_temperature = 2.0 * (translational_kinetic_energy + rotational_kinetic_energy) /
-                               (Units::KB * static_cast<double>(translationalDegreesOfFreedom + rotationalDegreesOfFreedom));
+                               (Units::KB * static_cast<double>(translationalDegreesOfFreedom - translationalCenterOfMassConstraint + rotationalDegreesOfFreedom));
   std::pair<double, double> average_temperature = averageTemperature.averageTemperature();
   std::pair<double, double> average_translational_temperature = averageTranslationalTemperature.averageTemperature();
   std::pair<double, double> average_rotational_temperature = averageRotationalTemperature.averageTemperature();
@@ -1206,6 +1229,11 @@ std::string System::writeProductionStatusReportMD(size_t currentCycle, size_t nu
              average_translational_temperature.first, average_translational_temperature.second);
   std::print(stream, "Rotational temperature: {: .6e} ({: .6e} +/- {:.6e})\n\n", rotational_temperature,
              average_rotational_temperature.first, average_rotational_temperature.second);
+
+  std::print(stream, "Translational constraint degrees of freedom center of mass: {}\n", translationalCenterOfMassConstraint);
+  std::print(stream, "Translational degrees of freedom molecules: {}\n", translationalDegreesOfFreedom);
+  std::print(stream, "Total translational degrees of freedom molecules: {}\n", translationalDegreesOfFreedom - translationalCenterOfMassConstraint);
+  std::print(stream, "Rotational degrees of freedom molecules: {}\n\n", rotationalDegreesOfFreedom);
 
   std::print(stream, "Conserved energy: {: .6e}\n", conservedEnergy);
   double drift = std::abs(Units::EnergyToKelvin * (conservedEnergy - referenceEnergy) / referenceEnergy);
@@ -1416,7 +1444,7 @@ void System::sampleProperties(size_t currentBlock, size_t currentCycle)
 
   double translationalKineticEnergy = computeTranslationalKineticEnergy();
   double translationalTemperature =
-      2.0 * translationalKineticEnergy / (Units::KB * static_cast<double>(translationalDegreesOfFreedom));
+      2.0 * translationalKineticEnergy / (Units::KB * static_cast<double>(translationalDegreesOfFreedom - translationalCenterOfMassConstraint));
   averageTranslationalTemperature.addSample(currentBlock, translationalTemperature, w);
 
   double rotationalKineticEnergy = computeRotationalKineticEnergy();
@@ -1424,7 +1452,7 @@ void System::sampleProperties(size_t currentBlock, size_t currentCycle)
   averageRotationalTemperature.addSample(currentBlock, rotationalTemperature, w);
 
   double overallTemperature = 2.0 * (translationalKineticEnergy + rotationalKineticEnergy) /
-                              (Units::KB * static_cast<double>(translationalDegreesOfFreedom + rotationalDegreesOfFreedom));
+                              (Units::KB * static_cast<double>(translationalDegreesOfFreedom - translationalCenterOfMassConstraint + rotationalDegreesOfFreedom));
   averageTemperature.addSample(currentBlock, overallTemperature, w);
 
   loadings = Loadings(components.size(), numberOfIntegerMoleculesPerComponent, simulationBox);
@@ -1817,6 +1845,90 @@ void System::initializeVelocities(RandomNumber& random)
       ++moleculeIndex;
     }
   }
+}
+
+void System::removeCenterOfMassVelocityDrift()
+{
+  size_t moleculeIndex{};
+
+  double3 sum_velocity{};
+  moleculeIndex = 0;
+  for (size_t l = 0; l != components.size(); ++l)
+  {
+    for (size_t m = 0; m != numberOfMoleculesPerComponent[l]; ++m)
+    {
+      sum_velocity += moleculePositions[moleculeIndex].velocity;
+      ++moleculeIndex;
+    }
+  }
+
+  double number_of_molecules = static_cast<double>(numberOfMolecules());
+  moleculeIndex = 0;
+  for (size_t l = 0; l != components.size(); ++l)
+  {
+    for (size_t m = 0; m != numberOfMoleculesPerComponent[l]; ++m)
+    {
+      moleculePositions[moleculeIndex].velocity -= sum_velocity / number_of_molecules;
+      
+      ++moleculeIndex;
+    }
+  }
+}
+
+double3 System::computeCenterOfMass() const
+{
+  size_t moleculeIndex{};
+
+  double3 com{};
+  double totalMass{};
+  for (size_t l = 0; l != components.size(); ++l)
+  {
+    double molecularMass = components[l].totalMass;
+    for (size_t m = 0; m != numberOfMoleculesPerComponent[l]; ++m)
+    {
+      totalMass += molecularMass;
+      com += molecularMass * moleculePositions[moleculeIndex].centerOfMassPosition;
+      ++moleculeIndex;
+    }
+  }
+  return com / totalMass;
+}
+
+// The velocity of the center of mass is the average velocity of all objects in the system weighted by their masses
+double3 System::computeCenterOfMassVelocity() const
+{
+  size_t moleculeIndex{};
+
+  double3 com_velocity{};
+  double totalMass{};
+  for (size_t l = 0; l != components.size(); ++l)
+  {
+    double molecularMass = components[l].totalMass;
+    for (size_t m = 0; m != numberOfMoleculesPerComponent[l]; ++m)
+    {
+      totalMass += molecularMass;
+      com_velocity += molecularMass * moleculePositions[moleculeIndex].velocity;
+      ++moleculeIndex;
+    }
+  }
+  return com_velocity / totalMass;
+}
+
+double3 System::computeLinearMomentum() const
+{
+  size_t moleculeIndex{};
+
+  double3 com_velocity{};
+  for (size_t l = 0; l != components.size(); ++l)
+  {
+    double molecularMass = components[l].totalMass;
+    for (size_t m = 0; m != numberOfMoleculesPerComponent[l]; ++m)
+    {
+      com_velocity += molecularMass * moleculePositions[moleculeIndex].velocity;
+      ++moleculeIndex;
+    }
+  }
+  return com_velocity;
 }
 
 double System::computeTranslationalKineticEnergy() const
@@ -2369,6 +2481,7 @@ Archive<std::ofstream>& operator<<(Archive<std::ofstream>& archive, const System
   archive << s.numberOfPseudoAtoms;
   archive << s.totalNumberOfPseudoAtoms;
   archive << s.frameworkMass;
+  archive << s.translationalCenterOfMassConstraint;
   archive << s.translationalDegreesOfFreedom;
   archive << s.rotationalDegreesOfFreedom;
   archive << s.timeStep;
@@ -2475,6 +2588,7 @@ Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, System& s)
   archive >> s.numberOfPseudoAtoms;
   archive >> s.totalNumberOfPseudoAtoms;
   archive >> s.frameworkMass;
+  archive >> s.translationalCenterOfMassConstraint;
   archive >> s.translationalDegreesOfFreedom;
   archive >> s.rotationalDegreesOfFreedom;
   archive >> s.timeStep;

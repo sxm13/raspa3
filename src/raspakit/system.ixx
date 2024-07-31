@@ -186,6 +186,7 @@ export struct System
   std::vector<std::vector<size_t>> numberOfPseudoAtoms;
   std::vector<size_t> totalNumberOfPseudoAtoms;
 
+  size_t translationalCenterOfMassConstraint{};
   size_t translationalDegreesOfFreedom{};
   size_t rotationalDegreesOfFreedom{};
 
@@ -296,6 +297,10 @@ export struct System
   void determineSimulationBox();
 
   void initializeVelocities(RandomNumber &random);
+  void removeCenterOfMassVelocityDrift();
+  double3 computeCenterOfMass() const;
+  double3 computeCenterOfMassVelocity() const;
+  double3 computeLinearMomentum() const;
   double computeTranslationalKineticEnergy() const;
   double computeRotationalKineticEnergy() const;
   void integrate();

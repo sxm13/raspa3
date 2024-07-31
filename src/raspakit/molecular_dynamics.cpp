@@ -262,11 +262,6 @@ void MolecularDynamics::initialize()
   continueInitializationStage:;
   }
 
-  for (System& system : systems)
-  {
-    system.createCartesianPositions();
-    system.initializeVelocities(random);
-  }
 }
 
 void MolecularDynamics::equilibrate()
@@ -279,12 +274,24 @@ void MolecularDynamics::equilibrate()
     std::ostream stream(streams[system.systemId].rdbuf());
 
     system.createCartesianPositions();
+    system.initializeVelocities(random);
+
+    system.removeCenterOfMassVelocityDrift();
+    if(system.thermostat.has_value())
+    {
+      if(system.frameworkComponents.empty() && system.numberOfMolecules() > 1uz)
+      {
+        system.translationalCenterOfMassConstraint = 3;
+        system.thermostat->translationalCenterOfMassConstraint = 3;
+      }
+      system.thermostat->initialize(random);
+    }
+
     system.runningEnergies = system.computeTotalGradients();
     system.runningEnergies.translationalKineticEnergy = system.computeTranslationalKineticEnergy();
     system.runningEnergies.rotationalKineticEnergy = system.computeRotationalKineticEnergy();
     if(system.thermostat.has_value())
     {
-      system.thermostat->initializeVelocities(random);
       system.runningEnergies.NoseHooverEnergy = system.thermostat->getEnergy();
     }
     system.referenceEnergy = system.runningEnergies.conservedEnergy();

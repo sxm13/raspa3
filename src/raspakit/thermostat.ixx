@@ -25,7 +25,7 @@ export struct Thermostat
 {
   Thermostat() {}
   Thermostat(double temperature, size_t thermostatChainLength, size_t numberOfYoshidaSuzukiSteps, double deltaT,
-             size_t translation_degrees_of_freedom, size_t rotational_degrees_of_freedom);
+             size_t translationalDegreesOfFreedom, size_t rotationalDgreesOfFreedom);
 
   uint64_t versionNumber{1};
 
@@ -35,8 +35,10 @@ export struct Thermostat
   size_t numberOfRespaSteps{ 5 };
   size_t numberOfYoshidaSuzukiSteps{ 5 };
   double deltaT{};
-  size_t translation_degrees_of_freedom;
-  size_t rotational_degrees_of_freedom;
+
+  size_t translationalCenterOfMassConstraint{};
+  size_t translationalDegreesOfFreedom;
+  size_t rotationalDgreesOfFreedom;
 
   std::vector<double> thermostatDegreesOfFreedomTranslation;
   std::vector<double> thermostatForceTranslation;
@@ -52,7 +54,7 @@ export struct Thermostat
 
   std::vector<double> w;
 
-  void initializeVelocities(RandomNumber &random);
+  void initialize(RandomNumber &random);
 
   std::pair<double, double> NoseHooverNVT(double UKineticTranslation, double UKineticRotation);
 
