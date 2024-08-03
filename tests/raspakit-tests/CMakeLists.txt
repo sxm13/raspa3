@@ -14,6 +14,10 @@ add_executable(unit_tests_raspakit
                electrostatic_potential.cpp
                electrostatic_field.cpp
                electrostatic_polarization.cpp
+               nist_water_1.cpp
+               nist_water_2.cpp
+               nist_water_3.cpp
+               nist_water_4.cpp
                main.cpp)
 
 

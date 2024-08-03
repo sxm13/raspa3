@@ -41,6 +41,11 @@ TEST(Ewald, Test_2_CO2_in_Box_10_10_10)
       {VDWParameters(22.0, 2.30), VDWParameters(53.0, 3.3), VDWParameters(158.5, 3.72), VDWParameters(29.933, 2.745),
        VDWParameters(85.671, 3.017)},
       ForceField::MixingRule::Lorentz_Berthelot, 12.0, true, false, true);
+
+  forceField.automaticEwald = false;
+  forceField.EwaldAlpha = 0.25;
+  forceField.numberOfWaveVectors = int3(8, 8, 8);
+
   Component c = Component(
       0, forceField, "CO2", 304.1282, 7377300.0, 0.22394,
       {// double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId,
@@ -48,6 +53,7 @@ TEST(Ewald, Test_2_CO2_in_Box_10_10_10)
        Atom(double3(0.0, 0.0, 1.149), -0.3256, 1.0, 0, 4, 0, 0), Atom(double3(0.0, 0.0, 0.0), 0.6512, 1.0, 0, 3, 0, 0),
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 0, 0)},
       5, 21);
+
 
   System system = System(0, SimulationBox(10.0, 10.0, 10.0), 300.0, 1e4, forceField, {}, {c}, {2}, 5);
 
@@ -59,10 +65,7 @@ TEST(Ewald, Test_2_CO2_in_Box_10_10_10)
   atomPositions[4].position = double3(1.0, 0.0, 0.0);
   atomPositions[5].position = double3(1.0, 0.0, -1.149);
 
-  // double3 perpendicularWidths = system.simulationBox.perpendicularWidths();
-  // system.forceField.initializeEwaldParameters(perpendicularWidths);
-  system.forceField.EwaldAlpha = 0.25;
-  system.forceField.numberOfWaveVectors = int3(8, 8, 8);
+
   Interactions::computeEwaldFourierEnergySingleIon(system.eik_x, system.eik_y, system.eik_z, system.eik_xy,
                                                    system.forceField, system.simulationBox, double3(0.0, 0.0, 0.0),
                                                    1.0);
@@ -72,7 +75,7 @@ TEST(Ewald, Test_2_CO2_in_Box_10_10_10)
       system.forceField, system.simulationBox, system.components, system.numberOfMoleculesPerComponent,
       system.spanOfMoleculeAtoms());
 
-  EXPECT_NEAR(energy.ewald * Units::EnergyToKelvin, 90.54613836, 1e-6);
+  EXPECT_NEAR(energy.ewaldFourier() * Units::EnergyToKelvin, 90.54613836, 1e-6);
 }
 
 TEST(Ewald, Test_1_Na_1_Cl_in_Box_10_10_10_Gradient)
@@ -88,6 +91,11 @@ TEST(Ewald, Test_1_Na_1_Cl_in_Box_10_10_10_Gradient)
       {VDWParameters(22.0, 2.30), VDWParameters(53.0, 3.3), VDWParameters(158.5, 3.72), VDWParameters(75.0, 1.0),
        VDWParameters(75.0, 1.0)},
       ForceField::MixingRule::Lorentz_Berthelot, 12.0, true, false, true);
+
+  forceField.automaticEwald = false;
+  forceField.EwaldAlpha = 0.25;
+  forceField.numberOfWaveVectors = int3(8, 8, 8);
+
   Component na = Component(0, forceField, "Na", 304.1282, 7377300.0, 0.22394,
                            {
                                Atom(double3(0.0, 0.0, 0.0), 1.0, 1.0, 0, 3, 0, 0),
@@ -110,10 +118,6 @@ TEST(Ewald, Test_1_Na_1_Cl_in_Box_10_10_10_Gradient)
   }
 
   RunningEnergy energy;
-  // double3 perpendicularWidths = system.simulationBox.perpendicularWidths();
-  // system.forceField.initializeEwaldParameters(perpendicularWidths);
-  system.forceField.EwaldAlpha = 0.25;
-  system.forceField.numberOfWaveVectors = int3(8, 8, 8);
 
   system.precomputeTotalRigidEnergy();
   std::pair<EnergyStatus, double3x3> strainDerivative = Interactions::computeEwaldFourierEnergyStrainDerivative(
@@ -171,9 +175,9 @@ TEST(Ewald, Test_1_Na_1_Cl_in_Box_10_10_10_Gradient)
         std::span<const Atom>(atomPositions));
     atomPositions[i].position.z = spanOfMoleculeAtoms[i].position.z;
 
-    gradient.x = (x2.ewald - x1.ewald) / delta;
-    gradient.y = (y2.ewald - y1.ewald) / delta;
-    gradient.z = (z2.ewald - z1.ewald) / delta;
+    gradient.x = (x2.ewaldFourier() - x1.ewaldFourier()) / delta;
+    gradient.y = (y2.ewaldFourier() - y1.ewaldFourier()) / delta;
+    gradient.z = (z2.ewaldFourier() - z1.ewaldFourier()) / delta;
 
     EXPECT_NEAR(spanOfMoleculeAtoms[i].gradient.x, gradient.x, tolerance) << "Wrong x-gradient";
     EXPECT_NEAR(spanOfMoleculeAtoms[i].gradient.y, gradient.y, tolerance) << "Wrong y-gradient";
@@ -194,6 +198,11 @@ TEST(Ewald, Test_2_CO2_in_ITQ_29_1x1x1)
       {VDWParameters(22.0, 2.30), VDWParameters(53.0, 3.3), VDWParameters(158.5, 3.72), VDWParameters(29.933, 2.745),
        VDWParameters(85.671, 3.017)},
       ForceField::MixingRule::Lorentz_Berthelot, 12.0, true, false, true);
+
+  forceField.automaticEwald = false;
+  forceField.EwaldAlpha = 0.25;
+  forceField.numberOfWaveVectors = int3(8, 8, 8);
+
   Framework f = Framework(
       0, forceField, "ITQ-29", SimulationBox(11.8671, 11.8671, 11.8671), 517,
       {// double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId,
@@ -220,8 +229,6 @@ TEST(Ewald, Test_2_CO2_in_ITQ_29_1x1x1)
   atomPositions[4].position = double3(5.93355, 3.93355, 5.93355 + 0.0);
   atomPositions[5].position = double3(5.93355, 3.93355, 5.93355 - 1.149);
 
-  system.forceField.EwaldAlpha = 0.25;
-  system.forceField.numberOfWaveVectors = int3(8, 8, 8);
 
   system.precomputeTotalRigidEnergy();
   system.CoulombicFourierEnergySingleIon = Interactions::computeEwaldFourierEnergySingleIon(
@@ -233,7 +240,7 @@ TEST(Ewald, Test_2_CO2_in_ITQ_29_1x1x1)
       system.spanOfMoleculeAtoms());
 
   EXPECT_NEAR(system.CoulombicFourierEnergySingleIon * Units::EnergyToKelvin, 17464.2371790130, 1e-6);
-  EXPECT_NEAR(energy.ewald * Units::EnergyToKelvin, -702.65863478, 1e-6);
+  EXPECT_NEAR(energy.ewaldFourier() * Units::EnergyToKelvin, -702.65863478, 1e-6);
 }
 
 TEST(Ewald, Test_2_CO2_in_ITQ_29_2x2x2)
@@ -249,6 +256,11 @@ TEST(Ewald, Test_2_CO2_in_ITQ_29_2x2x2)
       {VDWParameters(22.0, 2.30), VDWParameters(53.0, 3.3), VDWParameters(158.5, 3.72), VDWParameters(29.933, 2.745),
        VDWParameters(85.671, 3.017)},
       ForceField::MixingRule::Lorentz_Berthelot, 12.0, true, false, true);
+
+  forceField.automaticEwald = false;
+  forceField.EwaldAlpha = 0.25;
+  forceField.numberOfWaveVectors = int3(8, 8, 8);
+
   Framework f = Framework(
       0, forceField, "ITQ-29", SimulationBox(11.8671, 11.8671, 11.8671), 517,
       {// double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type, uint8_t componentId,
@@ -275,8 +287,6 @@ TEST(Ewald, Test_2_CO2_in_ITQ_29_2x2x2)
   atomPositions[4].position = double3(5.93355, 3.93355, 5.93355 + 0.0);
   atomPositions[5].position = double3(5.93355, 3.93355, 5.93355 - 1.149);
 
-  system.forceField.EwaldAlpha = 0.25;
-  system.forceField.numberOfWaveVectors = int3(8, 8, 8);
   system.precomputeTotalRigidEnergy();
   system.CoulombicFourierEnergySingleIon = Interactions::computeEwaldFourierEnergySingleIon(
       system.eik_x, system.eik_y, system.eik_z, system.eik_xy, system.forceField, system.simulationBox,
@@ -287,7 +297,7 @@ TEST(Ewald, Test_2_CO2_in_ITQ_29_2x2x2)
       system.spanOfMoleculeAtoms());
 
   EXPECT_NEAR(system.CoulombicFourierEnergySingleIon * Units::EnergyToKelvin, 9673.9032373025, 1e-6);
-  EXPECT_NEAR(energy.ewald * Units::EnergyToKelvin, -721.64644486, 1e-6);
+  EXPECT_NEAR(energy.ewaldFourier() * Units::EnergyToKelvin, -721.64644486, 1e-6);
 }
 
 TEST(Ewald, Test_2_CO2_in_MFI_1x1x1)
@@ -303,6 +313,11 @@ TEST(Ewald, Test_2_CO2_in_MFI_1x1x1)
       {VDWParameters(22.0, 2.30), VDWParameters(53.0, 3.3), VDWParameters(158.5, 3.72), VDWParameters(29.933, 2.745),
        VDWParameters(85.671, 3.017)},
       ForceField::MixingRule::Lorentz_Berthelot, 12.0, true, false, true);
+
+  forceField.automaticEwald = false;
+  forceField.EwaldAlpha = 0.25;
+  forceField.numberOfWaveVectors = int3(8, 8, 8);
+
   Framework f = Framework(0, forceField, "MFI_SI", SimulationBox(20.022, 19.899, 13.383), 292,
                           {// double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type,
                            // uint8_t componentId, uint8_t groupId
@@ -363,8 +378,6 @@ TEST(Ewald, Test_2_CO2_in_MFI_1x1x1)
   atomPositions[4].position = double3(10.011, 4.97475 - 2.0, 0.0);
   atomPositions[5].position = double3(10.011, 4.97475 - 2.0, -1.149);
 
-  system.forceField.EwaldAlpha = 0.25;
-  system.forceField.numberOfWaveVectors = int3(8, 8, 8);
 
   system.precomputeTotalRigidEnergy();
   system.CoulombicFourierEnergySingleIon = Interactions::computeEwaldFourierEnergySingleIon(
@@ -376,7 +389,7 @@ TEST(Ewald, Test_2_CO2_in_MFI_1x1x1)
       system.spanOfMoleculeAtoms());
 
   EXPECT_NEAR(system.CoulombicFourierEnergySingleIon * Units::EnergyToKelvin, 12028.1731827280, 1e-6);
-  EXPECT_NEAR(energy.ewald * Units::EnergyToKelvin, -1191.77790165, 1e-6);
+  EXPECT_NEAR(energy.ewaldFourier() * Units::EnergyToKelvin, -1191.77790165, 1e-6);
 }
 
 TEST(Ewald, Test_2_CO2_in_MFI_2x2x2)
@@ -392,6 +405,11 @@ TEST(Ewald, Test_2_CO2_in_MFI_2x2x2)
       {VDWParameters(22.0, 2.30), VDWParameters(53.0, 3.3), VDWParameters(158.5, 3.72), VDWParameters(29.933, 2.745),
        VDWParameters(85.671, 3.017)},
       ForceField::MixingRule::Lorentz_Berthelot, 12.0, true, false, true);
+
+  forceField.automaticEwald = false;
+  forceField.EwaldAlpha = 0.25;
+  forceField.numberOfWaveVectors = int3(8, 8, 8);
+
   Framework f = Framework(0, forceField, "MFI_SI", SimulationBox(20.022, 19.899, 13.383), 292,
                           {// double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type,
                            // uint8_t componentId, uint8_t groupId
@@ -452,8 +470,6 @@ TEST(Ewald, Test_2_CO2_in_MFI_2x2x2)
   atomPositions[4].position = double3(10.011, 4.97475 - 2.0, 0.0);
   atomPositions[5].position = double3(10.011, 4.97475 - 2.0, -1.149);
 
-  system.forceField.EwaldAlpha = 0.25;
-  system.forceField.numberOfWaveVectors = int3(8, 8, 8);
 
   system.precomputeTotalRigidEnergy();
   system.CoulombicFourierEnergySingleIon = Interactions::computeEwaldFourierEnergySingleIon(
@@ -465,7 +481,7 @@ TEST(Ewald, Test_2_CO2_in_MFI_2x2x2)
       system.spanOfMoleculeAtoms());
 
   EXPECT_NEAR(system.CoulombicFourierEnergySingleIon * Units::EnergyToKelvin, 6309.7866899037, 1e-6);
-  EXPECT_NEAR(energy.ewald * Units::EnergyToKelvin, -1197.23909965, 1e-6);
+  EXPECT_NEAR(energy.ewaldFourier() * Units::EnergyToKelvin, -1197.23909965, 1e-6);
 }
 
 TEST(Ewald, Test_20_Na_Cl_in_Box_25x25x25)
@@ -481,6 +497,11 @@ TEST(Ewald, Test_20_Na_Cl_in_Box_25x25x25)
       {VDWParameters(22.0, 2.30), VDWParameters(53.0, 3.3), VDWParameters(158.5, 3.72), VDWParameters(15.0966, 2.65755),
        VDWParameters(142.562, 3.51932)},
       ForceField::MixingRule::Lorentz_Berthelot, 12.0, true, false, true);
+
+  forceField.automaticEwald = false;
+  forceField.EwaldAlpha = 0.25;
+  forceField.numberOfWaveVectors = int3(8, 8, 8);
+
   Component na = Component(0, forceField, "Na", 304.1282, 7377300.0, 0.22394,
                            {
                                // double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type,
@@ -525,10 +546,7 @@ TEST(Ewald, Test_20_Na_Cl_in_Box_25x25x25)
   }
 
   RunningEnergy energy, rigidenergy;
-  // double3 perpendicularWidths = system.simulationBox.perpendicularWidths();
-  // system.forceField.initializeEwaldParameters(perpendicularWidths);
-  system.forceField.EwaldAlpha = 0.25;
-  system.forceField.numberOfWaveVectors = int3(8, 8, 8);
+
 
   system.precomputeTotalRigidEnergy();
   [[maybe_unused]] RunningEnergy factor = Interactions::computeEwaldFourierGradient(
@@ -614,11 +632,11 @@ TEST(Ewald, Test_20_Na_Cl_in_Box_25x25x25)
     atomPositions[i].position.z = spanOfMoleculeAtoms[i].position.z;
 
     gradient.x =
-        (-forward2_x.ewald + 8.0 * forward1_x.ewald - 8.0 * backward1_x.ewald + backward2_x.ewald) / (6.0 * delta);
+        (-forward2_x.ewaldFourier() + 8.0 * forward1_x.ewaldFourier() - 8.0 * backward1_x.ewaldFourier() + backward2_x.ewaldFourier()) / (6.0 * delta);
     gradient.y =
-        (-forward2_y.ewald + 8.0 * forward1_y.ewald - 8.0 * backward1_y.ewald + backward2_y.ewald) / (6.0 * delta);
+        (-forward2_y.ewaldFourier() + 8.0 * forward1_y.ewaldFourier() - 8.0 * backward1_y.ewaldFourier() + backward2_y.ewaldFourier()) / (6.0 * delta);
     gradient.z =
-        (-forward2_z.ewald + 8.0 * forward1_z.ewald - 8.0 * backward1_z.ewald + backward2_z.ewald) / (6.0 * delta);
+        (-forward2_z.ewaldFourier() + 8.0 * forward1_z.ewaldFourier() - 8.0 * backward1_z.ewaldFourier() + backward2_z.ewaldFourier()) / (6.0 * delta);
 
     EXPECT_NEAR(spanOfMoleculeAtoms[i].gradient.x, gradient.x, tolerance) << "Wrong x-gradient";
     EXPECT_NEAR(spanOfMoleculeAtoms[i].gradient.y, gradient.y, tolerance) << "Wrong y-gradient";

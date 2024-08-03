@@ -110,9 +110,11 @@ TEST(electrostatic_potential, Test_reference_system_1)
   EXPECT_NEAR(moleculeElectricPotential[3] / Units::CoulombicConversionFactor, 1.03921, 1e-5);
 
   EXPECT_NEAR(potentialEnergy * Units::EnergyToKelvin,
-              (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) * Units::EnergyToKelvin,
+              (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + 
+               energy.ewald_fourier + energy.ewald_self + energy.ewald_exclusion) * Units::EnergyToKelvin,
               1e-5);
-  EXPECT_NEAR((energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) /
+  EXPECT_NEAR((energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + 
+               energy.ewald_fourier + energy.ewald_self + energy.ewald_exclusion) /
                   Units::CoulombicConversionFactor,
               -1.98467, 1e-5);
 }
@@ -183,11 +185,13 @@ TEST(electrostatic_potential, Test_reference_system_2)
   EXPECT_NEAR(moleculeElectricPotential[3] / Units::CoulombicConversionFactor, -0.271447, 1e-5);
 
   EXPECT_NEAR(potentialEnergy * Units::EnergyToKelvin,
-              (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) * Units::EnergyToKelvin,
+              (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + 
+               energy.ewald_fourier + energy.ewald_self + energy.ewald_exclusion) * Units::EnergyToKelvin,
               1e-4);
 
   // Check again, when net charges are implemented
-  EXPECT_NEAR((energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) /
+  EXPECT_NEAR((energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + 
+               energy.ewald_fourier + energy.ewald_self + energy.ewald_exclusion) /
                   Units::CoulombicConversionFactor,
               -0.745882, 1e-2);
 }
@@ -270,6 +274,7 @@ TEST(electrostatic_potential, Test_2_CO2_in_ITQ_29_2x2x2)
   }
 
   EXPECT_NEAR(potentialEnergy * Units::EnergyToKelvin,
-              (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald) * Units::EnergyToKelvin,
+              (energy.frameworkMoleculeCharge + energy.moleculeMoleculeCharge + energy.ewald_fourier + 
+               energy.ewald_self + energy.ewald_exclusion) * Units::EnergyToKelvin,
               1e-5);
 }

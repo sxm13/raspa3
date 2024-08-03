@@ -294,7 +294,7 @@ TEST(rigid_gradient, Test_2_H2O_in_ITQ_29_2x2x2_no_symmetry)
   EXPECT_NEAR(energy.frameworkMoleculeCharge * Units::EnergyToKelvin, 2340.77151436, 1e-4);
   EXPECT_NEAR(energy.moleculeMoleculeVDW * Units::EnergyToKelvin, -0.51506625, 1e-4);
   EXPECT_NEAR(energy.moleculeMoleculeCharge * Units::EnergyToKelvin, 1.94101152, 1e-4);
-  EXPECT_NEAR(energy.ewald * Units::EnergyToKelvin, -578.26684244 + 18.14933840, 1e-4);
+  EXPECT_NEAR((energy.ewald_fourier + energy.ewald_self + energy.ewald_exclusion) * Units::EnergyToKelvin, -578.26684244 + 18.14933840, 1e-4);
   EXPECT_NEAR(energy.potentialEnergy() * Units::EnergyToKelvin, 15068.729964973694, 1e-4);
 
   RunningEnergy force = system.computeTotalGradients();
@@ -305,7 +305,7 @@ TEST(rigid_gradient, Test_2_H2O_in_ITQ_29_2x2x2_no_symmetry)
   EXPECT_NEAR(force.frameworkMoleculeCharge * Units::EnergyToKelvin, 2340.77151436, 1e-4);
   EXPECT_NEAR(force.moleculeMoleculeVDW * Units::EnergyToKelvin, -0.51506625, 1e-4);
   EXPECT_NEAR(force.moleculeMoleculeCharge * Units::EnergyToKelvin, 1.94101152, 1e-4);
-  EXPECT_NEAR(energy.ewald * Units::EnergyToKelvin, -578.26684244 + 18.14933840, 1e-4);
+  EXPECT_NEAR((energy.ewald_fourier + energy.ewald_self + energy.ewald_exclusion) * Units::EnergyToKelvin, -578.26684244 + 18.14933840, 1e-4);
   EXPECT_NEAR(energy.potentialEnergy() * Units::EnergyToKelvin, 15068.729964973694, 1e-4);
 
   EXPECT_NEAR(atomPositions[0].gradient.x, -10324.973732049806, 1e-4);

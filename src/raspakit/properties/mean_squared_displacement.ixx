@@ -38,12 +38,13 @@ export struct PropertyMeanSquaredDisplacement
 {
   PropertyMeanSquaredDisplacement() {};
 
-  PropertyMeanSquaredDisplacement(size_t numberOfComponents, size_t numberOfParticles, size_t sampleEvery, size_t writeEvery)
+  PropertyMeanSquaredDisplacement(size_t numberOfComponents, size_t numberOfParticles, 
+                size_t sampleEvery, size_t writeEvery, size_t numberOfBlockElementsMSD)
       : sampleEvery(sampleEvery),
         writeEvery(writeEvery),
         numberOfComponents(numberOfComponents),
         numberOfParticles(numberOfParticles),
-        numberOfBlockElementsMSD(25),
+        numberOfBlockElementsMSD(numberOfBlockElementsMSD),
         maxNumberOfBlocksMSD(1),
         blockLengthMSD(maxNumberOfBlocksMSD),
         msdOrderNCount(maxNumberOfBlocksMSD, std::vector<std::vector<size_t>>(numberOfComponents, std::vector<size_t>(numberOfBlockElementsMSD, 0uz))),

@@ -59,7 +59,9 @@ std::string RunningEnergy::printMC() const
   std::print(stream, "    molecule-molecule VDW:   {: .6e} [K]\n", conv * moleculeMoleculeVDW);
   std::print(stream, "    molecule-molecule Real:  {: .6e} [K]\n", conv * moleculeMoleculeCharge);
   std::print(stream, "    Van der Waals (Tail):    {: .6e} [K]\n", conv * tail);
-  std::print(stream, "    Coulombic Ewald:         {: .6e} [K]\n", conv * ewald);
+  std::print(stream, "    Ewald Fourier:           {: .6e} [K]\n", conv * ewald_fourier);
+  std::print(stream, "    Ewald self:              {: .6e} [K]\n", conv * ewald_self);
+  std::print(stream, "    Ewald exclusion:         {: .6e} [K]\n", conv * ewald_exclusion);
   std::print(stream, "    intra VDW:               {: .6e} [K]\n", conv * intraVDW);
   std::print(stream, "    intra Coulombic:         {: .6e} [K]\n", conv * intraCoul);
   std::print(stream, "    polarization:            {: .6e} [K]\n", conv * polarization);
@@ -87,7 +89,9 @@ std::string RunningEnergy::printMCDiff(RunningEnergy& other) const
   std::print(stream, "    molecule-molecule VDW   | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * moleculeMoleculeVDW, conv * other.moleculeMoleculeVDW, conv * drift.moleculeMoleculeVDW);
   std::print(stream, "    molecule-molecule Real  | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * moleculeMoleculeCharge, conv * other.moleculeMoleculeCharge, conv * drift.moleculeMoleculeCharge);
   std::print(stream, "    Van der Waals (Tail):   | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * tail, conv * other.tail, conv * drift.tail);
-  std::print(stream, "    Coulombic Ewald         | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * ewald, conv * other.ewald, conv * drift.ewald);
+  std::print(stream, "    Ewald Fourier           | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * ewald_fourier, conv * other.ewald_fourier, conv * drift.ewald_fourier);
+  std::print(stream, "    Ewald self              | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * ewald_self, conv * other.ewald_self, conv * drift.ewald_self);
+  std::print(stream, "    Ewald exclusion         | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * ewald_exclusion, conv * other.ewald_exclusion, conv * drift.ewald_exclusion);
   std::print(stream, "    intra VDW               | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * intraVDW, conv * other.intraVDW, conv * drift.intraVDW);
   std::print(stream, "    intra Coulombic         | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * intraCoul, conv * other.intraCoul, conv * drift.intraCoul);
   std::print(stream, "    polarization            | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * polarization, conv * other.polarization, conv * drift.polarization);
@@ -113,7 +117,9 @@ std::string RunningEnergy::printMD() const
   std::print(stream, "    molecule-molecule VDW:   {: .6e} [K]\n", conv * moleculeMoleculeVDW);
   std::print(stream, "    molecule-molecule Real:  {: .6e} [K]\n", conv * moleculeMoleculeCharge);
   std::print(stream, "    Van der Waals (Tail):    {: .6e} [K]\n", conv * tail);
-  std::print(stream, "    Coulombic Ewald:         {: .6e} [K]\n", conv * ewald);
+  std::print(stream, "    Ewald Fourier:           {: .6e} [K]\n", conv * ewald_fourier);
+  std::print(stream, "    Ewald self:              {: .6e} [K]\n", conv * ewald_self);
+  std::print(stream, "    Ewald exclusion:         {: .6e} [K]\n", conv * ewald_exclusion);
   std::print(stream, "    intra VDW:               {: .6e} [K]\n", conv * intraVDW);
   std::print(stream, "    intra Coulombic:         {: .6e} [K]\n", conv * intraCoul);
   std::print(stream, "    polarization:            {: .6e} [K]\n", conv * polarization);
@@ -145,7 +151,9 @@ std::string RunningEnergy::printMC(const std::string &label) const
   std::print(stream, "    molecule-molecule VDW:   {: .6e} [K]\n", conv * moleculeMoleculeVDW);
   std::print(stream, "    molecule-molecule Real:  {: .6e} [K]\n", conv * moleculeMoleculeCharge);
   std::print(stream, "    Van der Waals (Tail):    {: .6e} [K]\n", conv * tail);
-  std::print(stream, "    Coulombic Ewald:         {: .6e} [K]\n", conv * ewald);
+  std::print(stream, "    Ewald Fourier:           {: .6e} [K]\n", conv * ewald_fourier);
+  std::print(stream, "    Ewald self:              {: .6e} [K]\n", conv * ewald_self);
+  std::print(stream, "    Ewald exclusion:         {: .6e} [K]\n", conv * ewald_exclusion);
   std::print(stream, "    intra VDW:               {: .6e} [K]\n", conv * intraVDW);
   std::print(stream, "    intra Coulombic:         {: .6e} [K]\n", conv * intraCoul);
   std::print(stream, "    polarization:            {: .6e} [K]\n", conv * polarization);
@@ -175,7 +183,9 @@ std::string RunningEnergy::printMD(const std::string &label, double referenceEne
   std::print(stream, "    molecule-molecule VDW:   {: .6e} [K]\n", conv * moleculeMoleculeVDW);
   std::print(stream, "    molecule-molecule Real:  {: .6e} [K]\n", conv * moleculeMoleculeCharge);
   std::print(stream, "    Van der Waals (Tail):    {: .6e} [K]\n", conv * tail);
-  std::print(stream, "    Coulombic Ewald:         {: .6e} [K]\n", conv * ewald);
+  std::print(stream, "    Ewald Fourier:           {: .6e} [K]\n", conv * ewald_fourier);
+  std::print(stream, "    Ewald self:              {: .6e} [K]\n", conv * ewald_self);
+  std::print(stream, "    Ewald exclusion:         {: .6e} [K]\n", conv * ewald_exclusion);
   std::print(stream, "    intra VDW:               {: .6e} [K]\n", conv * intraVDW);
   std::print(stream, "    intra Coulombic:         {: .6e} [K]\n", conv * intraCoul);
   std::print(stream, "    polarization:            {: .6e} [K]\n", conv * polarization);
@@ -204,7 +214,9 @@ nlohmann::json RunningEnergy::jsonMC() const
   status["molecule-molecule VDW [K]"] = conv * moleculeMoleculeVDW;
   status["molecule-molecule Real [K]"] = conv * moleculeMoleculeCharge;
   status["Van der Waals (Tail) [K]"] = conv * tail;
-  status["Coulombic Ewald [K]"] = conv * ewald;
+  status["Ewald Fourier [K]"] = conv * ewald_fourier;
+  status["Ewald self [K]"] = conv * ewald_self;
+  status["Ewald exclusion [K]"] = conv * ewald_exclusion;
   status["intra VDW [K]"] = conv * intraVDW;
   status["intra Coulombic [K]"] = conv * intraCoul;
   status["polarization [K]"] = conv * polarization;
@@ -235,7 +247,9 @@ Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const Runnin
   archive << e.externalFieldCharge;
   archive << e.frameworkMoleculeCharge;
   archive << e.moleculeMoleculeCharge;
-  archive << e.ewald;
+  archive << e.ewald_fourier;
+  archive << e.ewald_self;
+  archive << e.ewald_exclusion;
   archive << e.intraVDW;
   archive << e.intraCoul;
   archive << e.tail;
@@ -267,7 +281,9 @@ Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, RunningEnerg
   archive >> e.externalFieldCharge;
   archive >> e.frameworkMoleculeCharge;
   archive >> e.moleculeMoleculeCharge;
-  archive >> e.ewald;
+  archive >> e.ewald_fourier;
+  archive >> e.ewald_self;
+  archive >> e.ewald_exclusion;
   archive >> e.intraVDW;
   archive >> e.intraCoul;
   archive >> e.tail;

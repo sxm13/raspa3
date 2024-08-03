@@ -115,7 +115,7 @@ TEST(energy_decomposition, CO2_Methane_in_Box_Ewald)
 
   strainDerivative.first.sumTotal();
 
-  EXPECT_NEAR(energy.ewald, strainDerivative.first.totalEnergy.energy, 1e-6);
+  EXPECT_NEAR(energy.ewald_fourier + energy.ewald_self + energy.ewald_exclusion, strainDerivative.first.totalEnergy.energy, 1e-6);
 }
 
 inline std::pair<EnergyStatus, double3x3> pair_acc(const std::pair<EnergyStatus, double3x3> &lhs,

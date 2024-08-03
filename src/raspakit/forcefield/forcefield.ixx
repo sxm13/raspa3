@@ -8,6 +8,7 @@ module;
 #include <ostream>
 #include <string>
 #include <vector>
+#include <limits>
 #endif
 
 export module forcefield;
@@ -20,6 +21,7 @@ import <iostream>;
 import <ostream>;
 import <fstream>;
 import <optional>;
+import <limits>;
 #endif
 
 import archive;
@@ -29,6 +31,7 @@ import int3;
 import pseudo_atom;
 import vdwparameters;
 import json;
+import simulationbox;
 
 export struct ForceField
 {
@@ -66,6 +69,8 @@ export struct ForceField
   double EwaldPrecision{ 1e-6 };
   double EwaldAlpha{ 0.265058 };
   int3 numberOfWaveVectors{ 8, 8, 8 };
+  size_t reciprocalIntegerCutOffSquared{ std::numeric_limits<size_t>::max() };
+  double reciprocalCutOffSquared{ std::numeric_limits<double>::max() };
   bool automaticEwald{ true };
 
   bool useCharge{ true };
@@ -105,7 +110,7 @@ export struct ForceField
   std::optional<size_t> findPseudoAtom(const std::string &name) const;
   static std::optional<size_t> findPseudoAtom(const std::vector<PseudoAtom> pseudoAtoms, const std::string &name);
 
-  void initializeEwaldParameters(double3 perpendicularWidths);
+  void initializeEwaldParameters(const SimulationBox &simulationBox);
 
   friend Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const ForceField &f);
   friend Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, ForceField &f);

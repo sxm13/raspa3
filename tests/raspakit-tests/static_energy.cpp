@@ -173,6 +173,11 @@ TEST(static_energy, Test_2_CO2_in_MFI_2x2x2_truncated)
       {VDWParameters(22.0, 2.30), VDWParameters(53.0, 3.3), VDWParameters(158.5, 3.72), VDWParameters(29.933, 2.745),
        VDWParameters(85.671, 3.017)},
       ForceField::MixingRule::Lorentz_Berthelot, 12.0, false, true, true);
+
+  forceField.automaticEwald = false;
+  forceField.EwaldAlpha = 0.25;
+  forceField.numberOfWaveVectors = int3(8, 8, 8);
+
   Framework f = Framework(0, forceField, "MFI_SI", SimulationBox(20.022, 19.899, 13.383), 292,
                           {// double3 position, double charge, double lambda, uint32_t moleculeId, uint16_t type,
                            // uint8_t componentId, uint8_t groupId
@@ -233,10 +238,6 @@ TEST(static_energy, Test_2_CO2_in_MFI_2x2x2_truncated)
   moleculeAtomPositions[4].position = double3(10.011, 4.97475 - 2.0, 0.0);
   moleculeAtomPositions[5].position = double3(10.011, 4.97475 - 2.0, -1.149);
 
-  system.forceField.EwaldAlpha = 0.25;
-  system.forceField.numberOfWaveVectors = int3(8, 8, 8);
-  // double3 perpendicularWidths = system.simulationBox.perpendicularWidths();
-  // system.forceField.initializeEwaldParameters(perpendicularWidths);
 
   RunningEnergy energy = system.computeTotalEnergies();
 
@@ -246,5 +247,5 @@ TEST(static_energy, Test_2_CO2_in_MFI_2x2x2_truncated)
   EXPECT_NEAR(energy.moleculeMoleculeCharge * Units::EnergyToKelvin, 162.41877650, 1e-6);
   // EXPECT_NEAR(energy.tail * Units::EnergyToKelvin, -127.81601515, 1e-6);
   EXPECT_NEAR(energy.tail * Units::EnergyToKelvin, -127.72803736223419, 1e-6);
-  EXPECT_NEAR(energy.ewald * Units::EnergyToKelvin, -1197.23909965, 1e-6);
+  EXPECT_NEAR((energy.ewald_fourier + energy.ewald_self + energy.ewald_exclusion) * Units::EnergyToKelvin, -1197.23909965, 1e-6);
 }

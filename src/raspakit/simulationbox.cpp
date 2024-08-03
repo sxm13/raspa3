@@ -44,7 +44,9 @@ import units;
 import stringutils;
 import json;
 
-SimulationBox::SimulationBox(double a, double b, double c, Type type) : type(type)
+
+SimulationBox::SimulationBox(double a, double b, double c):
+   type(Type::Rectangular)
 {
   lengthA = a;
   lengthB = b;
@@ -56,6 +58,34 @@ SimulationBox::SimulationBox(double a, double b, double c, Type type) : type(typ
   double3 v1 = double3(a, 0.0, 0.0);
   double3 v2 = double3(0.0, b, 0.0);
   double3 v3 = double3(0.0, 0.0, c);
+  cell = double3x3(v1, v2, v3);
+  if (a != 0.0 && b != 0.0 && c != 0.0)
+  {
+    inverseCell = cell.inverse();
+    volume = cell.determinant();
+  }
+  else
+  {
+    volume = 0.0;
+  }
+}
+
+SimulationBox::SimulationBox(double a, double b, double c, double alpha, double beta, double gamma)
+    : lengthA(a), lengthB(b), lengthC(c), angleAlpha(alpha), angleBeta(beta), angleGamma(gamma), type(Type::Triclinic)
+{
+  if(((std::fabs(angleAlpha - 0.5 * std::numbers::pi)) < 1e-5) &&
+     ((std::fabs(angleBeta - 0.5 * std::numbers::pi)) < 1e-5) &&
+     ((std::fabs(angleGamma - 0.5 * std::numbers::pi)) < 1e-5))
+  {
+    type = Type::Rectangular;
+  }
+
+  double temp = (std::cos(alpha) - std::cos(gamma) * std::cos(beta)) / std::sin(gamma);
+
+  double3 v1 = double3(a, 0.0, 0.0);
+  double3 v2 = double3(b * std::cos(gamma), b * std::sin(gamma), 0.0);
+  double3 v3 =
+      double3(c * std::cos(beta), c * temp, c * std::sqrt(1.0 - std::cos(beta) * std::cos(beta) - temp * temp));
   cell = double3x3(v1, v2, v3);
   if (a != 0.0 && b != 0.0 && c != 0.0)
   {
@@ -88,6 +118,32 @@ SimulationBox::SimulationBox(double a, double b, double c, double alpha, double 
     volume = 0.0;
   }
 }
+
+SimulationBox::SimulationBox(double3x3 m) : type(Type::Triclinic)
+{
+  this->cell = m;
+  this->inverseCell = m.inverse();
+  this->volume = m.determinant();
+
+  double3 column1 = cell[0];
+  double3 column2 = cell[1];
+  double3 column3 = cell[2];
+  this->lengthA = column1.length();
+  this->lengthB = column2.length();
+  this->lengthC = column3.length();
+
+  angleAlpha = std::acos(double3::dot(column2, column3) / (this->lengthB * this->lengthC));
+  angleBeta = std::acos(double3::dot(column1, column3) / (this->lengthA * this->lengthC));
+  angleGamma = std::acos(double3::dot(column1, column2) / (this->lengthA * this->lengthB));
+
+  if(((std::fabs(angleAlpha - 0.5 * std::numbers::pi)) < 1e-5) &&
+     ((std::fabs(angleBeta - 0.5 * std::numbers::pi)) < 1e-5) &&
+     ((std::fabs(angleGamma - 0.5 * std::numbers::pi)) < 1e-5))
+  {
+    type = Type::Rectangular;
+  }
+}
+
 
 SimulationBox::SimulationBox(double3x3 m, Type type) : type(type)
 {
@@ -185,6 +241,8 @@ std::string SimulationBox::printStatus() const
   std::print(stream, "Lengths: {:9.5f} {:9.5f} {:9.5f}\n", lengthA, lengthB, lengthC);
   double conv = 180.0 / std::numbers::pi;
   std::print(stream, "Angles:  {:9.5f} {:9.5f} {:9.5f}\n", conv * angleAlpha, conv * angleBeta, conv * angleGamma);
+  if(type == Type::Rectangular) std::print(stream, "Rectangular boundary conditions\n");
+  else std::print(stream, "Triclinic boundary conditions\n");
 
   return stream.str();
 }
@@ -215,6 +273,9 @@ std::string SimulationBox::printStatus(const SimulationBox &average, [[maybe_unu
   std::print(stream, "Angles:  {:9.5f} {:9.5f} {:9.5f}  Average: {:9.5f} {:9.5f} {:9.5f}\n", conv * angleAlpha,
              conv * angleBeta, conv * angleGamma, conv * average.angleAlpha, conv * average.angleBeta,
              conv * average.angleGamma);
+
+  if(type == Type::Rectangular) std::print(stream, "Rectangular boundary conditions\n");
+  else std::print(stream, "Triclinic boundary conditions\n");
 
   return stream.str();
 }

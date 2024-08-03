@@ -59,9 +59,11 @@ import units;
 import int3;
 import double3;
 import double4;
+import double3x3;
 import stringutils;
 import pseudo_atom;
 import vdwparameters;
+import simulationbox;
 import json;
 
 ForceField::ForceField(std::vector<PseudoAtom> pseudoAtoms, std::vector<VDWParameters> selfInteractions,
@@ -466,8 +468,10 @@ std::optional<size_t> ForceField::findPseudoAtom(const std::vector<PseudoAtom> p
   return std::nullopt;
 }
 
-void ForceField::initializeEwaldParameters(double3 perpendicularWidths)
+void ForceField::initializeEwaldParameters(const SimulationBox &simulationBox)
 {
+  double3 perpendicularWidths = simulationBox.perpendicularWidths();
+
   if (automaticEwald)
   {
     // compute the alpha-parameter and max k-vectors from the relative precision
@@ -483,9 +487,8 @@ void ForceField::initializeEwaldParameters(double3 perpendicularWidths)
              static_cast<int32_t>(rint(0.25 + perpendicularWidths.y * EwaldAlpha * tol1 / std::numbers::pi)),
              static_cast<int32_t>(rint(0.25 + perpendicularWidths.z * EwaldAlpha * tol1 / std::numbers::pi)));
 
-    // numberOfWavevectors = ((kx_max_unsigned + 1) * (2 * ky_max_unsigned + 1) * (2 * kz_max_unsigned + 1));
-    // if (ReciprocalCutOffSquared[i] < 0.0)
-    //     ReciprocalCutOffSquared[i] = SQR(1.05 * MAX3(kvec[i].x, kvec[i].y, kvec[i].z));
+    size_t maxNumberOfWaveVector = static_cast<size_t>(std::max({numberOfWaveVectors.x, numberOfWaveVectors.y, numberOfWaveVectors.z}));
+    reciprocalIntegerCutOffSquared = maxNumberOfWaveVector * maxNumberOfWaveVector;
   }
 }
 
@@ -510,6 +513,8 @@ Archive<std::ofstream>& operator<<(Archive<std::ofstream>& archive, const ForceF
   archive << f.EwaldPrecision;
   archive << f.EwaldAlpha;
   archive << f.numberOfWaveVectors;
+  archive << f.reciprocalIntegerCutOffSquared;
+  archive << f.reciprocalCutOffSquared;
   archive << f.automaticEwald;
   archive << f.useCharge;
   archive << f.omitEwaldFourier;
@@ -553,6 +558,8 @@ Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, ForceField& 
   archive >> f.EwaldPrecision;
   archive >> f.EwaldAlpha;
   archive >> f.numberOfWaveVectors;
+  archive >> f.reciprocalIntegerCutOffSquared;
+  archive >> f.reciprocalCutOffSquared;
   archive >> f.automaticEwald;
   archive >> f.useCharge;
   archive >> f.omitEwaldFourier;

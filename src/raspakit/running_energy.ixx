@@ -44,7 +44,9 @@ export struct RunningEnergy
         externalFieldCharge(0.0),
         frameworkMoleculeCharge(0.0),
         moleculeMoleculeCharge(0.0),
-        ewald(0.0),
+        ewald_fourier(0.0),
+        ewald_self(0.0),
+        ewald_exclusion(0.0),
         intraVDW(0.0),
         intraCoul(0.0),
         tail(0.0),
@@ -71,15 +73,27 @@ export struct RunningEnergy
   inline double potentialEnergy() const
   {
     return externalFieldVDW + frameworkMoleculeVDW + moleculeMoleculeVDW + externalFieldCharge +
-           frameworkMoleculeCharge + moleculeMoleculeCharge + ewald + intraVDW + intraCoul + tail + polarization;
+           frameworkMoleculeCharge + moleculeMoleculeCharge + 
+           ewald_fourier + ewald_self + ewald_exclusion +
+           intraVDW + intraCoul + tail + polarization;
+  }
+
+  inline double CoulombEnergy() const
+  {
+    return frameworkMoleculeCharge + moleculeMoleculeCharge +
+           ewald_fourier + ewald_self + ewald_exclusion;
   }
 
   inline double kineticEnergy() const { return translationalKineticEnergy + rotationalKineticEnergy; }
 
+  inline double ewaldFourier() const { return ewald_fourier + ewald_self + ewald_exclusion; }
+
   inline double conservedEnergy() const
   {
     return externalFieldVDW + frameworkMoleculeVDW + moleculeMoleculeVDW + externalFieldCharge +
-           frameworkMoleculeCharge + moleculeMoleculeCharge + ewald + intraVDW + intraCoul + tail + polarization +
+           frameworkMoleculeCharge + moleculeMoleculeCharge + 
+           ewald_fourier + ewald_self + ewald_exclusion +
+           intraVDW + intraCoul + tail + polarization +
            translationalKineticEnergy + rotationalKineticEnergy + NoseHooverEnergy;
   }
 
@@ -97,7 +111,9 @@ export struct RunningEnergy
     externalFieldCharge = 0.0;
     frameworkMoleculeCharge = 0.0;
     moleculeMoleculeCharge = 0.0;
-    ewald = 0.0;
+    ewald_fourier = 0.0;
+    ewald_self = 0.0;
+    ewald_exclusion = 0.0;
     intraVDW = 0.0;
     intraCoul = 0.0;
     tail = 0.0;
@@ -118,7 +134,9 @@ export struct RunningEnergy
     externalFieldCharge += b.externalFieldCharge;
     frameworkMoleculeCharge += b.frameworkMoleculeCharge;
     moleculeMoleculeCharge += b.moleculeMoleculeCharge;
-    ewald += b.ewald;
+    ewald_fourier += b.ewald_fourier;
+    ewald_self += b.ewald_self;
+    ewald_exclusion += b.ewald_exclusion;
     intraVDW += b.intraVDW;
     intraCoul += b.intraCoul;
     tail += b.tail;
@@ -141,7 +159,9 @@ export struct RunningEnergy
     externalFieldCharge -= b.externalFieldCharge;
     frameworkMoleculeCharge -= b.frameworkMoleculeCharge;
     moleculeMoleculeCharge -= b.moleculeMoleculeCharge;
-    ewald -= b.ewald;
+    ewald_fourier -= b.ewald_fourier;
+    ewald_self -= b.ewald_self;
+    ewald_exclusion -= b.ewald_exclusion;
     intraVDW -= b.intraVDW;
     intraCoul -= b.intraCoul;
     tail -= b.tail;
@@ -165,7 +185,9 @@ export struct RunningEnergy
     v.externalFieldCharge = -externalFieldCharge;
     v.frameworkMoleculeCharge = -frameworkMoleculeCharge;
     v.moleculeMoleculeCharge = -moleculeMoleculeCharge;
-    v.ewald = -ewald;
+    v.ewald_fourier = -ewald_fourier;
+    v.ewald_self = -ewald_self;
+    v.ewald_exclusion = -ewald_exclusion;
     v.intraVDW = -intraVDW;
     v.intraCoul = -intraCoul;
     v.tail = -tail;
@@ -188,7 +210,9 @@ export struct RunningEnergy
   double externalFieldCharge;
   double frameworkMoleculeCharge;
   double moleculeMoleculeCharge;
-  double ewald;
+  double ewald_fourier;
+  double ewald_self;
+  double ewald_exclusion;
   double intraVDW;
   double intraCoul;
   double tail;
@@ -213,7 +237,9 @@ export inline RunningEnergy operator+(const RunningEnergy& a, const RunningEnerg
   m.externalFieldCharge = a.externalFieldCharge + b.externalFieldCharge;
   m.frameworkMoleculeCharge = a.frameworkMoleculeCharge + b.frameworkMoleculeCharge;
   m.moleculeMoleculeCharge = a.moleculeMoleculeCharge + b.moleculeMoleculeCharge;
-  m.ewald = a.ewald + b.ewald;
+  m.ewald_fourier = a.ewald_fourier + b.ewald_fourier;
+  m.ewald_self = a.ewald_self + b.ewald_self;
+  m.ewald_exclusion = a.ewald_exclusion + b.ewald_exclusion;
   m.intraVDW = a.intraVDW + b.intraVDW;
   m.intraCoul = a.intraCoul + b.intraCoul;
   m.tail = a.tail + b.tail;
@@ -237,7 +263,9 @@ export inline RunningEnergy operator-(const RunningEnergy& a, const RunningEnerg
   m.externalFieldCharge = a.externalFieldCharge - b.externalFieldCharge;
   m.frameworkMoleculeCharge = a.frameworkMoleculeCharge - b.frameworkMoleculeCharge;
   m.moleculeMoleculeCharge = a.moleculeMoleculeCharge - b.moleculeMoleculeCharge;
-  m.ewald = a.ewald - b.ewald;
+  m.ewald_fourier = a.ewald_fourier - b.ewald_fourier;
+  m.ewald_self = a.ewald_self - b.ewald_self;
+  m.ewald_exclusion = a.ewald_exclusion - b.ewald_exclusion;
   m.intraVDW = a.intraVDW - b.intraVDW;
   m.intraCoul = a.intraCoul - b.intraCoul;
   m.tail = a.tail - b.tail;
@@ -260,7 +288,9 @@ export inline RunningEnergy operator*(double a, const RunningEnergy b)
   m.externalFieldCharge = a * b.externalFieldCharge;
   m.frameworkMoleculeCharge = a * b.frameworkMoleculeCharge;
   m.moleculeMoleculeCharge = a * b.moleculeMoleculeCharge;
-  m.ewald = a * b.ewald;
+  m.ewald_fourier = a * b.ewald_fourier;
+  m.ewald_self = a * b.ewald_self;
+  m.ewald_exclusion = a * b.ewald_exclusion;
   m.intraVDW = a * b.intraVDW;
   m.intraCoul = a * b.intraCoul;
   m.tail = a * b.tail;
@@ -284,7 +314,9 @@ export inline RunningEnergy operator*(const RunningEnergy a, double b)
   m.externalFieldCharge = b * a.externalFieldCharge;
   m.frameworkMoleculeCharge = b * a.frameworkMoleculeCharge;
   m.moleculeMoleculeCharge = b * a.moleculeMoleculeCharge;
-  m.ewald = b * a.ewald;
+  m.ewald_fourier = b * a.ewald_fourier;
+  m.ewald_self = b * a.ewald_self;
+  m.ewald_exclusion = b * a.ewald_exclusion;
   m.intraVDW = b * a.intraVDW;
   m.intraCoul = b * a.intraCoul;
   m.tail = b * a.tail;

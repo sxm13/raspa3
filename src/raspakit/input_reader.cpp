@@ -759,97 +759,10 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
       systems[systemId].hasExternalField = value["ExternalField"].get<bool>();
     }
 
-    if (value["ComputeConventionalRDF"].is_boolean())
-    {
-      if (value["ComputeConventionalRDF"].get<bool>())
-      {
-        size_t numberOfBinsConventionalRDF{128};
-        if (value["NumberOfBinsConventionalRDF"].is_number_unsigned())
-        {
-          numberOfBinsConventionalRDF = value["NumberOfBinsConventionalRDF"].get<size_t>();
-        }
-
-        double rangeConventionalRDF{15.0};
-        if (value["RangeConventionalRDF"].is_number_float())
-        {
-          rangeConventionalRDF = value["RangeConventionalRDF"].get<double>();
-        }
-
-        size_t sampleConventionalRDFEvery{10};
-        if (value["SampleConventionalRDFEvery"].is_number_unsigned())
-        {
-          sampleConventionalRDFEvery = value["SampleConventionalRDFEvery"].get<size_t>();
-        }
-
-        size_t writeConventionalRDFEvery{5000};
-        if (value["WriteConventionalRDFEvery"].is_number_unsigned())
-        {
-          writeConventionalRDFEvery = value["WriteConventionalRDFEvery"].get<size_t>();
-        }
-
-        systems[systemId].propertyConventionalRadialDistributionFunction =
-            PropertyConventionalRadialDistributionFunction(
-                jsonNumberOfBlocks, systems[systemId].forceField.pseudoAtoms.size(), numberOfBinsConventionalRDF,
-                rangeConventionalRDF, sampleConventionalRDFEvery, writeConventionalRDFEvery);
-      }
-    }
-
-    if (value["ComputeRDF"].is_boolean())
-    {
-      if (value["ComputeRDF"].get<bool>())
-      {
-        size_t numberOfBinsRDF{128};
-        if (value["NumberOfBinsRDF"].is_number_unsigned())
-        {
-          numberOfBinsRDF = value["NumberOfBinsRDF"].get<size_t>();
-        }
-
-        double rangeRDF{15.0};
-        if (value["RangeRDF"].is_number_float())
-        {
-          rangeRDF = value["RangeRDF"].get<double>();
-        }
-
-        size_t sampleRDFEvery{10};
-        if (value["SampleRDFEvery"].is_number_unsigned())
-        {
-          sampleRDFEvery = value["SampleRDFEvery"].get<size_t>();
-        }
-
-        size_t writeRDFEvery{5000};
-        if (value["WriteRDFEvery"].is_number_unsigned())
-        {
-          writeRDFEvery = value["WriteRDFEvery"].get<size_t>();
-        }
-
-        systems[systemId].propertyRadialDistributionFunction =
-            PropertyRadialDistributionFunction(jsonNumberOfBlocks, systems[systemId].forceField.pseudoAtoms.size(),
-                                               numberOfBinsRDF, rangeRDF, sampleRDFEvery, writeRDFEvery);
-      }
-    }
-
     if (value["ComputeEnergyHistogram"].is_boolean())
     {
       if (value["ComputeEnergyHistogram"].get<bool>())
       {
-        size_t numberOfBinsEnergyHistogram{ 128 };
-        if (value["NumberOfBinsEnergyHistogram"].is_number_unsigned())
-        {
-          numberOfBinsEnergyHistogram = value["NumberOfBinsEnergyHistogram"].get<size_t>();
-        }
-
-        double minimumRangeEnergyHistogram{ -5000.0 };
-        if (value["MininumRangeEnergyHistogram"].is_number_float())
-        {
-          minimumRangeEnergyHistogram = value["MininumRangeEnergyHistogram"].get<double>();
-        }
-
-        double maximumRangeEnergyHistogram{ 1000.0 };
-        if (value["MaximumRangeEnergyHistogram"].is_number_float())
-        {
-          maximumRangeEnergyHistogram = value["MaximumRangeEnergyHistogram"].get<double>();
-        }
-
         size_t sampleEnergyHistogramEvery{ 1 };
         if (value["SampleEnergyHistogramEvery"].is_number_unsigned())
         {
@@ -862,6 +775,24 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
           writeEnergyHistogramEvery = value["WriteEnergyHistogramEvery"].get<size_t>();
         }
 
+        size_t numberOfBinsEnergyHistogram{ 128 };
+        if (value["NumberOfBinsEnergyHistogram"].is_number_unsigned())
+        {
+          numberOfBinsEnergyHistogram = value["NumberOfBinsEnergyHistogram"].get<size_t>();
+        }
+
+        double minimumRangeEnergyHistogram{ -5000.0 };
+        if (value["LowerLimitEnergyHistogram"].is_number_float())
+        {
+          minimumRangeEnergyHistogram = value["LowerLimitEnergyHistogram"].get<double>();
+        }
+
+        double maximumRangeEnergyHistogram{ 1000.0 };
+        if (value["UpperLimitEnergyHistogram"].is_number_float())
+        {
+          maximumRangeEnergyHistogram = value["UpperLimitEnergyHistogram"].get<double>();
+        }
+
         systems[systemId].averageEnergyHistogram = PropertyEnergyHistogram(
             jsonNumberOfBlocks, numberOfBinsEnergyHistogram, {minimumRangeEnergyHistogram, maximumRangeEnergyHistogram},
             sampleEnergyHistogramEvery, writeEnergyHistogramEvery);
@@ -872,19 +803,7 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
     {
       if (value["ComputeNumberOfMoleculesHistogram"].get<bool>())
       {
-        size_t minimumRangeNumberOfMoleculesHistogram{ 0 };
-        if (value["MinimumRangeNumberOfMoleculesHistogram"].is_number_unsigned())
-        {
-          minimumRangeNumberOfMoleculesHistogram = value["MinimumRangeNumberOfMoleculesHistogram"].get<size_t>();
-        }
-
-        size_t maximumRangeNumberOfMoleculesHistogram{ 200 };
-        if (value["MaximumRangeNumberOfMoleculesHistogram"].is_number_unsigned())
-        {
-          maximumRangeNumberOfMoleculesHistogram = value["MaximumRangeNumberOfMoleculesHistogram"].get<size_t>();
-        }
-
-        size_t sampleNumberOfMoleculesHistogramEvery{ 10 };
+        size_t sampleNumberOfMoleculesHistogramEvery{ 1 };
         if (value["SampleNumberOfMoleculesHistogramEvery"].is_number_unsigned())
         {
           sampleNumberOfMoleculesHistogramEvery = value["SampleNumberOfMoleculesHistogramEvery"].get<size_t>();
@@ -896,6 +815,18 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
           writeNumberOfMoleculesHistogramEvery = value["WriteNumberOfMoleculesHistogramEvery"].get<size_t>();
         }
 
+        size_t minimumRangeNumberOfMoleculesHistogram{ 0 };
+        if (value["LowerLimitNumberOfMoleculesHistogram"].is_number_unsigned())
+        {
+          minimumRangeNumberOfMoleculesHistogram = value["LowerLimitNumberOfMoleculesHistogram"].get<size_t>();
+        }
+
+        size_t maximumRangeNumberOfMoleculesHistogram{ 200 };
+        if (value["UpperLimitNumberOfMoleculesHistogram"].is_number_unsigned())
+        {
+          maximumRangeNumberOfMoleculesHistogram = value["UpperLimitNumberOfMoleculesHistogram"].get<size_t>();
+        }
+
         systems[systemId].averageNumberOfMoleculesHistogram = 
           PropertyNumberOfMoleculesHistogram(jsonNumberOfBlocks, 
                                   {minimumRangeNumberOfMoleculesHistogram, maximumRangeNumberOfMoleculesHistogram}, 
@@ -903,6 +834,77 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
                                   sampleNumberOfMoleculesHistogramEvery, writeNumberOfMoleculesHistogramEvery);
       }
     }
+
+    if (value["ComputeRDF"].is_boolean())
+    {
+      if (value["ComputeRDF"].get<bool>())
+      {
+        size_t sampleRDFEvery{10};
+        if (value["SampleRDFEvery"].is_number_unsigned())
+        {
+          sampleRDFEvery = value["SampleRDFEvery"].get<size_t>();
+        }
+
+        size_t writeRDFEvery{5000};
+        if (value["WriteRDFEvery"].is_number_unsigned())
+        {
+          writeRDFEvery = value["WriteRDFEvery"].get<size_t>();
+        }
+
+        size_t numberOfBinsRDF{128};
+        if (value["NumberOfBinsRDF"].is_number_unsigned())
+        {
+          numberOfBinsRDF = value["NumberOfBinsRDF"].get<size_t>();
+        }
+
+        double rangeRDF{15.0};
+        if (value["UpperLimitRDF"].is_number_float())
+        {
+          rangeRDF = value["UpperLimitRDF"].get<double>();
+        }
+
+        systems[systemId].propertyRadialDistributionFunction =
+            PropertyRadialDistributionFunction(jsonNumberOfBlocks, systems[systemId].forceField.pseudoAtoms.size(),
+                                               numberOfBinsRDF, rangeRDF, sampleRDFEvery, writeRDFEvery);
+      }
+    }
+
+    if (value["ComputeConventionalRDF"].is_boolean())
+    {
+      if (value["ComputeConventionalRDF"].get<bool>())
+      {
+        size_t sampleConventionalRDFEvery{10};
+        if (value["SampleConventionalRDFEvery"].is_number_unsigned())
+        {
+          sampleConventionalRDFEvery = value["SampleConventionalRDFEvery"].get<size_t>();
+        }
+
+        size_t writeConventionalRDFEvery{5000};
+        if (value["WriteConventionalRDFEvery"].is_number_unsigned())
+        {
+          writeConventionalRDFEvery = value["WriteConventionalRDFEvery"].get<size_t>();
+        }
+
+        size_t numberOfBinsConventionalRDF{128};
+        if (value["NumberOfBinsConventionalRDF"].is_number_unsigned())
+        {
+          numberOfBinsConventionalRDF = value["NumberOfBinsConventionalRDF"].get<size_t>();
+        }
+
+        double rangeConventionalRDF{15.0};
+        if (value["RangeConventionalRDF"].is_number_float())
+        {
+          rangeConventionalRDF = value["RangeConventionalRDF"].get<double>();
+        }
+
+
+        systems[systemId].propertyConventionalRadialDistributionFunction =
+            PropertyConventionalRadialDistributionFunction(
+                jsonNumberOfBlocks, systems[systemId].forceField.pseudoAtoms.size(), numberOfBinsConventionalRDF,
+                rangeConventionalRDF, sampleConventionalRDFEvery, writeConventionalRDFEvery);
+      }
+    }
+
 
     if (value["ComputeMSD"].is_boolean())
     {
@@ -920,8 +922,15 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
           writeMSDEvery = value["WriteMSDEvery"].get<size_t>();
         }
 
+        size_t numberOfBlockElementsMSD{ 25 };
+        if (value["NumberOfBlockElementsMSD"].is_number_unsigned())
+        {
+          numberOfBlockElementsMSD = value["NumberOfBlockElementsMSD"].get<size_t>();
+        }
+
         systems[systemId].propertyMSD = 
-          PropertyMeanSquaredDisplacement(systems[systemId].components.size(), systems[systemId].moleculePositions.size(), sampleMSDEvery, writeMSDEvery);
+          PropertyMeanSquaredDisplacement(systems[systemId].components.size(), 
+              systems[systemId].moleculePositions.size(), sampleMSDEvery, writeMSDEvery, numberOfBlockElementsMSD);
       }
     }
 
@@ -929,12 +938,6 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
     {
       if (value["ComputeDensityGrid"].get<bool>())
       {
-        int3 densityGridSize{128, 128, 128};
-        if (value["DensityGridSize"].is_array())
-        {
-          densityGridSize = parseInt3("DensityGridSize", value["DensityGridSize"]);
-        }
-
         size_t sampleDensityGridEvery{10};
         if (value["SampleDensityGridEvery"].is_number_unsigned())
         {
@@ -945,6 +948,12 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
         if (value["WriteDensityGridEvery"].is_number_unsigned())
         {
           writeDensityGridEvery = value["WriteDensityGridEvery"].get<size_t>();
+        }
+
+        int3 densityGridSize{128, 128, 128};
+        if (value["DensityGridSize"].is_array())
+        {
+          densityGridSize = parseInt3("DensityGridSize", value["DensityGridSize"]);
         }
 
         std::vector<size_t> densityGridPseudoAtomsList{};

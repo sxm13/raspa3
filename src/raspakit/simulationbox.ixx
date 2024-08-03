@@ -94,7 +94,7 @@ export struct SimulationBox
    * \param c Length of side C.
    * \param type The type of the simulation box (default is Rectangular).
    */
-  explicit SimulationBox(double a, double b, double c, Type type = Type::Rectangular);
+  explicit SimulationBox(double a, double b, double c);
 
   /**
    * \brief Constructs a SimulationBox with given lengths and angles.
@@ -109,8 +109,8 @@ export struct SimulationBox
    * \param gamma Angle between sides A and B.
    * \param type The type of the simulation box (default is Rectangular).
    */
-  explicit SimulationBox(double a, double b, double c, double alpha, double beta, double gamma,
-                         Type type = Type::Rectangular);
+  explicit SimulationBox(double a, double b, double c, double alpha, double beta, double gamma);
+  explicit SimulationBox(double a, double b, double c, double alpha, double beta, double gamma, Type type);
 
   /**
    * \brief Constructs a SimulationBox with a given cell matrix.
@@ -120,7 +120,8 @@ export struct SimulationBox
    * \param m The cell matrix defining the box dimensions and angles.
    * \param type The type of the simulation box (default is Rectangular).
    */
-  explicit SimulationBox(double3x3 m, Type type = Type::Rectangular);
+  explicit SimulationBox(double3x3 m);
+  explicit SimulationBox(double3x3 m, Type type);
 
   ALWAYS_INLINE inline double3 applyPeriodicBoundaryConditions(const double3& dr) const
   {
@@ -181,7 +182,7 @@ export struct SimulationBox
   double3x3 cell;
   double3x3 inverseCell;
   double volume;
-  Type type = Type::Rectangular;
+  Type type;
 
   inline SimulationBox& operator+=(const SimulationBox& b)
   {

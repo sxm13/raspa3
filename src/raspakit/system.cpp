@@ -183,8 +183,7 @@ System::System(size_t id, std::optional<SimulationBox> box, double T, std::optio
   createFrameworks();
   determineSimulationBox();
 
-  double3 perpendicularWidths = simulationBox.perpendicularWidths();
-  forceField.initializeEwaldParameters(perpendicularWidths);
+  forceField.initializeEwaldParameters(simulationBox);
 
   CoulombicFourierEnergySingleIon =
     Interactions::computeEwaldFourierEnergySingleIon(eik_x, eik_y, eik_z, eik_xy, forceField, simulationBox,
@@ -1504,7 +1503,8 @@ void System::sampleProperties(size_t currentBlock, size_t currentCycle)
     averageEnergyHistogram->addSample(
         currentBlock, currentCycle,
         {runningEnergies.potentialEnergy(), runningEnergies.frameworkMoleculeVDW + runningEnergies.moleculeMoleculeVDW,
-         runningEnergies.frameworkMoleculeCharge + runningEnergies.moleculeMoleculeCharge + runningEnergies.ewald,
+         runningEnergies.frameworkMoleculeCharge + runningEnergies.moleculeMoleculeCharge + 
+         runningEnergies.ewald_fourier + runningEnergies.ewald_self + runningEnergies.ewald_exclusion,
          runningEnergies.polarization},
         w);
   }

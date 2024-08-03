@@ -682,7 +682,7 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2_difference_Ewald)
                                                  system.forceField, system.simulationBox, moleculeElectricFieldBefore, system.components,
                                                  system.numberOfMoleculesPerComponent, moleculeAtomPositions);
 
-  std::cout << "before: " << energy_before.ewald << std::endl;
+  //std::cout << "before: " << energy_before.ewald << std::endl;
 
   std::span<Atom> oldatoms = system.spanOfMolecule(0, 0);
   std::vector<Atom> newatoms = std::vector(oldatoms.begin(), oldatoms.end());
@@ -719,11 +719,11 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2_difference_Ewald)
                                                  system.fixedFrameworkStoredEik, system.storedEik,
                                                  system.forceField, system.simulationBox, moleculeElectricFieldAfter, system.components,
                                                  system.numberOfMoleculesPerComponent, moleculeAtomPositions);
-  std::cout << "after: " << energy_after.ewald << std::endl;
+  //std::cout << "after: " << energy_after.ewald << std::endl;
 
 
-  std::cout << "Running energy difference: " << energy_difference.ewald << std::endl;
-  std::cout << "energy before - after: " << energy_after.ewald - energy_before.ewald << std::endl;
+  //std::cout << "Running energy difference: " << energy_difference.ewald << std::endl;
+  //std::cout << "energy before - after: " << energy_after.ewald - energy_before.ewald << std::endl;
 
   double tolerance = 1e-5;
   for(size_t i = 0; i < moleculeElectricFieldAfter.size(); ++i)

@@ -368,7 +368,7 @@ TEST(gradients, Test_2_CO2_in_ITQ_29_2x2x2_Ewald)
       system.eik_x, system.eik_y, system.eik_z, system.eik_xy, system.fixedFrameworkStoredEik, system.forceField,
       system.simulationBox, system.components, system.numberOfMoleculesPerComponent, system.spanOfMoleculeAtoms());
 
-  EXPECT_NEAR(factorEwald.ewald * Units::EnergyToKelvin, -759.67572774 + 38.02930863, 1e-4);
+  EXPECT_NEAR((factorEwald.ewald_fourier + factorEwald.ewald_self + factorEwald.ewald_exclusion) * Units::EnergyToKelvin, -759.67572774 + 38.02930863, 1e-4);
 
   EXPECT_NEAR(atomPositions[0].gradient.x, 0.000000000000, 1e-4);
   EXPECT_NEAR(atomPositions[0].gradient.y, -362.766142495638, 1e-4);
