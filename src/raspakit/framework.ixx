@@ -56,26 +56,31 @@ export struct Framework
 {
   Framework();
   Framework(size_t currentComponent, const ForceField &forceField, const std::string &componentName,
-            std::optional<const std::string> fileName, int3 numberOfUnitCells) noexcept(false);
+            std::optional<const std::string> fileName, int3 numberOfUnitCells, bool useChargesFromCIFFile) noexcept(false);
   Framework(size_t componentId, const ForceField &forceField, std::string componentName, SimulationBox simulationBox,
             size_t spaceGroupHallNumber, std::vector<Atom> definedAtoms, int3 numberOfUnitCells) noexcept(false);
 
-  uint64_t versionNumber{1};
+  uint64_t versionNumber{ 1 };
 
   SimulationBox simulationBox;
-  size_t spaceGroupHallNumber{1};
-  int3 numberOfUnitCells{1, 1, 1};
+  size_t spaceGroupHallNumber{ 1 };
+  int3 numberOfUnitCells{ 1, 1, 1 };
 
-  size_t frameworkId{0};
+  size_t frameworkId{ 0 };
   std::string name{};
   std::optional<std::string> filenameData{};
   std::string filename{};
 
-  bool rigid{true};
+  bool rigid{ true };
 
-  double mass{0.0};
-  double unitCellMass{0.0};
-  double netCharge{0.0};
+  double mass{ 0.0 };
+  double unitCellMass{ 0.0 };
+
+  bool useChargesFromCIFFile{ true };
+  double netCharge{ 0.0 };
+  double smallestCharge{ 0.0 };
+  double largestCharge{ 0.0 };
+
   std::vector<Atom> definedAtoms{};
   std::vector<Atom> atoms{};
   std::vector<Atom> unitCellAtoms;

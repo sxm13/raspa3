@@ -55,7 +55,7 @@ TEST(Ewald, Test_2_CO2_in_Box_10_10_10)
       5, 21);
 
 
-  System system = System(0, SimulationBox(10.0, 10.0, 10.0), 300.0, 1e4, forceField, {}, {c}, {2}, 5);
+  System system = System(0, forceField, SimulationBox(10.0, 10.0, 10.0), 300.0, 1e4, 1.0, {}, {c}, {2}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
   atomPositions[0].position = double3(-1.0, 0.0, 1.149);
@@ -107,7 +107,7 @@ TEST(Ewald, Test_1_Na_1_Cl_in_Box_10_10_10_Gradient)
                            },
                            5, 21);
 
-  System system = System(0, SimulationBox(10.0, 10.0, 10.0), 300.0, 1e4, forceField, {}, {na, cl}, {1, 1}, 5);
+  System system = System(0, forceField, SimulationBox(10.0, 10.0, 10.0), 300.0, 1e4, 1.0, {}, {na, cl}, {1, 1}, 5);
 
   std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
   std::vector<Atom> atomPositions = std::vector<Atom>(spanOfMoleculeAtoms.begin(), spanOfMoleculeAtoms.end());
@@ -219,7 +219,7 @@ TEST(Ewald, Test_2_CO2_in_ITQ_29_1x1x1)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
   atomPositions[0].position = double3(5.93355, 7.93355, 5.93355 + 1.149);
@@ -277,7 +277,7 @@ TEST(Ewald, Test_2_CO2_in_ITQ_29_2x2x2)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
   atomPositions[0].position = double3(5.93355, 7.93355, 5.93355 + 1.149);
@@ -368,7 +368,7 @@ TEST(Ewald, Test_2_CO2_in_MFI_1x1x1)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
   atomPositions[0].position = double3(10.011, 4.97475 + 2.0, 1.149);
@@ -460,7 +460,7 @@ TEST(Ewald, Test_2_CO2_in_MFI_2x2x2)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
   atomPositions[0].position = double3(10.011, 4.97475 + 2.0, 1.149);
@@ -517,7 +517,7 @@ TEST(Ewald, Test_20_Na_Cl_in_Box_25x25x25)
                            },
                            5, 21);
 
-  System system = System(0, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, forceField, {}, {na, cl}, {20, 20}, 5);
+  System system = System(0, forceField, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, 1.0, {}, {na, cl}, {20, 20}, 5);
 
   // std::fill(system.forceField.data.begin(), system.forceField.data.end(), VDWParameters(0.0, 1.0));
 
@@ -674,7 +674,7 @@ TEST(Ewald, Test_20_Na_Cl_in_Box_25x25x25_strain_derivative)
                            },
                            5, 21);
 
-  System system = System(0, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, forceField, {}, {na, cl}, {20, 20}, 5);
+  System system = System(0, forceField, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, 1.0, {}, {na, cl}, {20, 20}, 5);
 
   std::span<Atom> moleculeAtomPositions = system.spanOfMoleculeAtoms();
 

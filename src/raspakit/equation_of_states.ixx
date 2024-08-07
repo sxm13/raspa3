@@ -45,7 +45,7 @@ export struct EquationOfState
   EquationOfState() = default;
 
   EquationOfState(EquationOfState::Type type, EquationOfState::MultiComponentMixingRules multiComponentMixingRules,
-                  double temperature, double pressure, const SimulationBox &simulationBox, double HeliumVoidFraction,
+                  double temperature, double pressure, const SimulationBox &simulationBox, double heliumVoidFraction,
                   std::vector<Component> &components);
 
   void computeComponentFluidProperties(EquationOfState::Type equationOfState,

@@ -365,6 +365,11 @@ std::string ForceField::printForceFieldStatus() const
   std::print(stream, "Force field status\n");
   std::print(stream, "===============================================================================\n\n");
 
+  std::print(stream, "Overlap-criteria VDW:  {: .6e} [K]\n\n", overlapCriteria);
+
+  std::print(stream, "Cutoff VDW:     {:9.5f} [Å]\n", cutOffVDW);
+  std::print(stream, "Cutoff Coulomb: {:9.5f} [Å]\n\n", cutOffCoulomb);
+
   for (size_t i = 0; i < numberOfPseudoAtoms; ++i)
   {
     for (size_t j = i; j < numberOfPseudoAtoms; ++j)

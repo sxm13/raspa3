@@ -40,7 +40,7 @@ TEST(MC_strain_tensor, Test_20_CH4_25x25x25_LJ)
                            Atom(double3(0.0, 0.0, 0.0), 0.0, 1.0, 0, 0, 0, 0)},
                           5, 21);
 
-  System system = System(0, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, forceField, {}, {c}, {20}, 5);
+  System system = System(0, forceField, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, 1.0, {}, {c}, {20}, 5);
 
   std::span<Atom> moleculeAtomPositions = system.spanOfMoleculeAtoms();
 
@@ -168,7 +168,7 @@ TEST(MC_strain_tensor, Test_20_Na_Cl_25x25x25_LJ_Real)
                            },
                            5, 21);
 
-  System system = System(0, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, forceField, {}, {na, cl}, {1, 1}, 5);
+  System system = System(0, forceField, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, 1.0, {}, {na, cl}, {1, 1}, 5);
 
   std::span<Atom> moleculeAtomPositions = system.spanOfMoleculeAtoms();
 

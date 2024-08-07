@@ -70,7 +70,7 @@ TEST(electrostatic_potential, Test_reference_system_1)
                            5, 21);
 
   System system =
-      System(0, SimulationBox(1000.0, 1000.0, 1000.0), 300.0, 1e4, forceField, {}, {c1, c2, c3, c4}, {1, 1, 1, 1}, 5);
+      System(0, forceField, SimulationBox(1000.0, 1000.0, 1000.0), 300.0, 1e4, 1.0, {}, {c1, c2, c3, c4}, {1, 1, 1, 1}, 5);
 
   std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
   std::span<const Atom> frameworkAtomPositions = system.spanOfFrameworkAtoms();
@@ -145,7 +145,7 @@ TEST(electrostatic_potential, Test_reference_system_2)
        Atom(double3(0.0, 0.0, 0.0), 1.5, 1.0, 1, 2, 1, 0), Atom(double3(0.0, 0.0, 0.0), -0.75, 1.0, 1, 3, 1, 0)},
       5, 21);
 
-  System system = System(0, SimulationBox(1000.0, 1000.0, 1000.0), 300.0, 1e4, forceField, {}, {c1, c2}, {1, 1}, 5);
+  System system = System(0, forceField, SimulationBox(1000.0, 1000.0, 1000.0), 300.0, 1e4, 1.0, {}, {c1, c2}, {1, 1}, 5);
 
   std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
   std::span<const Atom> frameworkAtomPositions = system.spanOfFrameworkAtoms();
@@ -228,7 +228,7 @@ TEST(electrostatic_potential, Test_2_CO2_in_ITQ_29_2x2x2)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 0, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
   system.forceField.EwaldAlpha = 0.25;
   system.forceField.numberOfWaveVectors = int3(8, 8, 8);
   // system.forceField.omitEwaldFourier = true;

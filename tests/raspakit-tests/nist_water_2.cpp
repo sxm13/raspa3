@@ -967,7 +967,7 @@ TEST(nist_water_2, Test_NIST_water_300_monoclinic)
                           5, 21);
 
 
-  System system = System(0, box, 300.0, 1e4, forceField, {}, {c}, {300}, 5);
+  System system = System(0, forceField, box, 300.0, 1e4, 1.0, {}, {c}, {300}, 5);
 
   std::span<Atom> moleculeAtomPositions = system.spanOfMoleculeAtoms();
 

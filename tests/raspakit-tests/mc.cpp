@@ -93,7 +93,7 @@ TEST(MC, translation)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21, MCMoveProbabilitiesParticles(1.0, 0.0, 1.0));
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {methane, co2}, {5, 3}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {methane, co2}, {5, 3}, 5);
 
   [[maybe_unused]] std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
 }

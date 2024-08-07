@@ -32,7 +32,7 @@ TEST(insertion_deletion, methane_number_of_molecules_per_component)
                            Atom(double3(0.0, 0.0, 0.0), 0.0, 1.0, 0, 0, 0, 0)},
                           5, 21);
 
-  System system = System(0, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, forceField, {}, {c}, {20}, 5);
+  System system = System(0, forceField, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, 1.0, {}, {c}, {20}, 5);
 
   EXPECT_EQ(system.numberOfMoleculesPerComponent[0], 20);
   EXPECT_EQ(system.numberOfPseudoAtoms[0][0], 20);
@@ -73,7 +73,7 @@ TEST(insertion_deletion, CO2_number_of_molecules_per_component)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, forceField, {}, {c}, {3}, 5);
+  System system = System(0, forceField, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, 1.0, {}, {c}, {3}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
 
@@ -176,7 +176,7 @@ TEST(insertion_deletion, CO2_Methane_number_of_molecules_per_component)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {methane, co2}, {5, 3}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {methane, co2}, {5, 3}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
 
@@ -316,7 +316,7 @@ TEST(insertion_deletion, Dynamic_CO2_Methane_number_of_molecules_per_component)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {methane, co2}, {5, 3}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {methane, co2}, {5, 3}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
 

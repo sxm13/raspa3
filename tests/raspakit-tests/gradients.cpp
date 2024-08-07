@@ -56,7 +56,7 @@ TEST(gradients, Test_2_CO2_in_ITQ_29_2x2x2_inter)
        Atom(double3(0.0, 0.0, -1.149), 0.0, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
   atomPositions[0].position = double3(5.93355, 7.93355, 5.93355 + 1.149);
@@ -150,7 +150,7 @@ TEST(gradients, Test_2_CO2_in_ITQ_29_2x2x2_framework_molecule)
        Atom(double3(0.0, 0.0, -1.149), 0.0, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
   atomPositions[0].position = double3(5.93355, 7.93355, 7.08255);
@@ -248,7 +248,7 @@ TEST(gradients, Test_2_CO2_in_ITQ_29_2x2x2_NonEwald)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
   atomPositions[0].position = double3(5.93355, 7.93355, 5.93355 + 1.149);
@@ -353,7 +353,7 @@ TEST(gradients, Test_2_CO2_in_ITQ_29_2x2x2_Ewald)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
   atomPositions[0].position = double3(5.93355, 7.93355, 5.93355 + 1.149);
@@ -454,7 +454,7 @@ TEST(gradients, Test_2_CO2_in_ITQ_29_2x2x2_Total)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
   atomPositions[0].position = double3(5.93355, 7.93355, 5.93355 + 1.149);
@@ -562,7 +562,7 @@ uint8_t groupId
       Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)
     }, 5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, { f }, { c }, { 2 }, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, { f }, { c }, { 2 }, 5);
 
   //std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
   //std::span<const Atom> frameworkAtoms = system.spanOfFrameworkAtoms();
@@ -694,7 +694,7 @@ TEST(gradients, Test_CO2_in_ITQ_29_1x1x1)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
 
   std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
 
@@ -790,7 +790,7 @@ TEST(gradients, Test_CH4_in_Box_25x25x25)
                            Atom(double3(0.0, 0.0, 0.0), 0.0, 1.0, 0, 0, 0, 0)},
                           5, 21);
 
-  System system = System(0, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, forceField, {}, {c}, {50}, 5);
+  System system = System(0, forceField, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, 1.0, {}, {c}, {50}, 5);
 
   std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
   std::span<const Atom> frameworkAtoms = system.spanOfFrameworkAtoms();
@@ -931,7 +931,7 @@ TEST(gradients, Test_CO2_in_MFI_2x2x2)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {10}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {10}, 5);
 
   std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
   std::span<const Atom> frameworkAtoms = system.spanOfFrameworkAtoms();
@@ -1037,7 +1037,7 @@ TEST(gradients, Test_20_Na_Cl_in_Box_25x25x25)
                            },
                            5, 21);
 
-  System system = System(0, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, forceField, {}, {na, cl}, {20, 20}, 5);
+  System system = System(0, forceField, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, 1.0, {}, {na, cl}, {20, 20}, 5);
 
   // std::fill(system.forceField.data.begin(), system.forceField.data.end(), VDWParameters(0.0, 1.0));
 

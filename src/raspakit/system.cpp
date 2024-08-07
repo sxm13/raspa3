@@ -123,7 +123,8 @@ import json;
  *
  *  Detailed description starts here.
  */
-System::System(size_t id, std::optional<SimulationBox> box, double T, std::optional<double> P, ForceField forcefield,
+System::System(size_t id, ForceField forcefield, std::optional<SimulationBox> box, 
+               double T, std::optional<double> P, double heliumVoidFraction,
                std::vector<Framework> f, std::vector<Component> c, std::vector<size_t> initialNumberOfMolecules,
                size_t numberOfBlocks, const MCMoveProbabilitiesSystem& systemProbabilities,
                std::optional<size_t> sampleMoviesEvery)
@@ -199,7 +200,7 @@ System::System(size_t id, std::optional<SimulationBox> box, double T, std::optio
 
   equationOfState =
       EquationOfState(EquationOfState::Type::PengRobinson, EquationOfState::MultiComponentMixingRules::VanDerWaals, T,
-                      P.value_or(0.0), simulationBox, HeliumVoidFraction, components);
+                      P.value_or(0.0), simulationBox, heliumVoidFraction, components);
 
   averageEnthalpiesOfAdsorption.resize(swappableComponents.size());
 
@@ -1352,9 +1353,10 @@ std::string System::writeSystemStatus() const
   std::print(stream, "System definitions\n");
   std::print(stream, "===============================================================================\n\n");
 
-  std::print(stream, "Temperature: {} [K]\n", temperature);
-  std::print(stream, "Beta:        {} [-]\n", beta);
-  std::print(stream, "Pressure:    {} [Pa]\n\n", pressure * Units::PressureConversionFactor);
+  std::print(stream, "Temperature:          {} [K]\n", temperature);
+  std::print(stream, "Beta:                 {} [-]\n", beta);
+  std::print(stream, "Pressure:             {} [Pa]\n", pressure * Units::PressureConversionFactor);
+  std::print(stream, "Helium void fraction: {} [-]\n\n", heliumVoidFraction);
 
   stream << simulationBox.printStatus();
   std::print(stream, "\n\n\n");
@@ -2457,7 +2459,7 @@ Archive<std::ofstream>& operator<<(Archive<std::ofstream>& archive, const System
   archive << s.pressure;
   archive << s.input_pressure;
   archive << s.beta;
-  archive << s.HeliumVoidFraction;
+  archive << s.heliumVoidFraction;
   archive << s.numberOfFrameworks;
   archive << s.numberOfFrameworkAtoms;
   archive << s.numberOfRigidFrameworkAtoms;
@@ -2564,7 +2566,7 @@ Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, System& s)
   archive >> s.pressure;
   archive >> s.input_pressure;
   archive >> s.beta;
-  archive >> s.HeliumVoidFraction;
+  archive >> s.heliumVoidFraction;
   archive >> s.numberOfFrameworks;
   archive >> s.numberOfFrameworkAtoms;
   archive >> s.numberOfRigidFrameworkAtoms;

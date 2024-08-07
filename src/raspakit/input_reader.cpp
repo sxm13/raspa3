@@ -666,6 +666,26 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
     }
     std::string typeString = value["Type"].get<std::string>();
 
+    if (!value.contains("ExternalTemperature"))
+    {
+      throw std::runtime_error(
+          std::format("[Input reader]: framework must have a key 'ExternalTemperature' with a value of "
+                      "floating-point-type'\n"));
+    }
+    double T = value["ExternalTemperature"].get<double>();
+
+    bool useChargesFromCIFFile = true;
+    if (value.contains("UseChargesFromCIFFile"))
+    {
+      useChargesFromCIFFile = value["UseChargesFromCIFFile"].get<bool>();
+    }
+
+    std::optional<double> P{};
+    if (value.contains("ExternalPressure"))
+    {
+      P = value["ExternalPressure"].get<double>();
+    }
+
     if (caseInSensStringCompare(typeString, "Framework"))
     {
       // Parse framework options
@@ -682,18 +702,10 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
         jsonNumberOfUnitCells = parseInt3("NumberOfUnitCells", value["NumberOfUnitCells"]);
       }
 
-      if (!value.contains("ExternalTemperature"))
+      double heliumVoidFraction{ 1.0 };
+      if (value.contains("HeliumVoidFraction"))
       {
-        throw std::runtime_error(
-            std::format("[Input reader]: framework must have a key 'ExternalTemperature' with a value of "
-                        "floating-point-type'\n"));
-      }
-      double T = value["ExternalTemperature"].get<double>();
-
-      std::optional<double> P{};
-      if (value.contains("ExternalPressure"))
-      {
-        P = value["ExternalPressure"].get<double>();
+        heliumVoidFraction = value["HeliumVoidFraction"].get<double>();
       }
 
       if (!forceFields[systemId].has_value())
@@ -702,10 +714,12 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
       }
 
       std::vector<Framework> jsonFrameworkComponents{
-          Framework(0, forceFields[systemId].value(), frameworkNameString, frameworkNameString, jsonNumberOfUnitCells)};
+          Framework(0, forceFields[systemId].value(), frameworkNameString, frameworkNameString, jsonNumberOfUnitCells, useChargesFromCIFFile)};
 
       // create system
-      systems[systemId] = System(systemId, std::nullopt, T, P, forceFields[systemId].value(), jsonFrameworkComponents,
+      systems[systemId] = System(systemId, forceFields[systemId].value(),
+                                 std::nullopt, T, P, heliumVoidFraction,
+                                 jsonFrameworkComponents,
                                  jsonComponents[systemId], jsonCreateNumberOfMolecules[systemId], jsonNumberOfBlocks,
                                  mc_moves_probabilities);
     }
@@ -713,19 +727,6 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
     {
       // Parse box options
 
-      if (!value.contains("ExternalTemperature"))
-      {
-        throw std::runtime_error(
-            std::format("[Input reader]: framework must have a key 'ExternalTemperature' with a value of "
-                        "floating-point-type'\n"));
-      }
-      [[maybe_unused]] double T = value["ExternalTemperature"].get<double>();
-
-      std::optional<double> P{};
-      if (value.contains("ExternalPressure"))
-      {
-        P = value["ExternalPressure"].get<double>();
-      }
       double3 boxLengths{25.0, 25.0, 25.0};
       if (value.contains("BoxLengths"))
       {
@@ -746,7 +747,7 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
       }
       SimulationBox simulationBox{boxLengths.x, boxLengths.y, boxLengths.z, boxAngles.x, boxAngles.y, boxAngles.z};
       systems[systemId] =
-          System(systemId, simulationBox, T, P, forceFields[systemId].value(), {}, jsonComponents[systemId],
+          System(systemId, forceFields[systemId].value(), simulationBox, T, P, 1.0, {}, jsonComponents[systemId],
                  jsonCreateNumberOfMolecules[systemId], jsonNumberOfBlocks, mc_moves_probabilities);
     }
     else
@@ -781,20 +782,20 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
           numberOfBinsEnergyHistogram = value["NumberOfBinsEnergyHistogram"].get<size_t>();
         }
 
-        double minimumRangeEnergyHistogram{ -5000.0 };
+        double lowerLimitEnergyHistogram{ -5000.0 };
         if (value["LowerLimitEnergyHistogram"].is_number_float())
         {
-          minimumRangeEnergyHistogram = value["LowerLimitEnergyHistogram"].get<double>();
+          lowerLimitEnergyHistogram = value["LowerLimitEnergyHistogram"].get<double>();
         }
 
-        double maximumRangeEnergyHistogram{ 1000.0 };
+        double upperLimitEnergyHistogram{ 1000.0 };
         if (value["UpperLimitEnergyHistogram"].is_number_float())
         {
-          maximumRangeEnergyHistogram = value["UpperLimitEnergyHistogram"].get<double>();
+          upperLimitEnergyHistogram = value["UpperLimitEnergyHistogram"].get<double>();
         }
 
         systems[systemId].averageEnergyHistogram = PropertyEnergyHistogram(
-            jsonNumberOfBlocks, numberOfBinsEnergyHistogram, {minimumRangeEnergyHistogram, maximumRangeEnergyHistogram},
+            jsonNumberOfBlocks, numberOfBinsEnergyHistogram, {lowerLimitEnergyHistogram, upperLimitEnergyHistogram},
             sampleEnergyHistogramEvery, writeEnergyHistogramEvery);
       }
     }
@@ -1002,6 +1003,11 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
         systems[systemId].thermostat = Thermostat(systems[systemId].temperature, thermostatChainLength, numberOfYoshidaSuzukiSteps, 
             systems[systemId].timeStep, systems[systemId].translationalDegreesOfFreedom, systems[systemId].rotationalDegreesOfFreedom);
       }
+    }
+
+    if (value["TimeStep"].is_number_float())
+    {
+      systems[systemId].timeStep = value["TimeStep"].get<double>();
     }
 
     systemId++;

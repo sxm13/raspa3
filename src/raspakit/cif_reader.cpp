@@ -248,7 +248,7 @@ void CIFReader::parseLoop([[maybe_unused]] std::string& string, const ForceField
             (atomSiteIndex != dictionary.end()))
         {
           std::string tempString1 = atomSiteIndex->second;
-          std::replace_if(tempString1.begin(), tempString1.end(), [](char c) { return std::isdigit(c); }, ' ');
+          //std::replace_if(tempString1.begin(), tempString1.end(), [](char c) { return std::isdigit(c); }, ' ');
           std::istringstream ss(tempString1);
           std::string value2;
           if (ss >> value2)
@@ -258,7 +258,7 @@ void CIFReader::parseLoop([[maybe_unused]] std::string& string, const ForceField
             // TODO: add pseudoAtom if not found
             if (!index1.has_value())
             {
-              throw(std::format("[cif reader]: atom type {} not recognized\n", value2));
+              throw std::runtime_error(std::format("[cif reader]: atom type {} not recognized\n", value2));
             }
 
             if (index1.has_value())

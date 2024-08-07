@@ -71,7 +71,7 @@ TEST(electrostatic_field, Test_reference_system_1)
                            5, 21);
 
   System system =
-      System(0, SimulationBox(100.0, 100.0, 100.0), 300.0, 1e4, forceField, {}, {c1, c2, c3, c4}, {1, 1, 1, 1}, 5);
+      System(0, forceField, SimulationBox(100.0, 100.0, 100.0), 300.0, 1e4, 1.0, {}, {c1, c2, c3, c4}, {1, 1, 1, 1}, 5);
 
   std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
   spanOfMoleculeAtoms[0].position = double3(-1.0, 0.0, 0.0);
@@ -127,7 +127,7 @@ TEST(electrostatic_field, Test_reference_system_2)
        Atom(double3(0.0, 0.0, 0.0), 1.5, 1.0, 1, 2, 1, 0), Atom(double3(0.0, 0.0, 0.0), -0.75, 1.0, 1, 3, 1, 0)},
       5, 21);
 
-  System system = System(0, SimulationBox(100.0, 100.0, 100.0), 300.0, 1e4, forceField, {}, {c1, c2}, {1, 1}, 5);
+  System system = System(0, forceField, SimulationBox(100.0, 100.0, 100.0), 300.0, 1e4, 1.0, {}, {c1, c2}, {1, 1}, 5);
 
   std::span<Atom> spanOfMoleculeAtoms = system.spanOfMoleculeAtoms();
   spanOfMoleculeAtoms[0].position = double3(-1.0, 0.0, 0.0);
@@ -188,7 +188,7 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 0, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
   system.forceField.EwaldAlpha = 0.25;
   system.forceField.numberOfWaveVectors = int3(8, 8, 8);
 
@@ -341,7 +341,7 @@ TEST(electrostatic_field, Test_CO2_in_ITQ_29_2x2x2_difference)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 0, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {1}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {1}, 5);
   system.forceField.EwaldAlpha = 0.25;
   system.forceField.numberOfWaveVectors = int3(8, 8, 8);
   // system.forceField.omitEwaldFourier = true;
@@ -428,7 +428,7 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2_difference)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 0, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
   system.forceField.EwaldAlpha = 0.25;
   system.forceField.numberOfWaveVectors = int3(8, 8, 8);
   // system.forceField.omitEwaldFourier = true;
@@ -539,7 +539,7 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2_difference_non_Ewald)
       Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 0, 0)
     }, 5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, { f }, { c }, { 2 }, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, { f }, { c }, { 2 }, 5);
   system.forceField.EwaldAlpha = 0.25;
   system.forceField.numberOfWaveVectors = int3(8, 8, 8);
   //system.forceField.omitEwaldFourier = true;
@@ -647,7 +647,7 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2_difference_Ewald)
       Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 0, 0)
     }, 5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, { f }, { c }, { 2 }, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, { f }, { c }, { 2 }, 5);
   system.forceField.EwaldAlpha = 0.25;
   system.forceField.numberOfWaveVectors = int3(8, 8, 8);
   system.forceField.omitInterPolarization = true;

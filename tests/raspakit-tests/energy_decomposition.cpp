@@ -52,7 +52,7 @@ TEST(energy_decomposition, CO2_Methane_in_Box)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, forceField, {}, {methane, co2}, {15, 30}, 5);
+  System system = System(0, forceField, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, 1.0, {}, {methane, co2}, {15, 30}, 5);
 
   RunningEnergy energy = system.computeTotalEnergies();
 
@@ -95,7 +95,7 @@ TEST(energy_decomposition, CO2_Methane_in_Box_Ewald)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, forceField, {}, {co2, co2_2}, {15, 30}, 5);
+  System system = System(0, forceField, SimulationBox(25.0, 25.0, 25.0), 300.0, 1e4, 1.0, {}, {co2, co2_2}, {15, 30}, 5);
 
   system.forceField.EwaldAlpha = 0.25;
   system.forceField.numberOfWaveVectors = int3(8, 8, 8);
@@ -191,7 +191,7 @@ TEST(energy_decomposition, CO2_Methane_in_Framework)
        Atom(double3(0.0, 0.0, -1.149), -0.3256, 1.0, 0, 4, 1, 0)},
       5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {methane, co2}, {10, 15}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {methane, co2}, {10, 15}, 5);
 
   system.precomputeTotalRigidEnergy();
 

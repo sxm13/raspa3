@@ -30,11 +30,11 @@ import simulationbox;
 
 EquationOfState::EquationOfState(EquationOfState::Type type, EquationOfState::MultiComponentMixingRules rules,
                                  double temperature, double pressure, const SimulationBox &simulationBox,
-                                 double HeliumVoidFraction, std::vector<Component> &components)
+                                 double heliumVoidFraction, std::vector<Component> &components)
     : equationOfState(type), multiComponentMixingRules(rules)
 {
   computeComponentFluidProperties(equationOfState, multiComponentMixingRules, temperature, pressure, simulationBox,
-                                  HeliumVoidFraction, components);
+                                  heliumVoidFraction, components);
 }
 
 // T in Kelvin
@@ -42,7 +42,7 @@ EquationOfState::EquationOfState(EquationOfState::Type type, EquationOfState::Mu
 void EquationOfState::computeComponentFluidProperties(EquationOfState::Type type,
                                                       EquationOfState::MultiComponentMixingRules rules,
                                                       double temperature, double pressure,
-                                                      const SimulationBox &simulationBox, double HeliumVoidFraction,
+                                                      const SimulationBox &simulationBox, double heliumVoidFraction,
                                                       std::vector<Component> &components)
 {
   std::vector<double> a(components.size());
@@ -239,11 +239,11 @@ void EquationOfState::computeComponentFluidProperties(EquationOfState::Type type
 
   /*
   if(ExcessVolume[CurrentSystem]>0.0)
-    excess_volume=ExcessVolume[CurrentSystem]*HeliumVoidFraction[CurrentSystem];
+    excess_volume=ExcessVolume[CurrentSystem]*heliumVoidFraction[CurrentSystem];
   else
-    excess_volume=Volume[CurrentSystem]*HeliumVoidFraction[CurrentSystem];
+    excess_volume=Volume[CurrentSystem]*heliumVoidFraction[CurrentSystem];
     */
-  double excess_volume = simulationBox.volume * HeliumVoidFraction;
+  double excess_volume = simulationBox.volume * heliumVoidFraction;
 
   // get the gas-phase fugacity coefficient
   for (size_t i = 0; i < components.size(); ++i)

@@ -86,8 +86,8 @@ Framework::Framework() {}
 
 // create Component in 'inputreader.cpp'
 Framework::Framework(size_t currentFramework, const ForceField& forceField, const std::string& componentName,
-                     std::optional<const std::string> fileName, int3 numberOfUnitCells) noexcept(false)
-    : numberOfUnitCells(numberOfUnitCells), frameworkId(currentFramework), name(componentName), filenameData(fileName)
+                     std::optional<const std::string> fileName, int3 numberOfUnitCells, bool useChargesFromCIFFile) noexcept(false)
+    : numberOfUnitCells(numberOfUnitCells), frameworkId(currentFramework), name(componentName), filenameData(fileName), useChargesFromCIFFile(useChargesFromCIFFile)
 {
   if (filenameData.has_value())
   {
@@ -111,6 +111,7 @@ Framework::Framework(size_t frameworkId, const ForceField& forceField, std::stri
       frameworkId(frameworkId),
       name(fileName),
       filenameData(fileName),
+      useChargesFromCIFFile(true),
       definedAtoms(definedAtoms)
 {
   expandDefinedAtomsToUnitCell();
@@ -125,11 +126,16 @@ Framework::Framework(size_t frameworkId, const ForceField& forceField, std::stri
 
   mass = 0.0;
   netCharge = 0.0;
+  smallestCharge = std::numeric_limits<double>::max();
+  largestCharge = std::numeric_limits<double>::lowest();
   for (const Atom& atom : atoms)
   {
     size_t atomType = static_cast<size_t>(atom.type);
     mass += forceField.pseudoAtoms[atomType].mass;
     netCharge += atom.charge;
+
+    if(atom.charge > largestCharge) largestCharge = atom.charge;
+    if(atom.charge < smallestCharge) smallestCharge = atom.charge;
   }
 
   for (size_t i = 0; i < unitCellAtoms.size(); ++i)
@@ -159,6 +165,15 @@ void Framework::readFramework(const ForceField& forceField, const std::string& f
   definedAtoms = parser.fractionalAtoms;
   spaceGroupHallNumber = parser._spaceGroupHallNumber.value_or(1);
 
+  if( !useChargesFromCIFFile )
+  {
+    // take the charges from the defined force-field
+    for(Atom &atom : definedAtoms)
+    {
+      atom.charge = forceField.pseudoAtoms[atom.type].charge;
+    }
+  }
+
   // expand the fractional atoms based on the space-group
   expandDefinedAtomsToUnitCell();
 
@@ -173,11 +188,15 @@ void Framework::readFramework(const ForceField& forceField, const std::string& f
 
   mass = 0.0;
   netCharge = 0.0;
+  smallestCharge = std::numeric_limits<double>::max();
+  largestCharge = std::numeric_limits<double>::lowest();
   for (const Atom& atom : atoms)
   {
     size_t atomType = static_cast<size_t>(atom.type);
     mass += forceField.pseudoAtoms[atomType].mass;
     netCharge += atom.charge;
+    if(atom.charge > largestCharge) largestCharge = atom.charge;
+    if(atom.charge < smallestCharge) smallestCharge = atom.charge;
   }
 
   for (size_t i = 0; i < unitCellAtoms.size(); ++i)
@@ -254,9 +273,12 @@ std::string Framework::printStatus(const ForceField& forceField) const
 
   std::print(stream, "Framework {} [{}]\n\n", frameworkId, name);
 
-  std::print(stream, "    number Of Atoms:  {}\n", unitCellAtoms.size());
-  std::print(stream, "    net charge:       {:12.5f} [e]\n", netCharge);
-  std::print(stream, "    mass:             {:12.5f} [amu]\n", mass);
+  std::print(stream, "    number Of Atoms:          {:>12d} [-]\n", unitCellAtoms.size());
+  std::print(stream, "    use charge from CIF-file: {:>12}\n", useChargesFromCIFFile);
+  std::print(stream, "    net charge:               {:>12.5f} [e]\n", netCharge);
+  std::print(stream, "    smallest charge:          {:>12.5f} [e]\n", smallestCharge);
+  std::print(stream, "    largest charge:           {:>12.5f} [e]\n", largestCharge);
+  std::print(stream, "    mass:                     {:>12.5f} [amu]\n", mass);
 
   for (size_t i = 0; i != definedAtoms.size(); ++i)
   {
@@ -314,7 +336,12 @@ Archive<std::ofstream>& operator<<(Archive<std::ofstream>& archive, const Framew
   archive << c.rigid;
 
   archive << c.mass;
+
+  archive << c.useChargesFromCIFFile;
   archive << c.netCharge;
+  archive << c.smallestCharge;
+  archive << c.largestCharge;
+
   archive << c.definedAtoms;
   archive << c.atoms;
 
@@ -362,7 +389,12 @@ Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, Framework& c
   archive >> c.rigid;
 
   archive >> c.mass;
+
+  archive >> c.useChargesFromCIFFile;
   archive >> c.netCharge;
+  archive >> c.smallestCharge;
+  archive >> c.largestCharge;
+
   archive >> c.definedAtoms;
   archive >> c.atoms;
 

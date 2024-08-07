@@ -51,7 +51,7 @@ TEST(cbmc_interactions, framework_molecule_1)
                            Atom(double3(0.0, 0.0, 0.0), 0.0, 1.0, 0, 2, 1, 0)},
                           5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {1}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {1}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
   std::span<const Atom> frameworkAtoms = system.spanOfFrameworkAtoms();
@@ -91,7 +91,7 @@ TEST(cbmc_interactions, framework_molecule_2)
                            Atom(double3(0.0, 0.0, 0.0), 0.0, 1.0, 0, 2, 1, 0)},
                           5, 21);
 
-  System system = System(0, std::nullopt, 300.0, 1e4, forceField, {f}, {c}, {2}, 5);
+  System system = System(0, forceField, std::nullopt, 300.0, 1e4, 1.0, {f}, {c}, {2}, 5);
 
   std::span<Atom> atomPositions = system.spanOfMoleculeAtoms();
   std::span<const Atom> frameworkAtoms = system.spanOfFrameworkAtoms();
