@@ -1,4 +1,4 @@
-project(raspa)
+project(raspa3)
 
 add_executable(${PROJECT_NAME}
         main.cpp

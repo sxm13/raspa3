@@ -71,11 +71,12 @@ PYBIND11_MODULE(raspalib, m)
       .value("Triclinic", SimulationBox::Type::Triclinic)
       .export_values();
   simulationBox
-      .def(pybind11::init<double, double, double, SimulationBox::Type>(), pybind11::arg("a"), pybind11::arg("b"),
-           pybind11::arg("c"), pybind11::arg("type") = SimulationBox::Type::Rectangular)
+      .def(pybind11::init<double, double, double>(), pybind11::arg("a"), pybind11::arg("b"), pybind11::arg("c"))
+      .def(pybind11::init<double, double, double, double, double, double>(), pybind11::arg("a"),
+           pybind11::arg("b"), pybind11::arg("c"), pybind11::arg("alpha"), pybind11::arg("beta"), pybind11::arg("gamma"))
       .def(pybind11::init<double, double, double, double, double, double, SimulationBox::Type>(), pybind11::arg("a"),
            pybind11::arg("b"), pybind11::arg("c"), pybind11::arg("alpha"), pybind11::arg("beta"),
-           pybind11::arg("gamma"), pybind11::arg("type") = SimulationBox::Type::Rectangular)
+           pybind11::arg("gamma"), pybind11::arg("type"))
       .def(pybind11::init<double3x3, SimulationBox::Type>())
       .def_readwrite("type", &SimulationBox::type)
       .def_readonly("lengthA", &SimulationBox::lengthA)
@@ -112,9 +113,9 @@ PYBIND11_MODULE(raspalib, m)
            pybind11::arg("frameworkId"), pybind11::arg("forceField"), pybind11::arg("componentName"),
            pybind11::arg("simulationBox"), pybind11::arg("spaceGroupHallNumber"), pybind11::arg("definedAtoms"),
            pybind11::arg("numberOfUnitCells"))
-      .def(pybind11::init<size_t, const ForceField &, const std::string &, std::optional<const std::string>, int3>(),
+      .def(pybind11::init<size_t, const ForceField &, const std::string &, std::optional<const std::string>, int3, bool>(),
            pybind11::arg("frameworkId"), pybind11::arg("forceField"), pybind11::arg("componentName"),
-           pybind11::arg("fileName"), pybind11::arg("numberOfUnitCells"))
+           pybind11::arg("fileName"), pybind11::arg("numberOfUnitCells"), pybind11::arg("useChargesFromCIFFile"))
       .def_readonly("name", &Framework::name)
       .def("__repr__", &Framework::repr);
 
@@ -186,11 +187,11 @@ PYBIND11_MODULE(raspalib, m)
       .export_values();
 
   pybind11::class_<System>(m, "System")
-      .def(pybind11::init<size_t, std::optional<SimulationBox>, double, std::optional<double>, ForceField,
+      .def(pybind11::init<size_t, ForceField, std::optional<SimulationBox>, double, std::optional<double>, double,
                           std::vector<Framework>, std::vector<Component>, std::vector<size_t>, size_t,
                           MCMoveProbabilitiesSystem, std::optional<size_t>>(),
-           pybind11::arg("systemId"), pybind11::arg("simulationBox"), pybind11::arg("temperature"),
-           pybind11::arg("pressure"), pybind11::arg("forceField"), pybind11::arg("frameworkComponents"),
+           pybind11::arg("systemId"), pybind11::arg("forceField"), pybind11::arg("simulationBox"), pybind11::arg("temperature"),
+           pybind11::arg("pressure"), pybind11::arg("heliumVoidFraction"), pybind11::arg("frameworkComponents"),
            pybind11::arg("components"), pybind11::arg("initialNumberOfMolecules"), pybind11::arg("numberOfBlocks"),
            pybind11::arg("systemProbabilities"), pybind11::arg("sampleMoviesEvery"))
       .def("computeTotalEnergies", &System::computeTotalEnergies)

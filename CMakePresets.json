@@ -92,7 +92,7 @@
         "CMAKE_INSTALL_PREFIX": "/usr/local",
         "CMAKE_CXX_FLAGS_RELEASE": "-stdlib=libc++ -fvisibility=hidden -fexperimental-library -Xclang -fopenmp -g -O3 -fomit-frame-pointer -ffast-math",
         "OpenMP_CXX_FLAGS": "-Xclang -fopenmp",
-        "OpenMP_libomp_LIBRARY": "/opt/homebrew/Cellar/libomp/18.1.7/lib/libomp.a",
+        "OpenMP_libomp_LIBRARY": "/opt/homebrew/Cellar/libomp/18.1.8/lib/libomp.a",
         "CMAKE_BUILD_WITH_INSTALL_RPATH": true,
         "BUILD_MAC_PACKAGE": true,
         "BUILD_TESTING": true
@@ -119,7 +119,7 @@
         "CMAKE_INSTALL_PREFIX": "/usr/local",
         "CMAKE_CXX_FLAGS_DEBUG": "-stdlib=libc++ -fvisibility=hidden -fexperimental-library -Xclang -fopenmp -g3 -O0 -DDEBUG -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address -fsanitize=leak -fsanitize=undefined",
         "OpenMP_CXX_FLAGS": "-Xclang -fopenmp",
-        "OpenMP_libomp_LIBRARY": "/opt/homebrew/Cellar/libomp/18.1.7/lib/libomp.a",
+        "OpenMP_libomp_LIBRARY": "/opt/homebrew/Cellar/libomp/18.1.8/lib/libomp.a",
         "CMAKE_BUILD_WITH_INSTALL_RPATH": true,
         "BUILD_MAC_PACKAGE": true,
         "BUILD_TESTING": true

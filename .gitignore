@@ -182,6 +182,23 @@ pybind11/
 *.dll
 *.dylib
 
+## Core latex/pdflatex auxiliary files:
+*.aux
+*.bbl
+*.blg
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+manual/raspa-manual.pdf
+
 
 # Built files
 build/
