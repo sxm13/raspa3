@@ -28,6 +28,7 @@ if (LINUX)
                         ${BLAS_LIBRARIES}
                         ${LAPACK_LIBRARIES}
                         ${HDF5_CXX_LIBRARIES}
+                        ${HDF5_LIBRARIES}
                         OpenMP::OpenMP_CXX
                         GTest::gtest
                         GTest::gtest_main
@@ -38,6 +39,7 @@ if (LINUX)
                         -l:libc++abi.a
                         -lm
                         -ldl
+                        -lz
                         -lpthread
 )
 elseif (Win32)
