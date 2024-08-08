@@ -12,12 +12,14 @@ if (LINUX)
         ${BLAS_LIBRARIES}
         ${LAPACK_LIBRARIES}
         ${HDF5_CXX_LIBRARIES}
+        ${HDF5_LIBRARIES}
         OpenMP::OpenMP_CXX
         -nostdlib++
         -l:libc++.a
         -l:libc++abi.a
         -lm
         -ldl
+        -lz
         -lpthread
 )
 elseif (Win32)

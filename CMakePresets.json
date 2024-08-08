@@ -322,7 +322,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_DEB_PACKAGE": true,
-        "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6",
+        "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6, zlib1g",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
@@ -333,7 +333,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_DEB_PACKAGE": true,
-        "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6",
+        "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6, zlib1g",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
@@ -344,7 +344,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_DEB_PACKAGE": true,
-        "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6",
+        "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6, zlib1g",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
