@@ -102,7 +102,6 @@ jobs:
           image: ghcr.io/iraspa/rocky-7-llvm-18:latest
           options: -v ${{ github.workspace }}:/tmp2
           run: |
-            yum install -y rpm-build libstdc++
             git clone https://github.com/iraspa/raspa3
             cd raspa3
             cmake -B ${{github.workspace}}/build --preset linux-redhat-7
@@ -129,7 +128,6 @@ jobs:
           image: ghcr.io/iraspa/centos-6-llvm-18:latest
           options: -v ${{ github.workspace }}:/tmp2
           run: |
-            yum install -y rpm-build
             git clone https://github.com/iraspa/raspa3
             cd raspa3
             cmake -B ${{github.workspace}}/build --preset linux-redhat-6
@@ -235,7 +233,6 @@ jobs:
       - name: configure cmake raspa
         shell: bash
         run: |
-          apt install -y git
           cmake -B ${{github.workspace}}/build --preset linux-ubuntu-20
       - name: create raspa deb package
         shell: bash
@@ -302,16 +299,16 @@ jobs:
         run: |
           dnf update -y
           dnf install -y 'dnf-command(config-manager)'
-          dnf install -y --setopt=install_weak_deps=False  wget git rpm-build
-          dnf install -y --setopt=install_weak_deps=False  llvm lld cmake clang clang-tools-extra ninja-build
-          dnf install -y --setopt=install_weak_deps=False  libomp-devel libcxx libcxxabi libcxx-devel libcxxabi-devel libcxx-static libcxxabi-static
-          dnf install -y --setopt=install_weak_deps=False  lapack-devel lapack64 blas64
-          dnf install -y --setopt=install_weak_deps=False python3 python3-devel python3-pybind11
-          dnf install -y --setopt=install_weak_deps=False pybind11-devel
+          dnf install -y --setopt=install_weak_deps=False wget git rpm-build
+          dnf install -y --setopt=install_weak_deps=False llvm lld cmake clang clang-tools-extra ninja-build
+          dnf install -y --setopt=install_weak_deps=False libomp-devel libcxx libcxxabi libcxx-devel libcxxabi-devel libcxx-static libcxxabi-static
+          dnf install -y --setopt=install_weak_deps=False lapack-devel lapack64 blas64
+          dnf install -y --setopt=install_weak_deps=False python3 python3-devel python3-pybind11 pybind11-devel
+          dnf install -y --setopt=install_weak_deps=False zlib-ng zlib-ng-devel zlib-ng-compat zlib-ng-compat-devel zlib-ng-compat-static
           wget https://github.com/HDFGroup/hdf5/releases/download/hdf5_1.14.4.3/hdf5.tar.gz
           tar -zxvf hdf5.tar.gz
           cd hdf5-1.14.4-3
-          cmake -B build -GNinja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_INSTALL_PREFIX=/usr -DHDF5_BUILD_CPP_LIB=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -std=c++23 -stdlib=libc++" -DZLIB_LIBRARY=/usr/lib/x86_64-linux-gnu/libz.a -DHDF5_ENABLE_NONSTANDARD_FEATURE_FLOAT16=OFF
+          cmake -B build -GNinja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_INSTALL_PREFIX=/usr -DHDF5_BUILD_CPP_LIB=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -std=c++23 -stdlib=libc++" -DZLIB_LIBRARY=/usr/lib64/libz.a -DHDF5_ENABLE_NONSTANDARD_FEATURE_FLOAT16=OFF
           ninja -C build
           ninja -C build install
           cd ..
@@ -623,7 +620,6 @@ jobs:
           image: ghcr.io/iraspa/opensuse-leap-15.2-llvm-18:latest
           options: -v ${{ github.workspace }}:/tmp2
           run: |
-            yum install -y rpm-build
             git clone https://github.com/iraspa/raspa3
             cd raspa3
             cmake -B ${{github.workspace}}/build --preset linux-opensuse-leap-15.2
