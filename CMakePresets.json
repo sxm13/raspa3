@@ -291,6 +291,9 @@
       "cacheVariables": {
         "BUILD_DEB_PACKAGE": true,
         "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6, zlib1g",
+        "OpenMP_CXX_FLAGS": "-fopenmp",
+        "OpenMP_CXX_LIB_NAMES": "libomp",
+        "OpenMP_libomp_LIBRARY": "/usr/lib/llvm-14/lib/libomp.so.5",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
@@ -302,6 +305,9 @@
       "cacheVariables": {
         "BUILD_DEB_PACKAGE": true,
         "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6, zlib1g",
+        "OpenMP_CXX_FLAGS": "-fopenmp",
+        "OpenMP_CXX_LIB_NAMES": "libomp",
+        "OpenMP_libomp_LIBRARY": "/usr/lib/llvm-11/lib/libomp.so.5",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
@@ -313,6 +319,9 @@
       "cacheVariables": {
         "BUILD_DEB_PACKAGE": true,
         "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas3, liblapack3 , libquadmath0, libgfortran5, libgcc1, libomp5, libc6, zlib1g",
+        "OpenMP_CXX_FLAGS": "-fopenmp",
+        "OpenMP_CXX_LIB_NAMES": "libomp",
+        "OpenMP_libomp_LIBRARY": "/usr/lib/llvm-7/lib/libomp.so.5",
         "BUILD_PYTHON": true
       }
     },
@@ -334,6 +343,9 @@
       "cacheVariables": {
         "BUILD_DEB_PACKAGE": true,
         "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6, zlib1g",
+        "OpenMP_CXX_FLAGS": "-fopenmp",
+        "OpenMP_CXX_LIB_NAMES": "libomp",
+        "OpenMP_libomp_LIBRARY": "/usr/lib/llvm-14/lib/libomp.so.5",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
@@ -345,6 +357,9 @@
       "cacheVariables": {
         "BUILD_DEB_PACKAGE": true,
         "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6, zlib1g",
+        "OpenMP_CXX_FLAGS": "-fopenmp",
+        "OpenMP_CXX_LIB_NAMES": "libomp",
+        "OpenMP_libomp_LIBRARY": "/usr/lib/llvm-10/lib/libomp.so.5",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
