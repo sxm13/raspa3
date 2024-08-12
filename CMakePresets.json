@@ -178,7 +178,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "libblas3, liblapack3, libgfortran4, libquadmath0, libLLVM9, libomp9-devel, glibc, libgcc_s1",
+        "CPACK_RPM_PACKAGE_DEPENDS": "libblas3, liblapack3, libgfortran4, libquadmath0, libLLVM9, libomp9-devel, glibc, libgcc_s1, zlib",
         "BUILD_PYTHON": true
       }
     },
@@ -188,7 +188,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "libblas3, liblapack3, libgfortran4, libquadmath0, libLLVM12, libomp12-devel, glibc, libgcc_s1",
+        "CPACK_RPM_PACKAGE_DEPENDS": "libblas3, liblapack3, libgfortran4, libquadmath0, libLLVM12, libomp12-devel, glibc, libgcc_s1, zlib",
         "BUILD_PYTHON": true
       }
     },
@@ -198,7 +198,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "libblas3, liblapack3, libgfortran4, libquadmath0, libLLVM15, libedit0, libomp15-devel, glibc, libgcc_s1",
+        "CPACK_RPM_PACKAGE_DEPENDS": "libblas3, liblapack3, libgfortran4, libquadmath0, libLLVM15, libedit0, libomp15-devel, glibc, libgcc_s1, zlib",
         "BUILD_PYTHON": true
       }
     },
@@ -208,7 +208,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "libblas3, liblapack3, libgfortran4, libquadmath0, libLLVM17, libedit0, libomp17-devel, glibc, libgcc_s1",
+        "CPACK_RPM_PACKAGE_DEPENDS": "libblas3, liblapack3, libgfortran4, libquadmath0, libLLVM17, libedit0, libomp17-devel, glibc, libgcc_s1, zlib",
         "BUILD_PYTHON": true
       }
     },
@@ -218,7 +218,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "libblas3, liblapack3, libgfortran5, libquadmath0, libLLVM17, libedit0, libomp17-devel, glibc, libgcc_s1",
+        "CPACK_RPM_PACKAGE_DEPENDS": "libblas3, liblapack3, libgfortran5, libquadmath0, libLLVM17, libedit0, libomp17-devel, glibc, libgcc_s1, zlib",
         "BUILD_PYTHON": true
       }
     },
@@ -238,7 +238,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "blas, lapack, libgfortran, glibc",
+        "CPACK_RPM_PACKAGE_DEPENDS": "blas, lapack, libgfortran, glibc, zlib",
         "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=/usr/bin/ld.lld",
         "OpenMP_CXX_FLAGS": "-fopenmp",
         "OpenMP_CXX_LIB_NAMES": "libomp",
@@ -252,7 +252,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  glibc, libgcc",
+        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  glibc, libgcc, zlib",
         "OpenMP_CXX_FLAGS": "-fopenmp",
         "OpenMP_CXX_LIB_NAMES": "libomp",
         "OpenMP_libomp_LIBRARY": "/usr/lib/libomp.a",
@@ -267,7 +267,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath, libomp, glibc, libgcc",
+        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath, libomp, glibc, libgcc, zlib",
         "BLAS_LIBRARIES": "/usr/lib64/libblas64_.so.3",
         "LAPACK_LIBRARIES": "/usr/lib64/liblapack64_.so.3",
         "Python3_EXECUTABLE": "/usr/bin/python3",
@@ -280,7 +280,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc",
+        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc, zlib",
         "BUILD_PYTHON": true
       }
     },
@@ -290,7 +290,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_DEB_PACKAGE": true,
-        "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6",
+        "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6, zlib1g",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
@@ -301,7 +301,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_DEB_PACKAGE": true,
-        "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6",
+        "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas64-3, liblapack64-3 , libquadmath0, libgfortran5, libgcc-s1, libomp5, libc6, zlib1g",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
@@ -312,7 +312,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_DEB_PACKAGE": true,
-        "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas3, liblapack3 , libquadmath0, libgfortran5, libgcc1, libomp5, libc6",
+        "CPACK_DEBIAN_PACKAGE_DEPENDS": "libblas3, liblapack3 , libquadmath0, libgfortran5, libgcc1, libomp5, libc6, zlib1g",
         "BUILD_PYTHON": true
       }
     },
@@ -355,7 +355,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc",
+        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc, zlib",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
@@ -366,7 +366,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc",
+        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc, zlib",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
@@ -377,7 +377,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc",
+        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc, zlib",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
@@ -388,7 +388,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc",
+        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc, zlib",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
@@ -399,7 +399,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc",
+        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc, zlib",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
@@ -410,7 +410,7 @@
       "inherits": "linux",
       "cacheVariables": {
         "BUILD_RPM_PACKAGE": true,
-        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc",
+        "CPACK_RPM_PACKAGE_DEPENDS": "blas64, lapack64, libgfortran, libquadmath,  libomp, glibc, libgcc, zlib-ng-compat",
         "BLA_SIZEOF_INTEGER": "8",
         "BUILD_PYTHON": true
       }
