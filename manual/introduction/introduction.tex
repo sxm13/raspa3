@@ -171,6 +171,115 @@ These include packages for macOS (both intel and apple silicon), and many linux 
   \caption{List of available binary packages: Linux distributions based on Red Hat and OpenSUSE (rpm-packages), Debian (deb-packages), and Arch Linux (tar.zst packages), and installers for intel- and apple-silicon macs.}
   \label{fig: binary_packages}
 \end{figure}
+\begin{table}[p]
+  \scriptsize
+  \begin{tabularx}{\linewidth}{X}
+    \multicolumn{1}{c}{Archlinux}\\
+    \hline
+      \verb+pacman -Sy\verb+\\
+      \verb+pacman -S wget\verb+\\
+      \verb+wget https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1-x86_64.pkg.tar.zst+ \\
+      \verb+pacman -U ./raspa-3.0.0-1-x86_64.pkg.tar.zst+\\
+  \end{tabularx}
+  \newline
+\vspace*{0.5 cm}
+\newline
+  \begin{tabularx}{\linewidth}{c|X}
+  \multicolumn{2}{c}{Redhat}\\
+   \hline
+  9 & \verb+yum install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.el9.x86_64.rpm+\\
+     \hline
+  8 & \verb+yum install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.el8.x86_64.rpm+\\
+     \hline
+  7 & \verb+yum install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.el7.x86_64.rpm+\\
+     \hline
+  6 & \verb+yum install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.el6.x86_64.rpm+\\
+  \end{tabularx}
+  \newline
+\vspace*{0.5 cm}
+\newline
+  \begin{tabularx}{\linewidth}{c|X}
+  \multicolumn{2}{c}{Fedora}\\
+   \hline
+  40 & \verb+dnf install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.fc40.x86_64.rpm+\\
+     \hline
+  39 & \verb+dnf install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.fc39.x86_64.rpm+\\
+     \hline
+  38 & \verb+dnf install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.fc38.x86_64.rpm+\\
+     \hline
+  37 & \verb+dnf install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.fc37.x86_64.rpm+\\
+     \hline
+  36 & \verb+dnf install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.fc36.x86_64.rpm+\\
+     \hline
+  35 & \verb+dnf install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.fc35.x86_64.rpm+\\
+  \end{tabularx}
+  \newline
+\vspace*{0.5 cm}
+\newline
+  \begin{tabularx}{\linewidth}{X}
+    \multicolumn{1}{c}{OpenSUSE Tumbleweed (Signature verification failed: choose 'ignore')}\\
+   \hline
+    \verb+zypper update+\\
+    \verb+zypper install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.opensuse-tumbleweed.x86_64.rpm+\\
+  \end{tabularx}
+  \newline
+\vspace*{0.5 cm}
+\newline
+  \begin{tabularx}{\linewidth}{c|X}
+  \multicolumn{2}{c}{OpenSUSE Leap (Signature verification failed: choose 'ignore')}\\
+   \hline
+  15.5 & \verb+zypper install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.opensuse-leap-15.5.x86_64.rpm+\\
+     \hline
+  15.4 & \verb+zypper install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.opensuse-leap-15.4.x86_64.rpm+\\
+     \hline
+  15.3 & \verb+zypper install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.opensuse-leap-15.3.x86_64.rpm+\\
+     \hline
+  15.2 & \verb+zypper install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.opensuse-leap-15.2.x86_64.rpm+\\
+  \end{tabularx}
+  \newline
+\vspace*{0.5 cm}
+\newline
+  \begin{tabularx}{\linewidth}{c|X}
+  \multicolumn{2}{c}{Ubuntu}\\
+   \hline
+  24 & \verb+apt update+\\
+     & \verb+apt install wget+\\
+     & \verb+wget https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa_3.0.0_amd64-ubuntu-24.deb+\\
+     & \verb+apt install ./raspa_3.0.0_amd64-ubuntu-24.deb+\\
+     \hline
+  22 & \verb+apt update+\\
+     & \verb+apt install wget+\\
+     & \verb+wget https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa_3.0.0_amd64-ubuntu-22.deb+\\
+     & \verb+apt install ./raspa_3.0.0_amd64-ubuntu-22.deb+\\
+     \hline
+  20 & \verb+apt update+\\
+     & \verb+apt install wget+\\
+     & \verb+wget https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa_3.0.0_amd64-ubuntu-20.deb+\\
+     & \verb+apt install ./raspa_3.0.0_amd64-ubuntu-20.deb+\\
+  \end{tabularx}
+  \newline
+\vspace*{0.5 cm}
+\newline
+  \begin{tabularx}{\linewidth}{c|X}
+  \multicolumn{2}{c}{Debian}\\
+   \hline
+  12 & \verb+apt update+\\
+     & \verb+apt install wget+\\
+     & \verb+wget https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa_3.0.0_amd64-debian-12.deb+\\
+     & \verb+apt install ./raspa_3.0.0_amd64-debian-12.deb+\\
+     \hline
+  11 & \verb+apt update+\\
+     & \verb+apt install wget+\\
+     & \verb+wget https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa_3.0.0_amd64-debian-11.deb+\\
+     & \verb+apt install ./raspa_3.0.0_amd64-debian-11.deb+\\
+     \hline
+  10 & \verb+apt update+\\
+     & \verb+apt install wget+\\
+     & \verb+wget https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa_3.0.0_amd64-debian-10.deb+\\
+     & \verb+apt install ./raspa_3.0.0_amd64-debian-10.deb+\\
+  \end{tabularx}
+  \caption{Install instructions for binary packages.}
+\end{table}
 
 \subsection{Compiling RASPA}
 
@@ -280,6 +389,7 @@ dnf install -y python3 python3-devel python3-pybind11
 dnf install -y pybind11-devel hdf5
 \end{verbatim}
 
+
 \subsection{Running RASPA\label{Introduction: running RASPA}}
 Running RASPA is based on two files:
 \begin{itemize}
@@ -287,8 +397,8 @@ Running RASPA is based on two files:
   an example file is:
 \begin{verbatim}
 #! /bin/sh -f
-export RASPA_DIR=/usr/
-${RASPA_DIR}/bin/raspa3
+export RASPA_DIR=/usr/share/raspa3
+/usr/bin/raspa3
 \end{verbatim}
   This type of file is know as a 'shell script'. RASPA needs the variable 'RASPA\_DIR' to be set in order
   to look up the molecules, frameworks, etc. The scripts sets the variable and runs RASPA. RASPA can then be run
@@ -346,8 +456,8 @@ In order to run it on a cluster using a queuing system one needs an additional f
      #$ -V
      #$ -cwd
      echo $PBS_JOBID > jobid
-     exprot RASPA_DIR=/usr
-     $RASPA_DIR/bin/raspa3
+     export RASPA_DIR=/usr/share/raspa3
+     /usr/bin/raspa3
   \end{verbatim}
 The job can be submitted using 'qsub bsub.job'.
  \item{'torque'}
@@ -361,8 +471,8 @@ The job can be submitted using 'qsub bsub.job'.
      #PBS -mba
      cd $PBS_O_WORKDIR
      echo $PBS_JOBID > jobid
-     export RASPA_DIR=/usr
-     ${RASPA_DIR}/bin/raspa3
+     export RASPA_DIR=/usr/share/raspa3
+     /usr/bin/raspa3
   \end{verbatim}
 The job can be submitted using 'qsub bsub.job'.
  \item{'slurm'}
@@ -375,8 +485,8 @@ The job can be submitted using 'qsub bsub.job'.
   valhost=$SLURM_JOB_NODELIST
   echo $valhost > hostname
   module load slurm
-  export RASPA_DIR=/usr
-  ${RASPA_DIR}/bin/raspa3
+  export RASPA_DIR=/usr/share/raspa3
+  /usr/bin/raspa3
 \end{verbatim}
 The job can be submitted using 'sbatch bsub.job'.
 \end{itemize}
