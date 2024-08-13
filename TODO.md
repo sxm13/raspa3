@@ -1,16 +1,12 @@
- 1) read molecule
- 2) read framework
- 3) flexible molecules
- 4) quaternions for rigid
- 5) reaction ensemble
- 6) Molecular Dynamics
- 7) identity change
- 8) make routines cutoff-dependence for dual-cutoff method
- 9) polarization
-10) grids for rigid frameworks
-11) cell-lists for rigid frameworks
-12) partial molar volumes
-13) json https://github.com/nlohmann/json
+ 1) flexible molecules
+ 2) reaction ensemble
+ 3) identity change
+ 4) make routines cutoff-dependence for dual-cutoff method
+ 5) polarization
+ 6) grids for rigid frameworks
+ 7) cell-lists for rigid frameworks
+ 8) partial molar volumes
+ 9) zeo++-type calculations
 
 tests
 =====
