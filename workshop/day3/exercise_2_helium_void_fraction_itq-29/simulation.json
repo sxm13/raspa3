@@ -1,0 +1,31 @@
+{
+  "SimulationType" : "MonteCarlo",
+  "NumberOfCycles" : 100000,
+  "NumberOfInitializationCycles" : 1000,
+  "PrintEvery" : 5000,
+  
+  "Systems" : [
+    {
+      "Type" : "Framework",
+      "Name" : "ITQ-29",
+      "NumberOfUnitCells" : [2, 2, 2],
+      "ChargeMethod" : "None",
+      "CutOff": 11.8,
+      "ExternalTemperature" : 300.0
+    }
+  ],
+
+  "Components" : [ 
+    {
+      "Name" : "helium",
+      "WidomProbability" : 0.5,
+      "blockingPockets" : [
+           [0.0,       0.0,        0.0,       4.0],
+           [0.5,       0.0,        0.0,       0.5],
+           [0.0,       0.5,        0.0,       0.5],
+           [0.0,       0.0,        0.5,       0.5]
+         ],
+      "CreateNuMberofmolecules" : 1
+    }
+  ]
+}

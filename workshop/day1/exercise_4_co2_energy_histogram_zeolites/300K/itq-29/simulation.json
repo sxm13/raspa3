@@ -1,0 +1,43 @@
+{
+  "SimulationType" : "MonteCarlo",
+  "NumberOfCycles" : 100000,
+  "NumberOfInitializationCycles" : 1000,
+  "PrintEvery" : 5000,
+  
+  "Systems" : [
+    {
+      "Type" : "Framework",
+      "Name" : "ITQ-29",
+      "NumberOfUnitCells" : [2, 2, 2],
+      "ChargeMethod" : "Ewald",
+      "CutOff": 11.8,
+      "ExternalTemperature" : 300.0,
+
+      "OutputPDBMovie" : false,
+      "SampleMovieEvery" : 1,
+
+      "ComputeEnergyHistogram": true,
+      "NumberOfBinsEnergyHistogram" : 400,
+      "MininumRangeEnergyHistogram" : -5000.0,
+      "MaximumRangeEnergyHistogram" : 1000.0,
+      "SampleEnergyHistogramEvery" : 1,
+      "WriteEnergyHistogramEvery" : 5000
+    }
+  ],
+
+  "Components" : [ 
+    {
+      "Name" : "CO2",
+      "TranslationProbability" : 0.5,
+      "RotationProbability" : 0.5,
+      "ReinsertionProbability" : 0.5,
+      "blockingPockets" : [
+           [0.0,       0.0,        0.0,       4.0],
+           [0.5,       0.0,        0.0,       0.5],
+           [0.0,       0.5,        0.0,       0.5],
+           [0.0,       0.0,        0.5,       0.5]
+         ],
+      "CreateNuMberofmolecules" : 1
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "SimulationType" : "MonteCarlo",
+  "NumberOfCycles" : 100000,
+  "NumberOfInitializationCycles" : 1000,
+  "PrintEvery" : 5000,
+  
+  "Systems" : [
+    {
+      "Type" : "Framework",
+      "Name" : "ITQ-29",
+      "NumberOfUnitCells" : [2, 2, 2],
+      "ChargeMethod" : "Ewald",
+      "CutOff": 11.8,
+      "ExternalTemperature" : 600.0,
+
+      "OutputPDBMovie" : false,
+      "SampleMovieEvery" : 1,
+
+      "ComputeDensityGrid" : true,
+      "SampleDensityGridEvery" : 10,
+      "DensityGridSize" : [128, 128, 128],
+      "DensityGridPseudoAtomsList" : ["O_co2"]
+    }
+  ],
+
+  "Components" : [ 
+    {
+      "Name" : "CO2",
+      "TranslationProbability" : 0.5,
+      "RotationProbability" : 0.5,
+      "ReinsertionProbability" : 0.5,
+      "blockingPockets" : [
+           [0.0,       0.0,        0.0,       4.0],
+           [0.5,       0.0,        0.0,       0.5],
+           [0.0,       0.5,        0.0,       0.5],
+           [0.0,       0.0,        0.5,       0.5]
+         ],
+      "CreateNuMberofmolecules" : 1
+    }
+  ]
+}

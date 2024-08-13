@@ -1,0 +1,27 @@
+{
+  "SimulationType" : "MonteCarlo",
+  "NumberOfCycles" : 1000,
+  "NumberOfInitializationCycles" : 500,
+  "PrintEvery" : 100,
+  
+  "Systems" : 
+  [
+    {
+      "Type" : "Box",
+      "BoxLengths" : [30.0, 30.0, 30.0],
+      "ExternalTemperature" : 300.0,
+      "ChargeMethod" : "None",
+      "OutputPDBMovie" : true,
+      "SampleMovieEvery" : 10
+    }
+  ],
+
+  "Components" : 
+  [ 
+    {
+      "Name" : "methane",
+      "TranslationProbability" : 1.0,
+      "CreateNumberOfMolecules" : 30
+    }
+  ]
+}

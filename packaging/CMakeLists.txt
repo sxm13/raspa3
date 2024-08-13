@@ -16,7 +16,7 @@ set(CPACK_RESOURCE_FILE_README ${CMAKE_SOURCE_DIR}/packaging/readme.txt)
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/packaging/license.txt)
 set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
 set(CPACK_STRIP_FILES ON)
-set(CPACK_COMPONENTS_ALL app examples-basic forcefields molecules manual python)
+set(CPACK_COMPONENTS_ALL app examples-basic workshop forcefields molecules manual python)
 
 include(CPack)
 
