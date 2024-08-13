@@ -79,26 +79,27 @@ std::string RunningEnergy::printMCDiff(RunningEnergy& other) const
   RunningEnergy drift = *this - other;
   double conv = Units::EnergyToKelvin;
 
-  std::print(stream, "Energy statistics           | unit |    Energy     |  Recomputed   |     Drift     |\n");
-  std::print(stream, "====================================================================================\n");
-  std::print(stream, "Total potential energy      | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * potentialEnergy(), conv * other.potentialEnergy(), conv * drift.potentialEnergy());
-  std::print(stream, "    external field VDW      | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * externalFieldVDW, conv * other.externalFieldVDW, conv * drift.externalFieldVDW);
-  std::print(stream, "    external field Real     | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * externalFieldCharge, conv * other.externalFieldCharge, conv * drift.externalFieldCharge);
-  std::print(stream, "    framework-molecule VDW  | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * frameworkMoleculeVDW, conv * other.frameworkMoleculeVDW, conv * drift.frameworkMoleculeVDW);
-  std::print(stream, "    framework-molecule Real | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * frameworkMoleculeCharge, conv * other.frameworkMoleculeCharge, conv * drift.frameworkMoleculeCharge);
-  std::print(stream, "    molecule-molecule VDW   | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * moleculeMoleculeVDW, conv * other.moleculeMoleculeVDW, conv * drift.moleculeMoleculeVDW);
-  std::print(stream, "    molecule-molecule Real  | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * moleculeMoleculeCharge, conv * other.moleculeMoleculeCharge, conv * drift.moleculeMoleculeCharge);
-  std::print(stream, "    Van der Waals (Tail):   | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * tail, conv * other.tail, conv * drift.tail);
-  std::print(stream, "    Ewald Fourier           | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * ewald_fourier, conv * other.ewald_fourier, conv * drift.ewald_fourier);
-  std::print(stream, "    Ewald self              | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * ewald_self, conv * other.ewald_self, conv * drift.ewald_self);
-  std::print(stream, "    Ewald exclusion         | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * ewald_exclusion, conv * other.ewald_exclusion, conv * drift.ewald_exclusion);
-  std::print(stream, "    intra VDW               | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * intraVDW, conv * other.intraVDW, conv * drift.intraVDW);
-  std::print(stream, "    intra Coulombic         | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * intraCoul, conv * other.intraCoul, conv * drift.intraCoul);
-  std::print(stream, "    polarization            | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * polarization, conv * other.polarization, conv * drift.polarization);
-  std::print(stream, "    dU/dlambda VDW          | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * dudlambdaVDW, conv * other.dudlambdaVDW, conv * drift.dudlambdaVDW);
-  std::print(stream, "    dU/dlambda Real         | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * dudlambdaCharge, conv * other.dudlambdaCharge, conv * drift.dudlambdaCharge);
-  std::print(stream, "    dU/dlambda Ewald        | [K]  | {:13.6e} | {:13.6e} | {:13.6e} |\n", conv * dudlambdaEwald, conv * other.dudlambdaEwald, conv * drift.dudlambdaEwald);
-  std::print(stream, "------------------------------------------------------------------------------------\n");
+  std::print(stream, "\n");
+  std::print(stream, "Energy statistics           |    Energy [K] | Recomputed [K] |     Drift [K] |\n");
+  std::print(stream, "=============================================================================\n");
+  std::print(stream, "Total potential energy      | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * potentialEnergy(), conv * other.potentialEnergy(), conv * drift.potentialEnergy());
+  std::print(stream, "    external field VDW      | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * externalFieldVDW, conv * other.externalFieldVDW, conv * drift.externalFieldVDW);
+  std::print(stream, "    external field Real     | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * externalFieldCharge, conv * other.externalFieldCharge, conv * drift.externalFieldCharge);
+  std::print(stream, "    framework-molecule VDW  | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * frameworkMoleculeVDW, conv * other.frameworkMoleculeVDW, conv * drift.frameworkMoleculeVDW);
+  std::print(stream, "    framework-molecule Real | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * frameworkMoleculeCharge, conv * other.frameworkMoleculeCharge, conv * drift.frameworkMoleculeCharge);
+  std::print(stream, "    molecule-molecule VDW   | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * moleculeMoleculeVDW, conv * other.moleculeMoleculeVDW, conv * drift.moleculeMoleculeVDW);
+  std::print(stream, "    molecule-molecule Real  | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * moleculeMoleculeCharge, conv * other.moleculeMoleculeCharge, conv * drift.moleculeMoleculeCharge);
+  std::print(stream, "    Van der Waals (Tail):   | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * tail, conv * other.tail, conv * drift.tail);
+  std::print(stream, "    Ewald Fourier           | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * ewald_fourier, conv * other.ewald_fourier, conv * drift.ewald_fourier);
+  std::print(stream, "    Ewald self              | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * ewald_self, conv * other.ewald_self, conv * drift.ewald_self);
+  std::print(stream, "    Ewald exclusion         | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * ewald_exclusion, conv * other.ewald_exclusion, conv * drift.ewald_exclusion);
+  std::print(stream, "    intra VDW               | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * intraVDW, conv * other.intraVDW, conv * drift.intraVDW);
+  std::print(stream, "    intra Coulombic         | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * intraCoul, conv * other.intraCoul, conv * drift.intraCoul);
+  std::print(stream, "    polarization            | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * polarization, conv * other.polarization, conv * drift.polarization);
+  std::print(stream, "    dU/dlambda VDW          | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * dudlambdaVDW, conv * other.dudlambdaVDW, conv * drift.dudlambdaVDW);
+  std::print(stream, "    dU/dlambda Real         | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * dudlambdaCharge, conv * other.dudlambdaCharge, conv * drift.dudlambdaCharge);
+  std::print(stream, "    dU/dlambda Ewald        | {: 13.6e} |  {: 13.6e} | {: 13.6e} |\n", conv * dudlambdaEwald, conv * other.dudlambdaEwald, conv * drift.dudlambdaEwald);
+  std::print(stream, "-----------------------------------------------------------------------------\n");
 
   return stream.str();
 

@@ -725,11 +725,11 @@ TEST(electrostatic_field, Test_2_CO2_in_ITQ_29_2x2x2_difference_Ewald)
   //std::cout << "Running energy difference: " << energy_difference.ewald << std::endl;
   //std::cout << "energy before - after: " << energy_after.ewald - energy_before.ewald << std::endl;
 
-  double tolerance = 1e-5;
-  for(size_t i = 0; i < moleculeElectricFieldAfter.size(); ++i)
-  {
-    std::cout << "i: " << i << " " << moleculeElectricFieldBefore[i].x - moleculeElectricFieldAfter[i].x << " " << moleculeElectricFieldDiff[i].x << std::endl;
-    std::cout << "i: " << i << " " << moleculeElectricFieldBefore[i].y - moleculeElectricFieldAfter[i].y << " " << moleculeElectricFieldDiff[i].y << std::endl;
-    std::cout << "i: " << i << " " << moleculeElectricFieldBefore[i].z - moleculeElectricFieldAfter[i].z << " " << moleculeElectricFieldDiff[i].z << std::endl;
-  }
+  //double tolerance = 1e-5;
+  //for(size_t i = 0; i < moleculeElectricFieldAfter.size(); ++i)
+  //{
+  //  std::cout << "i: " << i << " " << moleculeElectricFieldBefore[i].x - moleculeElectricFieldAfter[i].x << " " << moleculeElectricFieldDiff[i].x << std::endl;
+  //  std::cout << "i: " << i << " " << moleculeElectricFieldBefore[i].y - moleculeElectricFieldAfter[i].y << " " << moleculeElectricFieldDiff[i].y << std::endl;
+  //  std::cout << "i: " << i << " " << moleculeElectricFieldBefore[i].z - moleculeElectricFieldAfter[i].z << " " << moleculeElectricFieldDiff[i].z << std::endl;
+  //}
 }
