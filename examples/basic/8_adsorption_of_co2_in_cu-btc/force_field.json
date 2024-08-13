@@ -1,12 +1,12 @@
 {
   "PseudoAtoms" :
   [
-    {"name" : "Cu",    "print_to_output" : true,  "element" : "Cu", "print_as" : "Cu", "mass" : 63.546039732,  "charge" :  1.248},
-    {"name" : "O",     "print_to_output" : true,  "element" : "O",  "print_as" : "O",  "mass" : 15.999404927,  "charge" : -0.624},
-    {"name" : "C",     "print_to_output" : true,  "element" : "C",  "print_as" : "C",  "mass" : 12.010735897,  "charge" :  0.494},
-    {"name" : "C",     "print_to_output" : true,  "element" : "C",  "print_as" : "C",  "mass" : 12.010735897,  "charge" :  0.13},
-    {"name" : "C",     "print_to_output" : true,  "element" : "C",  "print_as" : "C",  "mass" : 12.010735897,  "charge" : -0.156},
-    {"name" : "H",     "print_to_output" : true,  "element" : "H",  "print_as" : "H",  "mass" : 1.007940754,   "charge" :  0.156},
+    {"name" : "Cu1",    "print_to_output" : true,  "element" : "Cu", "print_as" : "Cu", "mass" : 63.546039732,  "charge" :  1.248},
+    {"name" : "O1",     "print_to_output" : true,  "element" : "O",  "print_as" : "O",  "mass" : 15.999404927,  "charge" : -0.624},
+    {"name" : "C1",     "print_to_output" : true,  "element" : "C",  "print_as" : "C",  "mass" : 12.010735897,  "charge" :  0.494},
+    {"name" : "C2",     "print_to_output" : true,  "element" : "C",  "print_as" : "C",  "mass" : 12.010735897,  "charge" :  0.13},
+    {"name" : "C3",     "print_to_output" : true,  "element" : "C",  "print_as" : "C",  "mass" : 12.010735897,  "charge" : -0.156},
+    {"name" : "H1",     "print_to_output" : true,  "element" : "H",  "print_as" : "H",  "mass" : 1.007940754,   "charge" :  0.156},
     {"name" : "He",    "print_to_output" : true,  "element" : "He", "print_as" : "He", "mass" : 4.002602,      "charge" :  0.0},
     {"name" : "CH4",   "print_to_output" : true,  "element" : "C",  "print_as" : "C",  "mass" : 16.04246,      "charge" :  0.0},
     {"name" : "C_co2", "print_to_output" : true,  "element" : "C",  "print_as" : "C",  "mass" : 12.0,          "charge" :  0.6512},
@@ -15,25 +15,37 @@
   "SelfInteractions" : 
   [
     {
-      "name" : "Cu",
+      "name" : "Cu1",
       "type" : "lennard-jones",    
       "parameters" : [2.5161, 3.11369],
       "source" : "UFF"
     },
     {
-      "name" : "O",
+      "name" : "O1",
       "type" : "lennard-jones",    
       "parameters" : [48.1581, 3.03315],
       "source" : "DREIDING S.L. Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909"
     },
     {
-      "name" : "C",
+      "name" : "C1",
       "type" : "lennard-jones",    
       "parameters" : [47.8562, 3.47299],
       "source" : "DREIDING S.L. Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909"
     },
     {
-      "name" : "H",
+      "name" : "C2",
+      "type" : "lennard-jones",    
+      "parameters" : [47.8562, 3.47299],
+      "source" : "DREIDING S.L. Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909"
+    },
+    {
+      "name" : "C3",
+      "type" : "lennard-jones",    
+      "parameters" : [47.8562, 3.47299],
+      "source" : "DREIDING S.L. Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909"
+    },
+    {
+      "name" : "H1",
       "type" : "lennard-jones",    
       "parameters" : [7.64893, 2.84642],
       "source" : "DREIDING S.L. Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909"
