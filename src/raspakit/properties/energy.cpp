@@ -231,13 +231,13 @@ std::string PropertyEnergy::writeAveragesStatistics(bool externalField, std::vec
       double prefactor = Units::EnergyToKelvin;
       if (k == l)
       {
-        std::print(stream, "    Framework-molecule energy {}-{} [{}-{}]:\n", k, l, components[k].name,
+        std::print(stream, "    Framework-molecule energy {}-{} [{}-{}]:\n", k, l, frameworkComponents[k].name,
                    components[l].name);
       }
       else
       {
         prefactor *= 2.0;
-        std::print(stream, "    Framework-molecule energy {}-{} + {}-{} [{}-{}]:\n", k, l, l, k, components[k].name,
+        std::print(stream, "    Framework-molecule energy {}-{} + {}-{} [{}-{}]:\n", k, l, l, k, frameworkComponents[k].name,
                    components[l].name);
       }
       std::print(stream, "    ---------------------------------------------------------------------------\n");
@@ -266,12 +266,12 @@ std::string PropertyEnergy::writeAveragesStatistics(bool externalField, std::vec
       double prefactor = Units::EnergyToKelvin;
       if (k == l)
       {
-        std::print(stream, "    Van der Waals energy {}-{} [{}-{}]:\n", k, l, components[k].name, components[l].name);
+        std::print(stream, "    Van der Waals energy {}-{} [{}-{}]:\n", k, l, frameworkComponents[k].name, components[l].name);
       }
       else
       {
         prefactor *= 2.0;
-        std::print(stream, "    Van der Waals energy {}-{} + {}-{} [{}-{}]:\n", k, l, l, k, components[k].name,
+        std::print(stream, "    Van der Waals energy {}-{} + {}-{} [{}-{}]:\n", k, l, l, k, frameworkComponents[k].name,
                    components[l].name);
       }
       std::print(stream, "    ---------------------------------------------------------------------------\n");
@@ -296,13 +296,13 @@ std::string PropertyEnergy::writeAveragesStatistics(bool externalField, std::vec
       double prefactor = Units::EnergyToKelvin;
       if (k == l)
       {
-        std::print(stream, "    VDW Tail-Correction energy {}-{} [{}-{}]:\n", k, l, components[k].name,
+        std::print(stream, "    VDW Tail-Correction energy {}-{} [{}-{}]:\n", k, l, frameworkComponents[k].name,
                    components[l].name);
       }
       else
       {
         prefactor *= 2.0;
-        std::print(stream, "    VDW Tail-Correction energy {}-{} + {}-{} [{}-{}]:\n", k, l, l, k, components[k].name,
+        std::print(stream, "    VDW Tail-Correction energy {}-{} + {}-{} [{}-{}]:\n", k, l, l, k, frameworkComponents[k].name,
                    components[l].name);
       }
       std::print(stream, "    ---------------------------------------------------------------------------\n");
@@ -327,12 +327,12 @@ std::string PropertyEnergy::writeAveragesStatistics(bool externalField, std::vec
       double prefactor = Units::EnergyToKelvin;
       if (k == l)
       {
-        std::print(stream, "    Coulomb Real energy {}-{} [{}-{}]:\n", k, l, components[k].name, components[l].name);
+        std::print(stream, "    Coulomb Real energy {}-{} [{}-{}]:\n", k, l, frameworkComponents[k].name, components[l].name);
       }
       else
       {
         prefactor *= 2.0;
-        std::print(stream, "    Coulomb Real energy {}-{} + {}-{} [{}-{}]:\n", k, l, l, k, components[k].name,
+        std::print(stream, "    Coulomb Real energy {}-{} + {}-{} [{}-{}]:\n", k, l, l, k, frameworkComponents[k].name,
                    components[l].name);
       }
       std::print(stream, "    ---------------------------------------------------------------------------\n");
@@ -357,12 +357,12 @@ std::string PropertyEnergy::writeAveragesStatistics(bool externalField, std::vec
       double prefactor = Units::EnergyToKelvin;
       if (k == l)
       {
-        std::print(stream, "    Coulomb Fourier energy {}-{} [{}-{}]:\n", k, l, components[k].name, components[l].name);
+        std::print(stream, "    Coulomb Fourier energy {}-{} [{}-{}]:\n", k, l, frameworkComponents[k].name, components[l].name);
       }
       else
       {
         prefactor *= 2.0;
-        std::print(stream, "    Coulomb Fourier energy {}-{} + {}-{} [{}-{}]:\n", k, l, l, k, components[k].name,
+        std::print(stream, "    Coulomb Fourier energy {}-{} + {}-{} [{}-{}]:\n", k, l, l, k, frameworkComponents[k].name,
                    components[l].name);
       }
       std::print(stream, "    ---------------------------------------------------------------------------\n");

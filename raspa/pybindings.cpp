@@ -181,7 +181,6 @@ PYBIND11_MODULE(raspalib, m)
       .def("__repr__", &Component::repr);
 
   pybind11::enum_<Component::Type>(component, "Type")
-      .value("Framework", Component::Type::Framework)
       .value("Adsorbate", Component::Type::Adsorbate)
       .value("Cation", Component::Type::Cation)
       .export_values();

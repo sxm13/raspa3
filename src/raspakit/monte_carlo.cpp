@@ -566,7 +566,7 @@ void MonteCarlo::output()
     std::print(
         stream, "{}",
         system.averageEnthalpiesOfAdsorption.writeAveragesStatistics(system.swappableComponents, system.components));
-    std::print(stream, "{}", system.averageLoadings.writeAveragesStatistics(system.components, system.frameworkMass));
+    std::print(stream, "{}", system.averageLoadings.writeAveragesStatistics(system.components, system.frameworkMass()));
 
     // json statistics
     outputJsons[system.systemId]["output"]["runningEnergies"] = system.runningEnergies.jsonMC();

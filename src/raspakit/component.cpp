@@ -492,6 +492,15 @@ std::string Component::printStatus(const ForceField &forceField) const
 
   std::print(stream, "Component {} [{}]\n\n", componentId, name);
 
+  if(type == Component::Type::Adsorbate)
+  {
+    std::print(stream, "    Type: Adsorbate\n\n");
+  }
+  else if(type == Component::Type::Cation)
+  {
+    std::print(stream, "    Type: Cation\n\n");
+  }
+
   std::print(stream, "    Critical temperature:  {} [K]\n", criticalTemperature);
   std::print(stream, "    Critical pressure:     {} [Pa]\n", criticalPressure);
   std::print(stream, "    Acentric factor:       {} [-]\n\n", acentricFactor);

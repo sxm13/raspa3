@@ -53,27 +53,16 @@ std::string Loadings::printStatus(const Component &comp, std::optional<double> f
 
     const double toMolePerKg = 1000.0 / frameworkMass.value();
     const double toMgPerG = 1000.0 * comp.totalMass / frameworkMass.value();
-    const double densityConversionFactor =
-        1.0 / (1000.0 * Units::Angstrom * Units::Angstrom * Units::Angstrom * Units::AvogadroConstant);
 
-    switch (comp.type)
-    {
-      case Component::Type::Framework:
-        std::print(stream, "    framework density:   {: .6e} kg/m^3\n",
-                   densityConversionFactor * comp.totalMass * numberDensities[comp.componentId]);
-        break;
-      default:
-        double loading = numberOfMolecules[comp.componentId];
-        std::print(stream, "    absolute adsorption: {: .6e} molecules\n", loading);
-        std::print(stream, "                         {: .6e} mol/kg-framework\n", loading * toMolePerKg);
-        std::print(stream, "                         {: .6e} mg/g-framework\n", loading * toMgPerG);
+    double loading = numberOfMolecules[comp.componentId];
+    std::print(stream, "    absolute adsorption: {: .6e} molecules\n", loading);
+    std::print(stream, "                         {: .6e} mol/kg-framework\n", loading * toMolePerKg);
+    std::print(stream, "                         {: .6e} mg/g-framework\n", loading * toMgPerG);
 
-        double excess_loading = numberOfMolecules[comp.componentId] - comp.amountOfExcessMolecules;
-        std::print(stream, "    excess adsorption:   {: .6e} molecules\n", excess_loading);
-        std::print(stream, "                         {: .6e} mol/kg-framework\n", excess_loading * toMolePerKg);
-        std::print(stream, "                         {: .6e} mg/g-framework\n", excess_loading * toMgPerG);
-        break;
-    }
+    double excess_loading = numberOfMolecules[comp.componentId] - comp.amountOfExcessMolecules;
+    std::print(stream, "    excess adsorption:   {: .6e} molecules\n", excess_loading);
+    std::print(stream, "                         {: .6e} mol/kg-framework\n", excess_loading * toMolePerKg);
+    std::print(stream, "                         {: .6e} mg/g-framework\n", excess_loading * toMgPerG);
   }
   else
   {
@@ -98,39 +87,28 @@ std::string Loadings::printStatus(const Component &comp, const Loadings &average
   {
     const double toMolePerKg = 1000.0 / frameworkMass.value();
     const double toMgPerKg = 1000.0 * comp.totalMass / frameworkMass.value();
-    const double densityConversionFactor =
-        1.0 / (1000.0 * Units::Angstrom * Units::Angstrom * Units::Angstrom * Units::AvogadroConstant);
 
     std::print(stream, "Component {} ({})\n", comp.componentId, comp.name);
 
-    switch (comp.type)
-    {
-      case Component::Type::Framework:
-        std::print(stream, "    density:   {: .6e} kg/m^3\n",
-                   densityConversionFactor * comp.totalMass * numberDensities[comp.componentId]);
-        break;
-      default:
-        double loading = numberOfMolecules[comp.componentId];
-        double loading_avg = average.numberOfMolecules[comp.componentId];
-        double loading_error = error.numberOfMolecules[comp.componentId];
-        std::print(stream, "    absolute adsorption: {:.6e} molecules ({:.6e} +/- {:.6e})]\n", loading, loading_avg,
-                   loading_error);
-        std::print(stream, "                         {:.6e} mol/kg    ({:.6e} +/- {:.6e})]\n", loading * toMolePerKg,
-                   loading_avg * toMolePerKg, loading_error * toMolePerKg);
-        std::print(stream, "                         {:.6e} mg/g      ({:.6e} +/- {:.6e})]\n", loading * toMgPerKg,
-                   loading_avg * toMgPerKg, loading_error * toMgPerKg);
+    double loading = numberOfMolecules[comp.componentId];
+    double loading_avg = average.numberOfMolecules[comp.componentId];
+    double loading_error = error.numberOfMolecules[comp.componentId];
+    std::print(stream, "    absolute adsorption: {:.6e} molecules ({:.6e} +/- {:.6e})]\n", loading, loading_avg,
+               loading_error);
+    std::print(stream, "                         {:.6e} mol/kg    ({:.6e} +/- {:.6e})]\n", loading * toMolePerKg,
+               loading_avg * toMolePerKg, loading_error * toMolePerKg);
+    std::print(stream, "                         {:.6e} mg/g      ({:.6e} +/- {:.6e})]\n", loading * toMgPerKg,
+               loading_avg * toMgPerKg, loading_error * toMgPerKg);
 
-        double excess_loading = numberOfMolecules[comp.componentId] - comp.amountOfExcessMolecules;
-        double excess_loading_avg = average.numberOfMolecules[comp.componentId] - comp.amountOfExcessMolecules;
-        double excess_loading_error = error.numberOfMolecules[comp.componentId];
-        std::print(stream, "    excess adsorption:   {:.6e} molecules ({:.6e} +/- {:.6e})]\n", excess_loading,
-                   excess_loading_avg, excess_loading_error);
-        std::print(stream, "                         {:.6e} mol/kg    ({:.6e} +/- {:.6e})]\n",
-                   excess_loading * toMolePerKg, excess_loading_avg * toMolePerKg, excess_loading_error * toMolePerKg);
-        std::print(stream, "                         {:.6e} mg/g      ({:.6e} +/- {:.6e})]\n",
-                   excess_loading * toMgPerKg, excess_loading_avg * toMgPerKg, excess_loading_error * toMgPerKg);
-        break;
-    }
+    double excess_loading = numberOfMolecules[comp.componentId] - comp.amountOfExcessMolecules;
+    double excess_loading_avg = average.numberOfMolecules[comp.componentId] - comp.amountOfExcessMolecules;
+    double excess_loading_error = error.numberOfMolecules[comp.componentId];
+    std::print(stream, "    excess adsorption:   {:.6e} molecules ({:.6e} +/- {:.6e})]\n", excess_loading,
+               excess_loading_avg, excess_loading_error);
+    std::print(stream, "                         {:.6e} mol/kg    ({:.6e} +/- {:.6e})]\n",
+               excess_loading * toMolePerKg, excess_loading_avg * toMolePerKg, excess_loading_error * toMolePerKg);
+    std::print(stream, "                         {:.6e} mg/g      ({:.6e} +/- {:.6e})]\n",
+               excess_loading * toMgPerKg, excess_loading_avg * toMgPerKg, excess_loading_error * toMgPerKg);
   }
   else
   {

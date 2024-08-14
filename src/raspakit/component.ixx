@@ -65,9 +65,8 @@ export struct Component
 {
   enum class Type : size_t
   {
-    Framework = 0,
-    Adsorbate = 1,
-    Cation = 2
+    Adsorbate = 0,
+    Cation = 1
   };
 
   enum class GrowType : size_t

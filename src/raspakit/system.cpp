@@ -178,7 +178,6 @@ System::System(size_t id, ForceField forcefield, std::optional<SimulationBox> bo
   determineFractionalComponents();
   rescaleMoveProbabilities();
   rescaleMolarFractions();
-  computeFrameworkDensity();
   computeNumberOfPseudoAtoms();
 
   createFrameworks();
@@ -226,8 +225,29 @@ void System::createFrameworks()
     numberOfFrameworkAtoms += atoms.size();
     numberOfRigidFrameworkAtoms += atoms.size();
     netChargeFramework += framework.netCharge;
+    netCharge += framework.netCharge;
   }
 }
+
+std::optional<double> System::frameworkMass() const
+{
+  if(frameworkComponents.empty()) return std::nullopt;
+
+  double mass = 0.0;
+  for (const Framework& framework : frameworkComponents)
+  {
+    mass += framework.mass;
+  }
+  for (size_t i = 0; i < components.size(); ++i)
+  {
+    if(components[i].type == Component::Type::Cation)
+    {
+      mass += components[i].totalMass * static_cast<double>(numberOfIntegerMoleculesPerComponent[i]);
+    }
+  }
+  return mass;
+}
+
 
 void System::determineSimulationBox()
 {
@@ -827,13 +847,6 @@ void System::rescaleMolarFractions()
   }
 }
 
-void System::computeFrameworkDensity()
-{
-  for (Framework& frameworkComponent : frameworkComponents)
-  {
-    frameworkMass = frameworkMass.value_or(0.0) + frameworkComponent.mass;
-  }
-}
 
 void System::computeNumberOfPseudoAtoms()
 {
@@ -939,7 +952,7 @@ std::string System::writeInitializationStatusReport(size_t currentCycle, size_t 
   std::print(stream, "-------------------------------------------------------------------------------\n");
   for (const Component& c : components)
   {
-    std::print(stream, "{}", loadings.printStatus(c, frameworkMass));
+    std::print(stream, "{}", loadings.printStatus(c, frameworkMass()));
   }
   std::print(stream, "\n");
 
@@ -986,7 +999,7 @@ std::string System::writeEquilibrationStatusReportMC(size_t currentCycle, size_t
   std::print(stream, "-------------------------------------------------------------------------------\n");
   for (const Component& c : components)
   {
-    std::print(stream, "{}", loadings.printStatus(c, frameworkMass));
+    std::print(stream, "{}", loadings.printStatus(c, frameworkMass()));
   }
   std::print(stream, "\n");
 
@@ -1064,7 +1077,7 @@ std::string System::writeEquilibrationStatusReportMD(size_t currentCycle, size_t
   std::print(stream, "-------------------------------------------------------------------------------\n");
   for (const Component& c : components)
   {
-    std::print(stream, "{}", loadings.printStatus(c, frameworkMass));
+    std::print(stream, "{}", loadings.printStatus(c, frameworkMass()));
   }
   std::print(stream, "\n");
 
@@ -1109,7 +1122,7 @@ std::string System::writeProductionStatusReportMC(size_t currentCycle, size_t nu
   std::pair<Loadings, Loadings> loadingData = averageLoadings.averageLoading();
   for (const Component& c : components)
   {
-    std::print(stream, "{}", loadings.printStatus(c, loadingData.first, loadingData.second, frameworkMass));
+    std::print(stream, "{}", loadings.printStatus(c, loadingData.first, loadingData.second, frameworkMass()));
   }
   std::print(stream, "\n");
   double conv = Units::EnergyToKelvin;
@@ -1316,7 +1329,7 @@ std::string System::writeProductionStatusReportMD(size_t currentCycle, size_t nu
   std::pair<Loadings, Loadings> loadingData = averageLoadings.averageLoading();
   for (const Component& c : components)
   {
-    std::print(stream, "{}", loadings.printStatus(c, loadingData.first, loadingData.second, frameworkMass));
+    std::print(stream, "{}", loadings.printStatus(c, loadingData.first, loadingData.second, frameworkMass()));
   }
   std::print(stream, "\n");
 
@@ -2482,7 +2495,6 @@ Archive<std::ofstream>& operator<<(Archive<std::ofstream>& archive, const System
   archive << s.hasExternalField;
   archive << s.numberOfPseudoAtoms;
   archive << s.totalNumberOfPseudoAtoms;
-  archive << s.frameworkMass;
   archive << s.translationalCenterOfMassConstraint;
   archive << s.translationalDegreesOfFreedom;
   archive << s.rotationalDegreesOfFreedom;
@@ -2589,7 +2601,6 @@ Archive<std::ifstream>& operator>>(Archive<std::ifstream>& archive, System& s)
   archive >> s.hasExternalField;
   archive >> s.numberOfPseudoAtoms;
   archive >> s.totalNumberOfPseudoAtoms;
-  archive >> s.frameworkMass;
   archive >> s.translationalCenterOfMassConstraint;
   archive >> s.translationalDegreesOfFreedom;
   archive >> s.rotationalDegreesOfFreedom;

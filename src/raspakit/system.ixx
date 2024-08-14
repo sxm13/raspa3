@@ -191,7 +191,7 @@ export struct System
   size_t translationalDegreesOfFreedom{};
   size_t rotationalDegreesOfFreedom{};
 
-  std::optional<double> frameworkMass{};
+  std::optional<double> frameworkMass() const;
 
   double timeStep{0.0005};
 
@@ -381,7 +381,6 @@ export struct System
   void determineFractionalComponents();
   void rescaleMolarFractions();
   void computeComponentFluidProperties();
-  void computeFrameworkDensity();
   void computeNumberOfPseudoAtoms();
   void optimizeMCMoves();
 
@@ -398,14 +397,6 @@ export struct System
   nlohmann::json jsonSystemStatus() const;
   nlohmann::json jsonComponentStatus() const;
   nlohmann::json jsonMCMoveStatistics() const;
-
-  std::vector<Component> nonFrameworkComponents()
-  {
-    std::vector<Component> comps{};
-    std::copy_if(components.begin(), components.end(), std::back_inserter(comps),
-                 [](const Component &c) { return c.type != Component::Type::Framework; });
-    return comps;
-  }
 
   void insertMolecule(size_t selectedComponent, const Molecule &molecule, std::vector<Atom> atoms);
   void insertFractionalMolecule(size_t selectedComponent, const Molecule &molecule, std::vector<Atom> atoms,

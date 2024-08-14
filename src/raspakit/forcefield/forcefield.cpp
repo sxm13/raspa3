@@ -158,17 +158,11 @@ ForceField::ForceField(std::string filePath)
   }
   tailCorrection = parsed_data.value("TailCorrections", false);
 
-  // Validate and read self-interactions
-  if (!parsed_data.contains("SelfInteractions"))
-  {
-    throw std::runtime_error(
-        "[ReadForceFieldSelfInteractions]: No pseudo-atoms found [keyword 'SelfInteractions' missing]\n");
-  }
-
   data.resize(numberOfPseudoAtoms * numberOfPseudoAtoms, VDWParameters(0.0, 0.0));
   shiftPotentials.resize(numberOfPseudoAtoms * numberOfPseudoAtoms, shiftPotential);
   tailCorrections.resize(numberOfPseudoAtoms * numberOfPseudoAtoms, tailCorrection);
 
+  // Read self-interactions
   for (const auto& [_, item] : parsed_data["SelfInteractions"].items())
   {
     std::string jsonName = item.value("name", "");
@@ -191,7 +185,7 @@ ForceField::ForceField(std::string filePath)
     if (!index.has_value())
     {
       throw std::runtime_error(std::format(
-          "[ReadForceFieldSelfInteractions]: unknown pseudo-atom '{}', please define in 'pseudo_atoms.json'\n",
+          "[ReadForceFieldSelfInteractions]: unknown pseudo-atom '{}', please define\n",
           jsonName));
     }
 
@@ -213,14 +207,80 @@ ForceField::ForceField(std::string filePath)
     mixingRule = MixingRule::Lorentz_Berthelot;
   }
 
+  // Apply mixing rule and precompute potentials
+  applyMixingRule();
+
+  // Read binary interactions
+  for (const auto& [_, item] : parsed_data["BinaryInteractions"].items())
+  {
+    std::string jsonType = item.value("type", "lennard-jones");
+    std::string jsonSource = item.value("source", "");
+
+    std::vector<std::string> scannedJsonParameterNames;
+    try
+    {
+      scannedJsonParameterNames = item.value("names", std::vector<std::string>{});
+    }
+    catch (const nlohmann::json::exception& ex)
+    {
+      throw std::runtime_error(
+          std::format("[ReadForceFieldBinaryInteractions]: names {} must be array of two strings \n{}\n",
+                      item["names"].dump(), ex.what()));
+    }
+
+    if (scannedJsonParameterNames.size() != 2)
+    {
+      throw std::runtime_error(
+          std::format("[ReadForceFieldBinaryInteractions]: incorrect number of strings {}\n", item["names"].dump()));
+    }
+
+    std::optional<size_t> indexA = ForceField::findPseudoAtom(scannedJsonParameterNames[0]);
+    if (!indexA.has_value())
+    {
+      throw std::runtime_error(std::format(
+          "[ReadForceFieldSelfInteractions]: unknown pseudo-atom '{}', please define'\n",
+          scannedJsonParameterNames[0]));
+    }
+    std::optional<size_t> indexB = ForceField::findPseudoAtom(scannedJsonParameterNames[1]);
+    if (!indexB.has_value())
+    {
+      throw std::runtime_error(std::format(
+          "[ReadForceFieldSelfInteractions]: unknown pseudo-atom '{}', please define'\n",
+          scannedJsonParameterNames[1]));
+    }
+
+    std::vector<double> scannedJsonParameters;
+    try
+    {
+      scannedJsonParameters = item.value("parameters", std::vector<double>{});
+    }
+    catch (const nlohmann::json::exception& ex)
+    {
+      throw std::runtime_error(
+          std::format("[ReadForceFieldBinaryInteractions]: parameters {} must be array of numbers \n{}\n",
+                      item["parameters"].dump(), ex.what()));
+    }
+
+    if (scannedJsonParameters.size() < 2)
+    {
+      throw std::runtime_error(
+          std::format("[ReadForceFieldSelfInteractions]: incorrect vdw parameters {}\n", item["parameters"].dump()));
+    }
+
+    double param0 = scannedJsonParameters[0];
+    double param1 = scannedJsonParameters[1];
+
+    data[indexA.value() * numberOfPseudoAtoms + indexB.value()] = VDWParameters(param0, param1);
+    data[indexB.value() * numberOfPseudoAtoms + indexA.value()] = VDWParameters(param0, param1);
+  }
+
+
   // Get charge method
   useCharge = parsed_data.value("ChargeMethod", "Ewald") != "Ewald";
 
   cutOffVDW = parsed_data.value("CutOffVDW", 12.0);
   cutOffCoulomb = parsed_data.value("CutOffCoulomb", 12.0);
 
-  // Apply mixing rule and precompute potentials
-  applyMixingRule();
   preComputePotentialShift();
   preComputeTailCorrection();
 }

@@ -348,6 +348,20 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
     }
     std::string jsonComponentName = item["Name"].get<std::string>();
 
+    Component::Type componentType = Component::Type::Adsorbate;
+    if (item["Type"].is_string())
+    {
+      std::string typeString = item["Type"].get<std::string>();
+      if (caseInSensStringCompare(typeString, "Adsorbate"))
+      {
+        componentType = Component::Type::Adsorbate;
+      }
+      else if (caseInSensStringCompare(typeString, "Cation"))
+      {
+        componentType = Component::Type::Cation;
+      }
+    }
+
     // Convenience notation listing the properties as a single value. These will then be taken for all systems.
     // ========================================================================================================
 
@@ -514,7 +528,7 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
       }
 
       jsonComponents[i][componentId] =
-          Component(Component::Type::Adsorbate, componentId, forceFields[i].value(), jsonComponentName,
+          Component(componentType, componentId, forceFields[i].value(), jsonComponentName,
                     jsonComponentName, jsonNumberOfBlocks, jsonNumberOfLambdaBins, move_probabilities[i]);
     }
 
@@ -1081,7 +1095,7 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
     double sum = 0.0;
     for (size_t j = 0uz; j < systems[i].components.size(); ++j)
     {
-      if (systems[i].components[j].type != Component::Type::Framework)
+      if (systems[i].components[j].type != Component::Type::Cation)
       {
         sum += systems[i].components[j].molFraction;
       }
@@ -1090,7 +1104,7 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
     {
       for (size_t j = 0uz; j < systems[i].components.size(); ++j)
       {
-        if (systems[i].components[j].type != Component::Type::Framework)
+        if (systems[i].components[j].type != Component::Type::Cation)
         {
           systems[i].components[j].molFraction /= sum;
         }
@@ -1104,18 +1118,15 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
     systems[i].carrierGasComponent = 0uz;
     for (size_t j = 0uz; j < systems[i].components.size(); ++j)
     {
-      if (systems[i].components[j].type != Component::Type::Framework)
+      if (systems[i].components[j].isCarrierGas)
       {
-        if (systems[i].components[j].isCarrierGas)
-        {
-          systems[i].carrierGasComponent = j;
-          std::vector<double> values{1.0, 0.0};
-          const Isotherm isotherm = Isotherm(Isotherm::Type::Langmuir, values, 2);
-          systems[i].components[systems[i].carrierGasComponent].isotherm.add(isotherm);
-          systems[i].components[systems[i].carrierGasComponent].isotherm.numberOfSites = 1;
+        systems[i].carrierGasComponent = j;
+        std::vector<double> values{1.0, 0.0};
+        const Isotherm isotherm = Isotherm(Isotherm::Type::Langmuir, values, 2);
+        systems[i].components[systems[i].carrierGasComponent].isotherm.add(isotherm);
+        systems[i].components[systems[i].carrierGasComponent].isotherm.numberOfSites = 1;
 
-          systems[i].numberOfCarrierGases++;
-        }
+        systems[i].numberOfCarrierGases++;
       }
     }
 

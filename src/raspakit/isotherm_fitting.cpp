@@ -117,8 +117,7 @@ void IsothermFitting::run(std::ostream &stream)
 {
   for (size_t componentId = 0; componentId < system.components.size(); ++componentId)
   {
-    if ((system.components[componentId].type != Component::Type::Framework) &&
-        (!system.components[componentId].filename.empty()))
+    if (!system.components[componentId].filename.empty())
     {
       const std::vector<std::pair<double, double>> rawData = readData(componentId);
       writeComponentIsothermFittingStatus(stream, rawData);

@@ -60,12 +60,12 @@ std::optional<RunningEnergy> MC_Moves::randomTranslationMove(RandomNumber &rando
                                                              const std::vector<Component> &components,
                                                              Molecule &molecule, std::span<Atom> molecule_atoms)
 {
-  double3 displacement{};
+  double3 s,displacement{};
   std::chrono::system_clock::time_point time_begin, time_end;
 
-  double3 maxDisplacement = system.components[selectedComponent].mc_moves_statistics.randomTranslationMove.maxChange;
   size_t selectedDirection = size_t(3.0 * random.uniform());
-  displacement[selectedDirection] = maxDisplacement[selectedDirection] * 2.0 * (random.uniform() - 0.5);
+  s[selectedDirection] = random.uniform();
+  displacement = system.simulationBox.cell * s;
 
   system.components[selectedComponent].mc_moves_statistics.randomTranslationMove.counts[selectedDirection] += 1;
   system.components[selectedComponent].mc_moves_statistics.randomTranslationMove.totalCounts[selectedDirection] += 1;
@@ -118,15 +118,13 @@ std::optional<RunningEnergy> MC_Moves::randomTranslationMove(RandomNumber &rando
       externalFieldMolecule.value() + frameworkMolecule.value() + interMolecule.value() + ewaldFourierEnergy;
 
   system.components[selectedComponent].mc_moves_statistics.randomTranslationMove.constructed[selectedDirection] += 1;
-  system.components[selectedComponent].mc_moves_statistics.randomTranslationMove.totalConstructed[selectedDirection] +=
-      1;
+  system.components[selectedComponent].mc_moves_statistics.randomTranslationMove.totalConstructed[selectedDirection] += 1;
 
   // apply acceptance/rejection rule
   if (random.uniform() < std::exp(-system.beta * energyDifference.potentialEnergy()))
   {
     system.components[selectedComponent].mc_moves_statistics.randomTranslationMove.accepted[selectedDirection] += 1;
-    system.components[selectedComponent].mc_moves_statistics.randomTranslationMove.totalAccepted[selectedDirection] +=
-        1;
+    system.components[selectedComponent].mc_moves_statistics.randomTranslationMove.totalAccepted[selectedDirection] += 1;
 
     Interactions::acceptEwaldMove(system.forceField, system.storedEik, system.totalEik);
     std::copy(trialMolecule.second.cbegin(), trialMolecule.second.cend(), molecule_atoms.begin());
