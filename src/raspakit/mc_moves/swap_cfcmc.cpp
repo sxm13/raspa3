@@ -180,6 +180,14 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC(Random
     std::pair<Molecule, std::vector<Atom>> trialMolecule =
         system.components[selectedComponent].equilibratedMoleculeRandomInBox(random, system.simulationBox);
 
+    if(system.insideBlockedPockets(system.components[selectedComponent], trialMolecule.second))
+    {
+      // reject, set fractional molecule back to old state
+      std::copy(oldFractionalMolecule.begin(), oldFractionalMolecule.end(), fractionalMolecule.begin());
+
+      return {std::nullopt, double3(0.0, 1.0, 0.0)};
+    }
+
     // copy atoms from the old-fractional molecule, including the groupdIds
     size_t upcomingMoleculeId = system.numberOfMoleculesPerComponent[selectedComponent];
     size_t groupId = static_cast<size_t>(oldFractionalMolecule.front().groupId);

@@ -206,6 +206,14 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC_CBMC(R
       return {std::nullopt, double3(0.0, 1.0, 0.0)};
     }
 
+    if(system.insideBlockedPockets(system.components[selectedComponent], growData->atom))
+    {
+      // reject, set fractional molecule back to old state
+      std::copy(oldFractionalMolecule.begin(), oldFractionalMolecule.end(), fractionalMolecule.begin());
+
+      return {std::nullopt, double3(0.0, 1.0, 0.0)};
+    }
+
     system.components[selectedComponent].mc_moves_statistics.swapMove_CFCMC_CBMC.constructed[0] += 1;
     system.components[selectedComponent].mc_moves_statistics.swapMove_CFCMC_CBMC.totalConstructed[0] += 1;
 

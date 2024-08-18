@@ -29,7 +29,7 @@
       "TranslationProbability" : 0.5,
       "RotationProbability" : 0.5,
       "ReinsertionProbability" : 0.5,
-      "CreateNumberOfMolecules" : 100
+      "CreateNumberOfMolecules" : 32
     }
   ]
 }

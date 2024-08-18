@@ -21,12 +21,32 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run.cmake.in ${CMAKE_CURRENT_SOURCE_D
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run.cmake.in ${CMAKE_CURRENT_SOURCE_DIR}/day3/exercise_3_adsorption_co2_in_itq-29/run)
 
 
-install(DIRECTORY basic DESTINATION share/raspa3/workshop 
+install(DIRECTORY "day1" DESTINATION share/raspa3/workshop 
         COMPONENT workshop
         PATTERN "run" EXCLUDE
         PERMISSIONS OWNER_READ GROUP_READ)
 
-install(DIRECTORY basic DESTINATION share/raspa3/workshop 
+install(DIRECTORY "day1" DESTINATION share/raspa3/workshop 
+        COMPONENT workshop
+        PATTERN "run" 
+        PERMISSIONS  OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ)
+
+install(DIRECTORY "day2" DESTINATION share/raspa3/workshop 
+        COMPONENT workshop
+        PATTERN "run" EXCLUDE
+        PERMISSIONS OWNER_READ GROUP_READ)
+
+install(DIRECTORY "day2" DESTINATION share/raspa3/workshop 
+        COMPONENT workshop
+        PATTERN "run" 
+        PERMISSIONS  OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ)
+
+install(DIRECTORY "day3" DESTINATION share/raspa3/workshop 
+        COMPONENT workshop
+        PATTERN "run" EXCLUDE
+        PERMISSIONS OWNER_READ GROUP_READ)
+
+install(DIRECTORY "day3" DESTINATION share/raspa3/workshop 
         COMPONENT workshop
         PATTERN "run" 
         PERMISSIONS  OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ)

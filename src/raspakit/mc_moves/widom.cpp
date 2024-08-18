@@ -80,6 +80,11 @@ std::optional<double> MC_Moves::WidomMove(RandomNumber& random, System& system, 
 
   [[maybe_unused]] std::span<const Atom> newMolecule = std::span(growData->atom.begin(), growData->atom.end());
 
+  if(system.insideBlockedPockets(system.components[selectedComponent], newMolecule))
+  {
+    return std::nullopt;
+  }
+
   system.components[selectedComponent].mc_moves_statistics.WidomMove_CBMC.constructed += 1;
   system.components[selectedComponent].mc_moves_statistics.WidomMove_CBMC.totalConstructed += 1;
 

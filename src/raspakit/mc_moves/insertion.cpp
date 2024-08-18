@@ -72,6 +72,11 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::insertionMove(RandomN
   std::pair<Molecule, std::vector<Atom>> trialMolecule =
       system.components[selectedComponent].equilibratedMoleculeRandomInBox(random, system.simulationBox);
 
+  if(system.insideBlockedPockets(system.components[selectedComponent], trialMolecule.second))
+  {
+    return {std::nullopt, double3(0.0, 1.0, 0.0)};
+  }
+
   std::for_each(std::begin(trialMolecule.second), std::end(trialMolecule.second),
                 [selectedComponent, selectedMolecule](Atom& atom)
                 {

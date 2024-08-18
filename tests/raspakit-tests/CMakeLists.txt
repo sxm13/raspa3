@@ -68,7 +68,6 @@ target_link_libraries(unit_tests_raspakit PRIVATE
                       GTest::gmock_main
                       -nostdlib++
                       ${LLVM_LIBS}/c++/libc++experimental.a
-                      ${LLVM_LIBS}/c++/libc++experimental.a
                       ${LLVM_LIBS}/c++/libc++.a
                       ${LLVM_LIBS}/c++/libc++abi.a
                       ${LLVM_LIBS}/libunwind.a

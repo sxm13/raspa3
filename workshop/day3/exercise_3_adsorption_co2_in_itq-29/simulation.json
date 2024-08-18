@@ -9,6 +9,7 @@
       "Type" : "Framework",
       "Name" : "ITQ-29",
       "NumberOfUnitCells" : [2, 2, 2],
+      "CutOff" : 11.8,
       "HeliumVoidFraction" : 0.401506,
       "ChargeMethod" : "Ewald",
       "ExternalTemperature" : 300.0,
@@ -20,7 +21,8 @@
       "SampleNumberOfMoleculesHistogramEvery" : 1,
       "WriteNumberOfMoleculesHistogramEvery" : 1000,
 
-      "OutputPDBMovie" : false
+      "OutputPDBMovie" : false,
+      "SampleMovieEvery" : 1
     }
   ],
 
@@ -41,7 +43,7 @@
            [0.0,       0.0,        0.5,       0.5]
          ],
 
-      "CreateNuMberofmolecules" : 1
+      "CreateNuMberofmolecules" : 0
     }
   ]
 }

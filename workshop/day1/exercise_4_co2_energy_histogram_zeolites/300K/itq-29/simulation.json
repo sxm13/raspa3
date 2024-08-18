@@ -1,6 +1,6 @@
 {
   "SimulationType" : "MonteCarlo",
-  "NumberOfCycles" : 100000,
+  "NumberOfCycles" : 100000000,
   "NumberOfInitializationCycles" : 1000,
   "PrintEvery" : 5000,
   
@@ -37,7 +37,7 @@
            [0.0,       0.5,        0.0,       0.5],
            [0.0,       0.0,        0.5,       0.5]
          ],
-      "CreateNuMberofmolecules" : 1
+      "CreateNumberOfMolecules" : 1
     }
   ]
 }

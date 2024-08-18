@@ -1014,6 +1014,8 @@ std::string System::writeEquilibrationStatusReportMD(size_t currentCycle, size_t
 {
   std::ostringstream stream;
 
+  double conv = Units::EnergyToKelvin;
+
   std::print(stream, "Equilibration: Current cycle: {} out of {}\n", currentCycle, numberOfCycles);
   std::print(stream, "===============================================================================\n\n");
 
@@ -1043,8 +1045,12 @@ std::string System::writeEquilibrationStatusReportMD(size_t currentCycle, size_t
   std::print(stream, "Total translational degrees of freedom molecules: {}\n", translationalDegreesOfFreedom - translationalCenterOfMassConstraint);
   std::print(stream, "Rotational degrees of freedom molecules: {}\n\n", rotationalDegreesOfFreedom);
 
-  std::print(stream, "Conserved energy: {: .6e}\n", conservedEnergy);
-  double drift = std::abs(Units::EnergyToKelvin * (conservedEnergy - referenceEnergy) / referenceEnergy);
+  std::print(stream, "Potential energy:   {: .6e}\n", conv * runningEnergies.potentialEnergy());
+  std::print(stream, "Kinetic energy:     {: .6e}\n", conv * (runningEnergies.translationalKineticEnergy 
+                                                        + runningEnergies.rotationalKineticEnergy));
+  std::print(stream, "Nose-Hoover energy: {: .6e}\n", conv * runningEnergies.NoseHooverEnergy);
+  std::print(stream, "Conserved energy:   {: .6e}\n", conservedEnergy);
+  double drift = std::abs(conv * (conservedEnergy - referenceEnergy) / referenceEnergy);
   std::print(stream, "Drift: {:.6e} Average drift: {:.6e}\n\n", drift,
              accumulatedDrift / static_cast<double>(std::max(currentCycle, 1uz)));
 
@@ -1207,6 +1213,8 @@ std::string System::writeProductionStatusReportMD(size_t currentCycle, size_t nu
 {
   std::ostringstream stream;
 
+  double conv = Units::EnergyToKelvin;
+
   std::print(stream, "Current cycle: {} out of {}\n", currentCycle, numberOfCycles);
   std::print(stream, "===============================================================================\n\n");
 
@@ -1248,12 +1256,15 @@ std::string System::writeProductionStatusReportMD(size_t currentCycle, size_t nu
   std::print(stream, "Total translational degrees of freedom molecules: {}\n", translationalDegreesOfFreedom - translationalCenterOfMassConstraint);
   std::print(stream, "Rotational degrees of freedom molecules: {}\n\n", rotationalDegreesOfFreedom);
 
-  std::print(stream, "Conserved energy: {: .6e}\n", conservedEnergy);
-  double drift = std::abs(Units::EnergyToKelvin * (conservedEnergy - referenceEnergy) / referenceEnergy);
+  std::print(stream, "Potential energy:   {: .6e}\n", conv * runningEnergies.potentialEnergy());
+  std::print(stream, "Kinetic energy:     {: .6e}\n", conv * (runningEnergies.translationalKineticEnergy
+                                                        + runningEnergies.rotationalKineticEnergy));
+  std::print(stream, "Nose-Hoover energy: {: .6e}\n", conv * runningEnergies.NoseHooverEnergy);
+  std::print(stream, "Conserved energy:   {: .6e}\n", conservedEnergy);
+  double drift = std::abs(conv * (conservedEnergy - referenceEnergy) / referenceEnergy);
   std::print(stream, "Drift: {:.6e} Average drift: {:.6e}\n\n", drift,
              accumulatedDrift / static_cast<double>(std::max(currentCycle, 1uz)));
 
-  double conv = Units::EnergyToKelvin;
   std::pair<EnergyStatus, EnergyStatus> energyData = averageEnergies.averageEnergy();
   std::print(stream, "Total potential energy:   {: .6e} ({: .6e} +/- {:.6e}) [K]\n",
              conv * currentEnergyStatus.totalEnergy.energy, conv * energyData.first.totalEnergy.energy,

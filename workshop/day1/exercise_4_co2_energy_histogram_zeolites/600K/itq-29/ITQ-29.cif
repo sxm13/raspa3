@@ -87,9 +87,8 @@ _atom_site_polarization
 _atom_site_anisotropic_displacement
 _atom_site_anisotropic_type
 _atom_site_print_to_pdb
-Si1      Si4+   0.3683    0.1847    0         2.05    0       0    absolute yes
-O1       O2-    0.5       0.2179    0        -1.025   0       0    absolute yes
-O2       O2-    0.2939    0.2939    0        -1.025   0       0    absolute yes
-O3       O2-    0.3429    0.1098    0.1098   -1.025   0       0    absolute yes
-
+Si       Si     0.3683    0.1847    0         2.05    0       0    absolute yes
+O        O      0.5       0.2179    0        -1.025   0       0    absolute yes
+O        O      0.2939    0.2939    0        -1.025   0       0    absolute yes
+O        O      0.3429    0.1098    0.1098   -1.025   0       0    absolute yes
 
