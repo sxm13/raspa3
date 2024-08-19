@@ -72,6 +72,10 @@ if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
 
+if(BUILD_BENCHMARKS)
+  add_subdirectory(benchmarks)
+endif()
+
 if(BUILD_PYTHON)
   add_subdirectory(raspa)
 endif()
