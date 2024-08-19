@@ -223,8 +223,8 @@ PYBIND11_MODULE(raspalib, m)
       .value("ParallelTempering", InputReader::SimulationType::ParallelTempering)
       .export_values();
 
-  pybind11::class_<MonteCarlo>(m, "MonteCarlo")
-      .def(pybind11::init<size_t, size_t, size_t, size_t, size_t, size_t, size_t, std::vector<System> &, RandomNumber &,
+  pybind11::class_<MonteCarlo> mc(m, "MonteCarlo");
+    mc.def(pybind11::init<size_t, size_t, size_t, size_t, size_t, size_t, size_t, std::vector<System> &, RandomNumber &,
                           size_t>(),
            pybind11::arg("numberOfCycles"), pybind11::arg("numberOfInitializationCycles"),
            pybind11::arg("numberOfEquilibrationCycles"), pybind11::arg("printEvery"),
@@ -235,5 +235,15 @@ PYBIND11_MODULE(raspalib, m)
       .def("run", &MonteCarlo::run)
       .def("initialize", &MonteCarlo::initialize)
       .def("equilibrate", &MonteCarlo::equilibrate)
-      .def("production", &MonteCarlo::production);
+      .def("production", &MonteCarlo::production)
+      .def("cycle", &MonteCarlo::cycle)
+      .def("__repr__", &MonteCarlo::repr)
+      .def_readwrite("simulationStage", &MonteCarlo::simulationStage);
+
+  pybind11::enum_<MonteCarlo::SimulationStage>(mc, "SimulationStage")
+      .value("Uninitialized", MonteCarlo::SimulationStage::Uninitialized)
+      .value("Initialization", MonteCarlo::SimulationStage::Initialization)
+      .value("Equilibration", MonteCarlo::SimulationStage::Equilibration)
+      .value("Production", MonteCarlo::SimulationStage::Production)
+      .export_values();
 }
