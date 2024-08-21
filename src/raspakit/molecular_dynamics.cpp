@@ -508,7 +508,7 @@ void MolecularDynamics::production()
 
       if (system.propertyMSD.has_value())
       {
-        system.propertyMSD->writeOutput(system.systemId, system.components, system.timeStep, currentCycle);
+        system.propertyMSD->writeOutput(system.systemId, system.components, system.numberOfIntegerMoleculesPerComponent, system.timeStep, currentCycle);
       }
     }
 

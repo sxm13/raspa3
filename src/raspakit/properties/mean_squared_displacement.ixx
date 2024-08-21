@@ -32,7 +32,7 @@ import simulationbox;
 import forcefield;
 import component;
 
-// Computes Mean Squared Displacement (MSD)
+// Computes Mean Squared Displacement (MSD) using order-N algorithm
 
 export struct PropertyMeanSquaredDisplacement
 {
@@ -47,9 +47,13 @@ export struct PropertyMeanSquaredDisplacement
         numberOfBlockElementsMSD(numberOfBlockElementsMSD),
         maxNumberOfBlocksMSD(1),
         blockLengthMSD(maxNumberOfBlocksMSD),
-        msdOrderNCount(maxNumberOfBlocksMSD, std::vector<std::vector<size_t>>(numberOfComponents, std::vector<size_t>(numberOfBlockElementsMSD, 0uz))),
-        blockDataMSD(maxNumberOfBlocksMSD, std::vector<std::vector<double3>>(numberOfParticles, std::vector<double3>(numberOfBlockElementsMSD, double3()))),
-        msdOrderN(maxNumberOfBlocksMSD, std::vector<std::vector<double4>>(numberOfComponents, std::vector<double4>(numberOfBlockElementsMSD, double4())))
+        msdSelfCount(maxNumberOfBlocksMSD, std::vector<std::vector<size_t>>(numberOfComponents, std::vector<size_t>(numberOfBlockElementsMSD, 0uz))),
+        blockDataMSDSelf(maxNumberOfBlocksMSD, std::vector<std::vector<double3>>(numberOfParticles, std::vector<double3>(numberOfBlockElementsMSD, double3()))),
+        msdSelf(maxNumberOfBlocksMSD, std::vector<std::vector<double4>>(numberOfComponents, std::vector<double4>(numberOfBlockElementsMSD, double4()))),
+        msdOnsagerCount(maxNumberOfBlocksMSD, std::vector<std::vector<size_t>>(numberOfComponents, std::vector<size_t>(numberOfBlockElementsMSD, 0uz))),
+        blockDataMSDOnsager(maxNumberOfBlocksMSD, std::vector<std::vector<double3>>(numberOfComponents, std::vector<double3>(numberOfBlockElementsMSD, double3()))),
+        msdOnsager(maxNumberOfBlocksMSD, std::vector<std::vector<std::vector<double4>>>(numberOfComponents,
+            std::vector<std::vector<double4>>(numberOfComponents, std::vector<double4>(numberOfBlockElementsMSD, double4()))))
   {
   }
 
@@ -65,13 +69,19 @@ export struct PropertyMeanSquaredDisplacement
   size_t countMSD{ 0uz };
   size_t numberOfBlocksMSD;
   std::vector<size_t> blockLengthMSD;
-  std::vector<std::vector<std::vector<size_t>>> msdOrderNCount;
-  std::vector<std::vector<std::vector<double3>>> blockDataMSD;
-  std::vector<std::vector<std::vector<double4>>> msdOrderN;
+
+  std::vector<std::vector<std::vector<size_t>>> msdSelfCount;
+  std::vector<std::vector<std::vector<double3>>> blockDataMSDSelf;
+  std::vector<std::vector<std::vector<double4>>> msdSelf;
+
+  std::vector<std::vector<std::vector<size_t>>> msdOnsagerCount;
+  std::vector<std::vector<std::vector<double3>>> blockDataMSDOnsager;
+  std::vector<std::vector<std::vector<std::vector<double4>>>> msdOnsager;
 
   void addSample(size_t currentCycle, const std::vector<Component> &components,
                  const std::vector<size_t> &numberOfMoleculesPerComponent, std::vector<Molecule> &molecules);
-  void writeOutput(size_t systemId, const std::vector<Component> &components, double deltaT, size_t currentCycle);
+  void writeOutput(size_t systemId, const std::vector<Component> &components, 
+                 const std::vector<size_t> &numberOfMoleculesPerComponent, double deltaT, size_t currentCycle);
 
   friend Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive,
                                             const PropertyMeanSquaredDisplacement &msd);
