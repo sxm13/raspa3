@@ -40,7 +40,7 @@ int main()
 {  
   try
   {
-    InputReader inputReader("simulation.input");
+    InputReader inputReader("simulation.json");
 
     auto &pool = ThreadPool::ThreadPool<ThreadPool::details::default_function_type>::instance();
     pool.init(inputReader.numberOfThreads, inputReader.threadingType);

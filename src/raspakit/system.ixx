@@ -132,6 +132,9 @@ export struct System
          const MCMoveProbabilitiesSystem &systemProbabilities = MCMoveProbabilitiesSystem(),
          std::optional<size_t> sampleMoviesEvery = std::nullopt);
 
+  System(size_t id, double T, std::optional<double> P, double heliumVoidFraction,
+         std::vector<Framework> frameworkComponents, std::vector<Component> components);
+
   uint64_t versionNumber{1};
 
   size_t systemId{};

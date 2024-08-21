@@ -133,6 +133,7 @@ System::System(size_t id, ForceField forcefield, std::optional<SimulationBox> bo
       pressure(P.value_or(0.0) / Units::PressureConversionFactor),
       input_pressure(P.value_or(0.0)),
       beta(1.0 / (Units::KB * T)),
+      heliumVoidFraction(heliumVoidFraction),
       frameworkComponents(f),
       components(c),
       loadings(c.size()),
@@ -207,6 +208,19 @@ System::System(size_t id, ForceField forcefield, std::optional<SimulationBox> bo
   {
     samplePDBMovie = SampleMovie(id, sampleMoviesEvery.value());
   }
+}
+
+System::System(size_t id, double T, std::optional<double> P, double heliumVoidFraction,
+               std::vector<Framework> f, std::vector<Component> c)
+    : systemId(id),
+      temperature(T),
+      pressure(P.value_or(0.0) / Units::PressureConversionFactor),
+      input_pressure(P.value_or(0.0)),
+      beta(1.0 / (Units::KB * T)),
+      heliumVoidFraction(heliumVoidFraction),
+      frameworkComponents(f),
+      components(c)
+{
 }
 
 void System::createFrameworks()

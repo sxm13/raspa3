@@ -38,6 +38,7 @@ import stringutils;
 import int3;
 import double3;
 import threadpool;
+import json;
 
 import system;
 import atom;
@@ -90,7 +91,6 @@ export struct InputReader
 
   InputReader(const std::string inputFile);
 
-  std::ifstream inputStream;
   std::string inputString;
 
   InputReader::SimulationType simulationType{SimulationType::MonteCarlo};
@@ -118,4 +118,9 @@ export struct InputReader
   // size_t carrierGasComponent{ 0 };
   std::string displayName{"Column"};
   double temperature{-1.0};
+
+  void parseMolecularSimulations(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data);
+  void parseFitting(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data);
+  void parseMixturePrediction(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data);
+  void parseBreakthrough(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data);
 };

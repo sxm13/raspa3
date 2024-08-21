@@ -154,13 +154,17 @@ std::vector<T> parseList(size_t size, const std::string& item, auto json)
       std::format("[Input reader (parseList)]: key '{}', value {} should be array of numbers\n", item, json.dump()));
 }
 
-InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
+InputReader::InputReader(const std::string inputFile) // : inputStream(inputFile)
 {
+  if (!std::filesystem::exists(inputFile))
+  {
+    throw std::runtime_error(std::format("[Input reader]: File '{}' not found\n", inputFile));
+  }
+
   std::ifstream input("simulation.json");
 
   nlohmann::basic_json<nlohmann::raspa_map> parsed_data{};
 
-  size_t jsonNumberOfBlocks{5};
 
   try
   {
@@ -170,6 +174,173 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
   {
     std::cerr << "parse error at byte " << ex.byte << std::endl;
   }
+
+  if (parsed_data["SimulationType"].is_string())
+  {
+    std::string simulationTypeString = parsed_data["SimulationType"].get<std::string>();
+    if (caseInSensStringCompare(simulationTypeString, "MonteCarlo"))
+    {
+      simulationType = SimulationType::MonteCarlo;
+      parseMolecularSimulations(parsed_data);
+    }
+    else if (caseInSensStringCompare(simulationTypeString, "MonteCarloTransitionMatrix"))
+    {
+      simulationType = SimulationType::MonteCarloTransitionMatrix;
+      parseMolecularSimulations(parsed_data);
+    }
+    else if (caseInSensStringCompare(simulationTypeString, "MolecularDynamics"))
+    {
+      simulationType = SimulationType::MolecularDynamics;
+      parseMolecularSimulations(parsed_data);
+    }
+    else if (caseInSensStringCompare(simulationTypeString, "Minimization"))
+    {
+      simulationType = SimulationType::Minimization;
+      parseMolecularSimulations(parsed_data);
+    }
+    else if (caseInSensStringCompare(simulationTypeString, "Breakthrough"))
+    {
+      simulationType = SimulationType::Breakthrough;
+      parseBreakthrough(parsed_data);
+    }
+    else if (caseInSensStringCompare(simulationTypeString, "MixturePrediction"))
+    {
+      simulationType = SimulationType::MixturePrediction;
+      parseMixturePrediction(parsed_data);
+    }
+    else if (caseInSensStringCompare(simulationTypeString, "Fitting"))
+    {
+      simulationType = SimulationType::Fitting;
+      parseFitting(parsed_data);
+    }
+    else if (caseInSensStringCompare(simulationTypeString, "ParallelTempering"))
+    {
+      simulationType = SimulationType::ParallelTempering;
+      parseMolecularSimulations(parsed_data);
+    }
+    else
+    {
+      throw std::runtime_error(
+          std::format("[Input reader]: {} not a valid simulation type", simulationTypeString, parsed_data.dump()));
+    }
+  }
+}
+
+void InputReader::parseFitting(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data)
+{
+}
+
+void InputReader::parseMixturePrediction(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data)
+{
+}
+
+void InputReader::parseBreakthrough(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data)
+{
+  // count number of systems
+  if (!parsed_data.contains("Systems"))
+  {
+    throw std::runtime_error(
+        std::format("[Input reader]: no system defined with keyword 'Systems' and value of array-type\n"));
+  }
+  size_t jsonNumberOfSystems = parsed_data["Systems"].size();
+  if (jsonNumberOfSystems == 0)
+  {
+    throw std::runtime_error(std::format("[Input reader]: keyword 'Systems' has empty value of array-type\n"));
+  }
+
+  systems = std::vector<System>(jsonNumberOfSystems);
+
+  // count number of components
+  size_t jsonNumberOfComponents{};
+  if (parsed_data.contains("Components"))
+  {
+    jsonNumberOfComponents = parsed_data["Components"].size();
+  }
+
+  // pre-allocate the vector of vector (jsonNumberOfSystems x jsonNumberOfComponents), i.e. for each system a list of components
+  std::vector<std::vector<Component>> jsonComponents(jsonNumberOfSystems, std::vector<Component>(jsonNumberOfComponents));
+
+  // Parse component options
+  for (size_t componentId = 0; auto& [_, item] : parsed_data["Components"].items())
+  {
+    Component component{};
+
+    if (!item.contains("Name"))
+    {
+      throw std::runtime_error(
+          std::format("[Input reader]: component must have a key 'Name' with a value of string-type'\n"));
+    }
+    component.name = item["Name"].get<std::string>();
+
+    // construct Component
+    for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+    {
+      jsonComponents[i][componentId] = component;
+    }
+
+    componentId++;
+  }
+
+  for (size_t systemId = 0; auto& [key, value] : parsed_data["Systems"].items())
+  {
+
+    if (!value.contains("Type"))
+    {
+      throw std::runtime_error(
+          std::format("[Input reader]: system must have a key 'Type' with value 'Framework'\n"));
+    }
+    std::string typeString = value["Type"].get<std::string>();
+
+    if (caseInSensStringCompare(typeString, "Framework"))
+    {
+      Framework framework{};
+
+      // Parse framework options
+      if (!value.contains("Name"))
+      {
+        throw std::runtime_error(
+            std::format("[Input reader]: framework must have a key 'Name' with a value of string-type'\n"));
+      }
+
+      framework.name = value["Name"].get<std::string>();
+
+      double heliumVoidFraction{ 1.0 };
+      if (value.contains("HeliumVoidFraction"))
+      {
+        heliumVoidFraction = value["HeliumVoidFraction"].get<double>();
+      }
+
+      if (!value.contains("ExternalTemperature"))
+      {
+        throw std::runtime_error(
+            std::format("[Input reader]: framework must have a key 'ExternalTemperature' with a value of "
+                        "floating-point-type'\n"));
+      }
+      double T = value["ExternalTemperature"].get<double>();
+
+      bool useChargesFromCIFFile = true;
+      if (value.contains("UseChargesFromCIFFile"))
+      {
+        useChargesFromCIFFile = value["UseChargesFromCIFFile"].get<bool>();
+      }
+
+      std::optional<double> P{};
+      if (value.contains("ExternalPressure"))
+      {
+        P = value["ExternalPressure"].get<double>();
+      }
+
+      // create system
+      systems[systemId] = System(systemId, T, P, heliumVoidFraction, { framework },  jsonComponents[systemId]);
+    }
+
+    systemId++;
+  }
+}
+
+void InputReader::parseMolecularSimulations(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data)
+{
+  size_t jsonNumberOfBlocks{5};
 
   // count number of systems
   if (!parsed_data.contains("Systems"))
@@ -242,52 +413,6 @@ InputReader::InputReader(const std::string inputFile) : inputStream(inputFile)
   if (parsed_data["OptimizeMCMovesEvery"].is_number_unsigned())
   {
     optimizeMCMovesEvery = parsed_data["OptimizeMCMovesEvery"].get<size_t>();
-  }
-
-  if (parsed_data["SimulationType"].is_string())
-  {
-    std::string simulationTypeString = parsed_data["SimulationType"].get<std::string>();
-    if (caseInSensStringCompare(simulationTypeString, "MonteCarlo"))
-    {
-      simulationType = SimulationType::MonteCarlo;
-    }
-    else if (caseInSensStringCompare(simulationTypeString, "MonteCarloTransitionMatrix"))
-    {
-      simulationType = SimulationType::MonteCarloTransitionMatrix;
-    }
-    else if (caseInSensStringCompare(simulationTypeString, "MolecularDynamics"))
-    {
-      simulationType = SimulationType::MolecularDynamics;
-    }
-    else if (caseInSensStringCompare(simulationTypeString, "Minimization"))
-    {
-      simulationType = SimulationType::Minimization;
-    }
-    else if (caseInSensStringCompare(simulationTypeString, "Test"))
-    {
-      simulationType = SimulationType::Test;
-    }
-    else if (caseInSensStringCompare(simulationTypeString, "Breakthrough"))
-    {
-      simulationType = SimulationType::Breakthrough;
-    }
-    else if (caseInSensStringCompare(simulationTypeString, "MixturePrediction"))
-    {
-      simulationType = SimulationType::MixturePrediction;
-    }
-    else if (caseInSensStringCompare(simulationTypeString, "Fitting"))
-    {
-      simulationType = SimulationType::Fitting;
-    }
-    else if (caseInSensStringCompare(simulationTypeString, "ParallelTempering"))
-    {
-      simulationType = SimulationType::ParallelTempering;
-    }
-    else
-    {
-      throw std::runtime_error(
-          std::format("[Input reader]: {} not a valid simulation type", simulationTypeString, parsed_data.dump()));
-    }
   }
 
   if (parsed_data["ThreadingType"].is_string())
