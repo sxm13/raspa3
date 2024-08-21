@@ -1,5 +1,5 @@
 import numpy as np
-import raspalib
+import raspa.raspalib as raspalib
 
 
 class RaspaBase:

@@ -1,5 +1,5 @@
 import numpy as np
-import raspalib
+import raspa.raspalib as raspalib
 from .base import RaspaBase
 from .utils import popSelf
 

@@ -1,4 +1,4 @@
-import raspalib
+import raspa.raspalib as raspalib
 from .base import RaspaBase
 from .utils import popSelf
 from .simulationbox import SimulationBox
@@ -30,6 +30,7 @@ class System(RaspaBase):
         initialNumberOfMolecules: list[int],
         numberOfBlocks: int = 5,
         pressure: float = None,
+        heliumVoidFraction: float = 0.29,
         frameworkComponents: list[Framework] = [],
         simulationBox: SimulationBox = None,
         systemProbabilities: MCMoveProbabilitiesSystem = MCMoveProbabilitiesSystem(),

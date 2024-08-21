@@ -1,4 +1,4 @@
-import raspalib
+import raspa.raspalib as raspalib
 from .base import RaspaBase
 from .forcefield import ForceField
 from .atom import Atom

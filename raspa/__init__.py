@@ -1,4 +1,4 @@
-import raspalib
+import raspa.raspalib as raspalib
 
 from .forcefield import ForceField, PseudoAtom, VDWParameter
 from .atom import Atom

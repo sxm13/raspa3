@@ -1,6 +1,6 @@
 from typing import Literal
 
-import raspalib
+import raspa.raspalib as raspalib
 from .base import RaspaBase
 from .utils import RASPA_DIR, SHARE_DIR, popSelf
 import os
