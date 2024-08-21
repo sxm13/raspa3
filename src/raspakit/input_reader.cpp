@@ -462,694 +462,703 @@ void InputReader::parseMolecularSimulations(const nlohmann::basic_json<nlohmann:
                                                                std::vector<size_t>(jsonNumberOfComponents));
 
   // Parse component options
-  for (size_t componentId = 0; auto& [_, item] : parsed_data["Components"].items())
+  if(parsed_data.contains("Components"))
   {
-    std::vector<MCMoveProbabilitiesParticles> move_probabilities(jsonNumberOfSystems);
-
-    if (!item.contains("Name"))
+    for (size_t componentId = 0; auto& [_, item] : parsed_data["Components"].items())
     {
-      throw std::runtime_error(
-          std::format("[Input reader]: component must have a key 'Name' with a value of string-type'\n"));
-    }
-    std::string jsonComponentName = item["Name"].get<std::string>();
+      std::vector<MCMoveProbabilitiesParticles> move_probabilities(jsonNumberOfSystems);
 
-    Component::Type componentType = Component::Type::Adsorbate;
-    if (item["Type"].is_string())
-    {
-      std::string typeString = item["Type"].get<std::string>();
-      if (caseInSensStringCompare(typeString, "Adsorbate"))
-      {
-        componentType = Component::Type::Adsorbate;
-      }
-      else if (caseInSensStringCompare(typeString, "Cation"))
-      {
-        componentType = Component::Type::Cation;
-      }
-    }
-
-    // Convenience notation listing the properties as a single value. These will then be taken for all systems.
-    // ========================================================================================================
-
-    if (item["TranslationProbability"].is_number_float())
-    {
-      double probabilityTranslationMove = item["TranslationProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilityTranslationMove = probabilityTranslationMove;
-      }
-    }
-
-    if (item["RandomTranslationProbability"].is_number_float())
-    {
-      double probabilityRandomTranslationMove = item["RandomTranslationProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilityRandomTranslationMove = probabilityRandomTranslationMove;
-      }
-    }
-
-    if (item["RotationProbability"].is_number_float())
-    {
-      double probabilityRotationMove = item["RotationProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilityRotationMove = probabilityRotationMove;
-      }
-    }
-
-    if (item["RandomRotationProbability"].is_number_float())
-    {
-      double probabilityRandomTranslationMove = item["RandomRotationProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilityRandomTranslationMove = probabilityRandomTranslationMove;
-      }
-    }
-
-    if (item["ReinsertionProbability"].is_number_float())
-    {
-      double probabilityReinsertionMove_CBMC = item["ReinsertionProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilityReinsertionMove_CBMC = probabilityReinsertionMove_CBMC;
-      }
-    }
-
-    if (item["SwapConventionalProbability"].is_number_float())
-    {
-      double probabilitySwapMove = item["SwapConventionalProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilitySwapMove = probabilitySwapMove;
-      }
-    }
-
-    if (item["SwapProbability"].is_number_float())
-    {
-      double probabilitySwapMove_CBMC = item["SwapProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilitySwapMove_CBMC = probabilitySwapMove_CBMC;
-      }
-    }
-
-    if (item["CFCMC_SwapProbability"].is_number_float())
-    {
-      double probabilitySwapMove_CFCMC = item["CFCMC_SwapProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilitySwapMove_CFCMC = probabilitySwapMove_CFCMC;
-      }
-    }
-
-    if (item["CFCMC_CBMC_SwapProbability"].is_number_float())
-    {
-      double probabilitySwapMove_CFCMC_CBMC = item["CFCMC_CBMC_SwapProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilitySwapMove_CFCMC_CBMC = probabilitySwapMove_CFCMC_CBMC;
-      }
-    }
-
-    if (item["GibbsCFCMCSwapProbability"].is_number_float())
-    {
-      double probabilityGibbsSwapMove_CFCMC = item["GibbsCFCMCSwapProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilityGibbsSwapMove_CFCMC = probabilityGibbsSwapMove_CFCMC;
-      }
-    }
-
-    if (item["GibbsSwapProbability"].is_number_float())
-    {
-      double probabilityGibbsSwapMove_CBMC = item["GibbsSwapProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilityGibbsSwapMove_CBMC = probabilityGibbsSwapMove_CBMC;
-      }
-    }
-
-    if (item["WidomProbability"].is_number_float())
-    {
-      double probabilityWidomMove = item["WidomProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilityWidomMove = probabilityWidomMove;
-      }
-    }
-
-    if (item["CFCMC_WidomProbability"].is_number_float())
-    {
-      double probabilityWidomMove_CFCMC = item["CFCMC_WidomProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilityWidomMove_CFCMC = probabilityWidomMove_CFCMC;
-      }
-    }
-
-    if (item["CFCMC_CBMC_WidomProbability"].is_number_float())
-    {
-      double probabilityWidomMove_CFCMC_CBMC = item["CFCMC_CBMC_WidomProbability"].get<double>();
-      for (size_t i = 0; i < move_probabilities.size(); ++i)
-      {
-        move_probabilities[i].probabilityWidomMove_CFCMC_CBMC = probabilityWidomMove_CFCMC_CBMC;
-      }
-    }
-
-    if (item["CreateNumberOfMolecules"].is_number_integer())
-    {
-      size_t n = item["CreateNumberOfMolecules"].get<size_t>();
-      for (size_t i = 0; i != jsonNumberOfSystems; ++i)
-      {
-        jsonCreateNumberOfMolecules[i][componentId] = n;
-      }
-    }
-
-    size_t jsonNumberOfLambdaBins{41};
-    if (parsed_data["NumberOfLambdaBins"].is_number_unsigned())
-    {
-      jsonNumberOfLambdaBins = parsed_data["NumberOfLambdaBins"].get<size_t>();
-    }
-
-    // Explicit notation listing the properties as an array of the values for the particular systems
-    // ========================================================================================================
-
-    if (item["CreateNumberOfMolecules"].is_array())
-    {
-      std::vector<size_t> initialNumberOfMolecule =
-          parseList<size_t>(jsonNumberOfSystems, "CreateNumberOfMolecules", item["CreateNumberOfMolecules"]);
-      for (size_t i = 0; i != jsonNumberOfSystems; ++i)
-      {
-        jsonCreateNumberOfMolecules[i][componentId] = initialNumberOfMolecule[i];
-      }
-    }
-
-    // construct Component
-    for (size_t i = 0; i != jsonNumberOfSystems; ++i)
-    {
-      if (!forceFields[i].has_value())
-      {
-        throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
-      }
-
-      jsonComponents[i][componentId] =
-          Component(componentType, componentId, forceFields[i].value(), jsonComponentName,
-                    jsonComponentName, jsonNumberOfBlocks, jsonNumberOfLambdaBins, move_probabilities[i]);
-    }
-
-    if (item["StartingBead"].is_number_integer())
-    {
-      size_t n = item["StartingBead"].get<size_t>();
-      for (size_t i = 0; i != jsonNumberOfSystems; ++i)
-      {
-        if (n >= jsonComponents[i][componentId].definedAtoms.size())
-        {
-          throw std::runtime_error(std::format("[Input reader]: starting bead larger than the molecule size'\n"));
-        }
-
-        jsonComponents[i][componentId].startingBead = n;
-      }
-    }
-
-    if (item["FugacityCoefficient"].is_number_float())
-    {
-      double fugacity_coefficient = item["FugacityCoefficient"].get<double>();
-      for (size_t i = 0; i != jsonNumberOfSystems; ++i)
-      {
-        jsonComponents[i][componentId].fugacityCoefficient = fugacity_coefficient;
-      }
-    }
-
-    if (item["ThermodynamicIntegration"].is_boolean())
-    {
-      bool thermodynamic_integration = item["ThermodynamicIntegration"].get<bool>();
-      for (size_t i = 0; i != jsonNumberOfSystems; ++i)
-      {
-        jsonComponents[i][componentId].lambdaGC.computeDUdlambda = thermodynamic_integration;
-      }
-    }
-
-    for (auto &[_, block_pockets_item] : item["BlockingPockets"].items())
-    {
-      if (!block_pockets_item.is_array())
-      {
-        throw std::runtime_error(std::format("[Component reader]: item {} must be an array\n", block_pockets_item.dump()));
-      }
-
-      if (block_pockets_item.size() != 4)
+      if (!item.contains("Name"))
       {
         throw std::runtime_error(
-            std::format("[Component reader]: item {} must be an array with four elements, "
-                        "an array with the x,y,z positions, and a radius\n",
-                        block_pockets_item.dump()));
+            std::format("[Input reader]: component must have a key 'Name' with a value of string-type'\n"));
+      }
+      std::string jsonComponentName = item["Name"].get<std::string>();
+
+      Component::Type componentType = Component::Type::Adsorbate;
+      if (item["Type"].is_string())
+      {
+        std::string typeString = item["Type"].get<std::string>();
+        if (caseInSensStringCompare(typeString, "Adsorbate"))
+        {
+          componentType = Component::Type::Adsorbate;
+        }
+        else if (caseInSensStringCompare(typeString, "Cation"))
+        {
+          componentType = Component::Type::Cation;
+        }
       }
 
-      std::vector<double> data = block_pockets_item.is_array() ? block_pockets_item.get<std::vector<double>>() : std::vector<double>{};
+      // Convenience notation listing the properties as a single value. These will then be taken for all systems.
+      // ========================================================================================================
+
+      if (item["TranslationProbability"].is_number_float())
+      {
+        double probabilityTranslationMove = item["TranslationProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilityTranslationMove = probabilityTranslationMove;
+        }
+      }
+
+      if (item["RandomTranslationProbability"].is_number_float())
+      {
+        double probabilityRandomTranslationMove = item["RandomTranslationProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilityRandomTranslationMove = probabilityRandomTranslationMove;
+        }
+      }
+
+      if (item["RotationProbability"].is_number_float())
+      {
+        double probabilityRotationMove = item["RotationProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilityRotationMove = probabilityRotationMove;
+        }
+      }
+
+      if (item["RandomRotationProbability"].is_number_float())
+      {
+        double probabilityRandomTranslationMove = item["RandomRotationProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilityRandomTranslationMove = probabilityRandomTranslationMove;
+        }
+      }
+
+      if (item["ReinsertionProbability"].is_number_float())
+      {
+        double probabilityReinsertionMove_CBMC = item["ReinsertionProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilityReinsertionMove_CBMC = probabilityReinsertionMove_CBMC;
+        }
+      }
+
+      if (item["SwapConventionalProbability"].is_number_float())
+      {
+        double probabilitySwapMove = item["SwapConventionalProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilitySwapMove = probabilitySwapMove;
+        }
+      }
+
+      if (item["SwapProbability"].is_number_float())
+      {
+        double probabilitySwapMove_CBMC = item["SwapProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilitySwapMove_CBMC = probabilitySwapMove_CBMC;
+        }
+      }
+
+      if (item["CFCMC_SwapProbability"].is_number_float())
+      {
+        double probabilitySwapMove_CFCMC = item["CFCMC_SwapProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilitySwapMove_CFCMC = probabilitySwapMove_CFCMC;
+        }
+      }
+
+      if (item["CFCMC_CBMC_SwapProbability"].is_number_float())
+      {
+        double probabilitySwapMove_CFCMC_CBMC = item["CFCMC_CBMC_SwapProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilitySwapMove_CFCMC_CBMC = probabilitySwapMove_CFCMC_CBMC;
+        }
+      }
+
+      if (item["GibbsCFCMCSwapProbability"].is_number_float())
+      {
+        double probabilityGibbsSwapMove_CFCMC = item["GibbsCFCMCSwapProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilityGibbsSwapMove_CFCMC = probabilityGibbsSwapMove_CFCMC;
+        }
+      }
+
+      if (item["GibbsSwapProbability"].is_number_float())
+      {
+        double probabilityGibbsSwapMove_CBMC = item["GibbsSwapProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilityGibbsSwapMove_CBMC = probabilityGibbsSwapMove_CBMC;
+        }
+      }
+
+      if (item["WidomProbability"].is_number_float())
+      {
+        double probabilityWidomMove = item["WidomProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilityWidomMove = probabilityWidomMove;
+        }
+      }
+
+      if (item["CFCMC_WidomProbability"].is_number_float())
+      {
+        double probabilityWidomMove_CFCMC = item["CFCMC_WidomProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilityWidomMove_CFCMC = probabilityWidomMove_CFCMC;
+        }
+      }
+
+      if (item["CFCMC_CBMC_WidomProbability"].is_number_float())
+      {
+        double probabilityWidomMove_CFCMC_CBMC = item["CFCMC_CBMC_WidomProbability"].get<double>();
+        for (size_t i = 0; i < move_probabilities.size(); ++i)
+        {
+          move_probabilities[i].probabilityWidomMove_CFCMC_CBMC = probabilityWidomMove_CFCMC_CBMC;
+        }
+      }
+
+      if (item["CreateNumberOfMolecules"].is_number_integer())
+      {
+        size_t n = item["CreateNumberOfMolecules"].get<size_t>();
+        for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+        {
+          jsonCreateNumberOfMolecules[i][componentId] = n;
+        }
+      }
+
+      size_t jsonNumberOfLambdaBins{41};
+      if (parsed_data["NumberOfLambdaBins"].is_number_unsigned())
+      {
+        jsonNumberOfLambdaBins = parsed_data["NumberOfLambdaBins"].get<size_t>();
+      }
+
+      // Explicit notation listing the properties as an array of the values for the particular systems
+      // ========================================================================================================
+
+      if (item["CreateNumberOfMolecules"].is_array())
+      {
+        std::vector<size_t> initialNumberOfMolecule =
+            parseList<size_t>(jsonNumberOfSystems, "CreateNumberOfMolecules", item["CreateNumberOfMolecules"]);
+        for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+        {
+          jsonCreateNumberOfMolecules[i][componentId] = initialNumberOfMolecule[i];
+        }
+      }
+
+      // construct Component
       for (size_t i = 0; i != jsonNumberOfSystems; ++i)
       {
-        jsonComponents[i][componentId].blockingPockets.push_back(double4(data[0], data[1], data[2], data[3]));
-      }
-    }
+        if (!forceFields[i].has_value())
+        {
+          throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
+        }
 
-
-    componentId++;
-  }
-
-  for (size_t systemId = 0; auto& [key, value] : parsed_data["Systems"].items())
-  {
-    MCMoveProbabilitiesSystem mc_moves_probabilities{};
-
-    if (value["ForceField"].is_string())
-    {
-      std::string name = parsed_data["ForceField"].get<std::string>();
-      forceFields[systemId] = ForceField::readForceField(name, "force_field.json");
-    }
-
-    if (value["CutOffVDW"].is_number_float())
-    {
-      if (!forceFields[systemId].has_value())
-      {
-        throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
-      }
-      forceFields[systemId]->cutOffVDW = value["CutOffVDW"].get<double>();
-      forceFields[systemId]->preComputePotentialShift();
-    }
-
-    if (value["CutOffCoulomb"].is_number_float())
-    {
-      if (!forceFields[systemId].has_value())
-      {
-        throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
-      }
-      forceFields[systemId]->cutOffCoulomb = value["CutOffCoulomb"].get<double>();
-    }
-
-    if (value["OmitEwaldFourier"].is_boolean())
-    {
-      if (!forceFields[systemId].has_value())
-      {
-        throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
-      }
-      forceFields[systemId]->omitEwaldFourier = value["OmitEwaldFourier"].get<bool>();
-    }
-
-    if (value["ComputePolarization"].is_boolean())
-    {
-      if (!forceFields[systemId].has_value())
-      {
-        throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
-      }
-      forceFields[systemId]->computePolarization = value["ComputePolarization"].get<bool>();
-    }
-
-    if (value["ChargeMethod"].is_string())
-    {
-      if (!forceFields[systemId].has_value())
-      {
-        throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
+        jsonComponents[i][componentId] =
+            Component(componentType, componentId, forceFields[i].value(), jsonComponentName,
+                      jsonComponentName, jsonNumberOfBlocks, jsonNumberOfLambdaBins, move_probabilities[i]);
       }
 
-      std::string chargeMethodString = value["ChargeMethod"].get<std::string>();
-
-      if (caseInSensStringCompare(chargeMethodString, "Ewald"))
+      if (item["StartingBead"].is_number_integer())
       {
-        forceFields[systemId]->chargeMethod = ForceField::ChargeMethod::Ewald;
-        forceFields[systemId]->useCharge = true;
-      }
-      if (caseInSensStringCompare(chargeMethodString, "None"))
-      {
-        forceFields[systemId]->chargeMethod = ForceField::ChargeMethod::Ewald;
-        forceFields[systemId]->useCharge = false;
-      }
-    }
-
-    if (value["VolumeMoveProbability"].is_number_float())
-    {
-      mc_moves_probabilities.probabilityVolumeMove = value["VolumeMoveProbability"].get<double>();
-    }
-
-    if (value["GibbsVolumeMoveProbability"].is_number_float())
-    {
-      mc_moves_probabilities.probabilityGibbsVolumeMove = value["GibbsVolumeMoveProbability"].get<double>();
-    }
-
-    if (value["ParallelTemperingSwapProbability"].is_number_float())
-    {
-      mc_moves_probabilities.probabilityParallelTemperingSwap = value["ParallelTemperingSwapProbability"].get<double>();
-    }
-
-    if (!value.contains("Type"))
-    {
-      throw std::runtime_error(
-          std::format("[Input reader]: system must have a key 'Type' with value 'Box' or 'Framework'\n"));
-    }
-    std::string typeString = value["Type"].get<std::string>();
-
-    if (!value.contains("ExternalTemperature"))
-    {
-      throw std::runtime_error(
-          std::format("[Input reader]: framework must have a key 'ExternalTemperature' with a value of "
-                      "floating-point-type'\n"));
-    }
-    double T = value["ExternalTemperature"].get<double>();
-
-    bool useChargesFromCIFFile = true;
-    if (value.contains("UseChargesFromCIFFile"))
-    {
-      useChargesFromCIFFile = value["UseChargesFromCIFFile"].get<bool>();
-    }
-
-    std::optional<double> P{};
-    if (value.contains("ExternalPressure"))
-    {
-      P = value["ExternalPressure"].get<double>();
-    }
-
-    if (caseInSensStringCompare(typeString, "Framework"))
-    {
-      // Parse framework options
-      if (!value.contains("Name"))
-      {
-        throw std::runtime_error(
-            std::format("[Input reader]: framework must have a key 'Name' with a value of string-type'\n"));
-      }
-      std::string frameworkNameString = value["Name"].get<std::string>();
-
-      int3 jsonNumberOfUnitCells{1, 1, 1};
-      if (value.contains("NumberOfUnitCells"))
-      {
-        jsonNumberOfUnitCells = parseInt3("NumberOfUnitCells", value["NumberOfUnitCells"]);
-      }
-
-      double heliumVoidFraction{ 1.0 };
-      if (value.contains("HeliumVoidFraction"))
-      {
-        heliumVoidFraction = value["HeliumVoidFraction"].get<double>();
-      }
-
-      if (!forceFields[systemId].has_value())
-      {
-        throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
-      }
-
-      std::vector<Framework> jsonFrameworkComponents{
-          Framework(0, forceFields[systemId].value(), frameworkNameString, frameworkNameString, jsonNumberOfUnitCells, useChargesFromCIFFile)};
-
-      // create system
-      systems[systemId] = System(systemId, forceFields[systemId].value(),
-                                 std::nullopt, T, P, heliumVoidFraction,
-                                 jsonFrameworkComponents,
-                                 jsonComponents[systemId], jsonCreateNumberOfMolecules[systemId], jsonNumberOfBlocks,
-                                 mc_moves_probabilities);
-    }
-    else if (caseInSensStringCompare(typeString, "Box"))
-    {
-      // Parse box options
-
-      double3 boxLengths{25.0, 25.0, 25.0};
-      if (value.contains("BoxLengths"))
-      {
-        boxLengths = parseDouble3("BoxLengths", value["BoxLengths"]);
-      }
-
-      double3 boxAngles{90.0, 90.0, 90.0};
-      if (value.contains("BoxAngles"))
-      {
-        boxAngles = parseDouble3("BoxAngles", value["BoxAngles"]);
-      }
-      boxAngles = boxAngles * (std::numbers::pi / 180.0);
-
-      // create system
-      if (!forceFields[systemId].has_value())
-      {
-        throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
-      }
-      SimulationBox simulationBox{boxLengths.x, boxLengths.y, boxLengths.z, boxAngles.x, boxAngles.y, boxAngles.z};
-      systems[systemId] =
-          System(systemId, forceFields[systemId].value(), simulationBox, T, P, 1.0, {}, jsonComponents[systemId],
-                 jsonCreateNumberOfMolecules[systemId], jsonNumberOfBlocks, mc_moves_probabilities);
-    }
-    else
-    {
-      throw std::runtime_error(std::format("[Input reader]: system key 'Type' must have value 'Box' or 'Framework'\n"));
-    }
-
-    if (value.contains("ExternalField"))
-    {
-      systems[systemId].hasExternalField = value["ExternalField"].get<bool>();
-    }
-
-    if (value["ComputeEnergyHistogram"].is_boolean())
-    {
-      if (value["ComputeEnergyHistogram"].get<bool>())
-      {
-        size_t sampleEnergyHistogramEvery{ 1 };
-        if (value["SampleEnergyHistogramEvery"].is_number_unsigned())
+        size_t n = item["StartingBead"].get<size_t>();
+        for (size_t i = 0; i != jsonNumberOfSystems; ++i)
         {
-          sampleEnergyHistogramEvery = value["SampleEnergyHistogramEvery"].get<size_t>();
-        }
-
-        size_t writeEnergyHistogramEvery{ 5000 };
-        if (value["WriteEnergyHistogramEvery"].is_number_unsigned())
-        {
-          writeEnergyHistogramEvery = value["WriteEnergyHistogramEvery"].get<size_t>();
-        }
-
-        size_t numberOfBinsEnergyHistogram{ 128 };
-        if (value["NumberOfBinsEnergyHistogram"].is_number_unsigned())
-        {
-          numberOfBinsEnergyHistogram = value["NumberOfBinsEnergyHistogram"].get<size_t>();
-        }
-
-        double lowerLimitEnergyHistogram{ -5000.0 };
-        if (value["LowerLimitEnergyHistogram"].is_number_float())
-        {
-          lowerLimitEnergyHistogram = value["LowerLimitEnergyHistogram"].get<double>();
-        }
-
-        double upperLimitEnergyHistogram{ 1000.0 };
-        if (value["UpperLimitEnergyHistogram"].is_number_float())
-        {
-          upperLimitEnergyHistogram = value["UpperLimitEnergyHistogram"].get<double>();
-        }
-
-        systems[systemId].averageEnergyHistogram = PropertyEnergyHistogram(
-            jsonNumberOfBlocks, numberOfBinsEnergyHistogram, {lowerLimitEnergyHistogram, upperLimitEnergyHistogram},
-            sampleEnergyHistogramEvery, writeEnergyHistogramEvery);
-      }
-    }
-
-    if (value["ComputeNumberOfMoleculesHistogram"].is_boolean())
-    {
-      if (value["ComputeNumberOfMoleculesHistogram"].get<bool>())
-      {
-        size_t sampleNumberOfMoleculesHistogramEvery{ 1 };
-        if (value["SampleNumberOfMoleculesHistogramEvery"].is_number_unsigned())
-        {
-          sampleNumberOfMoleculesHistogramEvery = value["SampleNumberOfMoleculesHistogramEvery"].get<size_t>();
-        }
-
-        size_t writeNumberOfMoleculesHistogramEvery{ 5000 };
-        if (value["WriteNumberOfMoleculesHistogramEvery"].is_number_unsigned())
-        {
-          writeNumberOfMoleculesHistogramEvery = value["WriteNumberOfMoleculesHistogramEvery"].get<size_t>();
-        }
-
-        size_t minimumRangeNumberOfMoleculesHistogram{ 0 };
-        if (value["LowerLimitNumberOfMoleculesHistogram"].is_number_unsigned())
-        {
-          minimumRangeNumberOfMoleculesHistogram = value["LowerLimitNumberOfMoleculesHistogram"].get<size_t>();
-        }
-
-        size_t maximumRangeNumberOfMoleculesHistogram{ 200 };
-        if (value["UpperLimitNumberOfMoleculesHistogram"].is_number_unsigned())
-        {
-          maximumRangeNumberOfMoleculesHistogram = value["UpperLimitNumberOfMoleculesHistogram"].get<size_t>();
-        }
-
-        systems[systemId].averageNumberOfMoleculesHistogram = 
-          PropertyNumberOfMoleculesHistogram(jsonNumberOfBlocks, 
-                                  {minimumRangeNumberOfMoleculesHistogram, maximumRangeNumberOfMoleculesHistogram}, 
-                                  systems[systemId].components.size(),
-                                  sampleNumberOfMoleculesHistogramEvery, writeNumberOfMoleculesHistogramEvery);
-      }
-    }
-
-    if (value["ComputeRDF"].is_boolean())
-    {
-      if (value["ComputeRDF"].get<bool>())
-      {
-        size_t sampleRDFEvery{10};
-        if (value["SampleRDFEvery"].is_number_unsigned())
-        {
-          sampleRDFEvery = value["SampleRDFEvery"].get<size_t>();
-        }
-
-        size_t writeRDFEvery{5000};
-        if (value["WriteRDFEvery"].is_number_unsigned())
-        {
-          writeRDFEvery = value["WriteRDFEvery"].get<size_t>();
-        }
-
-        size_t numberOfBinsRDF{128};
-        if (value["NumberOfBinsRDF"].is_number_unsigned())
-        {
-          numberOfBinsRDF = value["NumberOfBinsRDF"].get<size_t>();
-        }
-
-        double rangeRDF{15.0};
-        if (value["UpperLimitRDF"].is_number_float())
-        {
-          rangeRDF = value["UpperLimitRDF"].get<double>();
-        }
-
-        systems[systemId].propertyRadialDistributionFunction =
-            PropertyRadialDistributionFunction(jsonNumberOfBlocks, systems[systemId].forceField.pseudoAtoms.size(),
-                                               numberOfBinsRDF, rangeRDF, sampleRDFEvery, writeRDFEvery);
-      }
-    }
-
-    if (value["ComputeConventionalRDF"].is_boolean())
-    {
-      if (value["ComputeConventionalRDF"].get<bool>())
-      {
-        size_t sampleConventionalRDFEvery{10};
-        if (value["SampleConventionalRDFEvery"].is_number_unsigned())
-        {
-          sampleConventionalRDFEvery = value["SampleConventionalRDFEvery"].get<size_t>();
-        }
-
-        size_t writeConventionalRDFEvery{5000};
-        if (value["WriteConventionalRDFEvery"].is_number_unsigned())
-        {
-          writeConventionalRDFEvery = value["WriteConventionalRDFEvery"].get<size_t>();
-        }
-
-        size_t numberOfBinsConventionalRDF{128};
-        if (value["NumberOfBinsConventionalRDF"].is_number_unsigned())
-        {
-          numberOfBinsConventionalRDF = value["NumberOfBinsConventionalRDF"].get<size_t>();
-        }
-
-        double rangeConventionalRDF{15.0};
-        if (value["RangeConventionalRDF"].is_number_float())
-        {
-          rangeConventionalRDF = value["RangeConventionalRDF"].get<double>();
-        }
-
-
-        systems[systemId].propertyConventionalRadialDistributionFunction =
-            PropertyConventionalRadialDistributionFunction(
-                jsonNumberOfBlocks, systems[systemId].forceField.pseudoAtoms.size(), numberOfBinsConventionalRDF,
-                rangeConventionalRDF, sampleConventionalRDFEvery, writeConventionalRDFEvery);
-      }
-    }
-
-
-    if (value["ComputeMSD"].is_boolean())
-    {
-      if (value["ComputeMSD"].get<bool>())
-      {
-        size_t sampleMSDEvery{ 10 };
-        if (value["SampleMSDEvery"].is_number_unsigned())
-        {
-          sampleMSDEvery = value["SampleMSDEvery"].get<size_t>();
-        }
-
-        size_t writeMSDEvery{ 5000 };
-        if (value["WriteMSDEvery"].is_number_unsigned())
-        {
-          writeMSDEvery = value["WriteMSDEvery"].get<size_t>();
-        }
-
-        size_t numberOfBlockElementsMSD{ 25 };
-        if (value["NumberOfBlockElementsMSD"].is_number_unsigned())
-        {
-          numberOfBlockElementsMSD = value["NumberOfBlockElementsMSD"].get<size_t>();
-        }
-
-        systems[systemId].propertyMSD = 
-          PropertyMeanSquaredDisplacement(systems[systemId].components.size(), 
-              systems[systemId].moleculePositions.size(), sampleMSDEvery, writeMSDEvery, numberOfBlockElementsMSD);
-      }
-    }
-
-    if (value["ComputeDensityGrid"].is_boolean())
-    {
-      if (value["ComputeDensityGrid"].get<bool>())
-      {
-        size_t sampleDensityGridEvery{10};
-        if (value["SampleDensityGridEvery"].is_number_unsigned())
-        {
-          sampleDensityGridEvery = value["SampleDensityGridEvery"].get<size_t>();
-        }
-
-        size_t writeDensityGridEvery{5000};
-        if (value["WriteDensityGridEvery"].is_number_unsigned())
-        {
-          writeDensityGridEvery = value["WriteDensityGridEvery"].get<size_t>();
-        }
-
-        int3 densityGridSize{128, 128, 128};
-        if (value["DensityGridSize"].is_array())
-        {
-          densityGridSize = parseInt3("DensityGridSize", value["DensityGridSize"]);
-        }
-
-        std::vector<size_t> densityGridPseudoAtomsList{};
-        if (value["DensityGridPseudoAtomsList"].is_array())
-        {
-          std::vector<std::string> string_list = value["DensityGridPseudoAtomsList"].get<std::vector<std::string>>();
-          for (std::string string : string_list)
+          if (n >= jsonComponents[i][componentId].definedAtoms.size())
           {
-            std::optional<size_t> atomType = systems[systemId].forceField.findPseudoAtom(string);
-            if (atomType.has_value())
-            {
-              densityGridPseudoAtomsList.push_back(atomType.value());
-            }
+            throw std::runtime_error(std::format("[Input reader]: starting bead larger than the molecule size'\n"));
+          }
+
+          jsonComponents[i][componentId].startingBead = n;
+        }
+      }
+
+      if (item["FugacityCoefficient"].is_number_float())
+      {
+        double fugacity_coefficient = item["FugacityCoefficient"].get<double>();
+        for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+        {
+          jsonComponents[i][componentId].fugacityCoefficient = fugacity_coefficient;
+        }
+      }
+
+      if (item["ThermodynamicIntegration"].is_boolean())
+      {
+        bool thermodynamic_integration = item["ThermodynamicIntegration"].get<bool>();
+        for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+        {
+          jsonComponents[i][componentId].lambdaGC.computeDUdlambda = thermodynamic_integration;
+        }
+      }
+
+      if(item.contains("BlockingPockets"))
+      {
+        for (auto &[_, block_pockets_item] : item["BlockingPockets"].items())
+        {
+          if (!block_pockets_item.is_array())
+          {
+            throw std::runtime_error(std::format("[Component reader]: item {} must be an array\n", block_pockets_item.dump()));
+          }
+
+          if (block_pockets_item.size() != 4)
+          {
+            throw std::runtime_error(
+                std::format("[Component reader]: item {} must be an array with four elements, "
+                            "an array with the x,y,z positions, and a radius\n",
+                            block_pockets_item.dump()));
+          }
+
+          std::vector<double> data = block_pockets_item.is_array() ? block_pockets_item.get<std::vector<double>>() : std::vector<double>{};
+          for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+          {
+            jsonComponents[i][componentId].blockingPockets.push_back(double4(data[0], data[1], data[2], data[3]));
           }
         }
-
-        systems[systemId].propertyDensityGrid = PropertyDensityGrid(
-            systems[systemId].frameworkComponents.size(), systems[systemId].components.size(), densityGridSize,
-            sampleDensityGridEvery, writeDensityGridEvery, densityGridPseudoAtomsList);
       }
-    }
 
-    if (value["OutputPDBMovie"].is_boolean())
+
+      componentId++;
+    }
+  }
+
+  if(parsed_data.contains("Systems"))
+  {
+    for (size_t systemId = 0; auto& [key, value] : parsed_data["Systems"].items())
     {
-      if (value["OutputPDBMovie"].get<bool>())
+      MCMoveProbabilitiesSystem mc_moves_probabilities{};
+
+      if (value["ForceField"].is_string())
       {
-        size_t sampleMovieEvery{1};
-        if (value["SampleMovieEvery"].is_number_unsigned())
+        std::string name = parsed_data["ForceField"].get<std::string>();
+        forceFields[systemId] = ForceField::readForceField(name, "force_field.json");
+      }
+
+      if (value["CutOffVDW"].is_number_float())
+      {
+        if (!forceFields[systemId].has_value())
         {
-          sampleMovieEvery = value["SampleMovieEvery"].get<size_t>();
+          throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
+        }
+        forceFields[systemId]->cutOffVDW = value["CutOffVDW"].get<double>();
+        forceFields[systemId]->preComputePotentialShift();
+      }
+
+      if (value["CutOffCoulomb"].is_number_float())
+      {
+        if (!forceFields[systemId].has_value())
+        {
+          throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
+        }
+        forceFields[systemId]->cutOffCoulomb = value["CutOffCoulomb"].get<double>();
+      }
+
+      if (value["OmitEwaldFourier"].is_boolean())
+      {
+        if (!forceFields[systemId].has_value())
+        {
+          throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
+        }
+        forceFields[systemId]->omitEwaldFourier = value["OmitEwaldFourier"].get<bool>();
+      }
+
+      if (value["ComputePolarization"].is_boolean())
+      {
+        if (!forceFields[systemId].has_value())
+        {
+          throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
+        }
+        forceFields[systemId]->computePolarization = value["ComputePolarization"].get<bool>();
+      }
+
+      if (value["ChargeMethod"].is_string())
+      {
+        if (!forceFields[systemId].has_value())
+        {
+          throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
         }
 
-        systems[systemId].samplePDBMovie = SampleMovie(systemId, sampleMovieEvery);
+        std::string chargeMethodString = value["ChargeMethod"].get<std::string>();
+
+        if (caseInSensStringCompare(chargeMethodString, "Ewald"))
+        {
+          forceFields[systemId]->chargeMethod = ForceField::ChargeMethod::Ewald;
+          forceFields[systemId]->useCharge = true;
+        }
+        if (caseInSensStringCompare(chargeMethodString, "None"))
+        {
+          forceFields[systemId]->chargeMethod = ForceField::ChargeMethod::Ewald;
+          forceFields[systemId]->useCharge = false;
+        }
       }
-    }
 
-
-    if (value["Ensemble"].is_string())
-    {
-      size_t thermostatChainLength{ 5 };
-      size_t numberOfYoshidaSuzukiSteps{ 5 };
-
-      std::string ensembleString = value["Ensemble"].get<std::string>();
-      if (caseInSensStringCompare(ensembleString, "NVT"))
+      if (value["VolumeMoveProbability"].is_number_float())
       {
-        systems[systemId].thermostat = Thermostat(systems[systemId].temperature, thermostatChainLength, numberOfYoshidaSuzukiSteps, 
-            systems[systemId].timeStep, systems[systemId].translationalDegreesOfFreedom, systems[systemId].rotationalDegreesOfFreedom);
+        mc_moves_probabilities.probabilityVolumeMove = value["VolumeMoveProbability"].get<double>();
       }
-    }
 
-    if (value["TimeStep"].is_number_float())
-    {
-      systems[systemId].timeStep = value["TimeStep"].get<double>();
-    }
+      if (value["GibbsVolumeMoveProbability"].is_number_float())
+      {
+        mc_moves_probabilities.probabilityGibbsVolumeMove = value["GibbsVolumeMoveProbability"].get<double>();
+      }
 
-    systemId++;
+      if (value["ParallelTemperingSwapProbability"].is_number_float())
+      {
+        mc_moves_probabilities.probabilityParallelTemperingSwap = value["ParallelTemperingSwapProbability"].get<double>();
+      }
+
+      if (!value.contains("Type"))
+      {
+        throw std::runtime_error(
+            std::format("[Input reader]: system must have a key 'Type' with value 'Box' or 'Framework'\n"));
+      }
+      std::string typeString = value["Type"].get<std::string>();
+
+      if (!value.contains("ExternalTemperature"))
+      {
+        throw std::runtime_error(
+            std::format("[Input reader]: framework must have a key 'ExternalTemperature' with a value of "
+                        "floating-point-type'\n"));
+      }
+      double T = value["ExternalTemperature"].get<double>();
+
+      bool useChargesFromCIFFile = true;
+      if (value.contains("UseChargesFromCIFFile"))
+      {
+        useChargesFromCIFFile = value["UseChargesFromCIFFile"].get<bool>();
+      }
+
+      std::optional<double> P{};
+      if (value.contains("ExternalPressure"))
+      {
+        P = value["ExternalPressure"].get<double>();
+      }
+
+      if (caseInSensStringCompare(typeString, "Framework"))
+      {
+        // Parse framework options
+        if (!value.contains("Name"))
+        {
+          throw std::runtime_error(
+              std::format("[Input reader]: framework must have a key 'Name' with a value of string-type'\n"));
+        }
+        std::string frameworkNameString = value["Name"].get<std::string>();
+
+        int3 jsonNumberOfUnitCells{1, 1, 1};
+        if (value.contains("NumberOfUnitCells"))
+        {
+          jsonNumberOfUnitCells = parseInt3("NumberOfUnitCells", value["NumberOfUnitCells"]);
+        }
+
+        double heliumVoidFraction{ 1.0 };
+        if (value.contains("HeliumVoidFraction"))
+        {
+          heliumVoidFraction = value["HeliumVoidFraction"].get<double>();
+        }
+
+        if (!forceFields[systemId].has_value())
+        {
+          throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
+        }
+
+        std::vector<Framework> jsonFrameworkComponents{
+            Framework(0, forceFields[systemId].value(), frameworkNameString, frameworkNameString, jsonNumberOfUnitCells, useChargesFromCIFFile)};
+
+        // create system
+        systems[systemId] = System(systemId, forceFields[systemId].value(),
+                                   std::nullopt, T, P, heliumVoidFraction,
+                                   jsonFrameworkComponents,
+                                   jsonComponents[systemId], jsonCreateNumberOfMolecules[systemId], jsonNumberOfBlocks,
+                                   mc_moves_probabilities);
+      }
+      else if (caseInSensStringCompare(typeString, "Box"))
+      {
+        // Parse box options
+
+        double3 boxLengths{25.0, 25.0, 25.0};
+        if (value.contains("BoxLengths"))
+        {
+          boxLengths = parseDouble3("BoxLengths", value["BoxLengths"]);
+        }
+
+        double3 boxAngles{90.0, 90.0, 90.0};
+        if (value.contains("BoxAngles"))
+        {
+          boxAngles = parseDouble3("BoxAngles", value["BoxAngles"]);
+        }
+        boxAngles = boxAngles * (std::numbers::pi / 180.0);
+
+        // create system
+        if (!forceFields[systemId].has_value())
+        {
+          throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
+        }
+        SimulationBox simulationBox{boxLengths.x, boxLengths.y, boxLengths.z, boxAngles.x, boxAngles.y, boxAngles.z};
+        systems[systemId] =
+            System(systemId, forceFields[systemId].value(), simulationBox, T, P, 1.0, {}, jsonComponents[systemId],
+                   jsonCreateNumberOfMolecules[systemId], jsonNumberOfBlocks, mc_moves_probabilities);
+      }
+      else
+      {
+        throw std::runtime_error(std::format("[Input reader]: system key 'Type' must have value 'Box' or 'Framework'\n"));
+      }
+
+      if (value.contains("ExternalField"))
+      {
+        systems[systemId].hasExternalField = value["ExternalField"].get<bool>();
+      }
+
+      if (value["ComputeEnergyHistogram"].is_boolean())
+      {
+        if (value["ComputeEnergyHistogram"].get<bool>())
+        {
+          size_t sampleEnergyHistogramEvery{ 1 };
+          if (value["SampleEnergyHistogramEvery"].is_number_unsigned())
+          {
+            sampleEnergyHistogramEvery = value["SampleEnergyHistogramEvery"].get<size_t>();
+          }
+
+          size_t writeEnergyHistogramEvery{ 5000 };
+          if (value["WriteEnergyHistogramEvery"].is_number_unsigned())
+          {
+            writeEnergyHistogramEvery = value["WriteEnergyHistogramEvery"].get<size_t>();
+          }
+
+          size_t numberOfBinsEnergyHistogram{ 128 };
+          if (value["NumberOfBinsEnergyHistogram"].is_number_unsigned())
+          {
+            numberOfBinsEnergyHistogram = value["NumberOfBinsEnergyHistogram"].get<size_t>();
+          }
+
+          double lowerLimitEnergyHistogram{ -5000.0 };
+          if (value["LowerLimitEnergyHistogram"].is_number_float())
+          {
+            lowerLimitEnergyHistogram = value["LowerLimitEnergyHistogram"].get<double>();
+          }
+
+          double upperLimitEnergyHistogram{ 1000.0 };
+          if (value["UpperLimitEnergyHistogram"].is_number_float())
+          {
+            upperLimitEnergyHistogram = value["UpperLimitEnergyHistogram"].get<double>();
+          }
+
+          systems[systemId].averageEnergyHistogram = PropertyEnergyHistogram(
+              jsonNumberOfBlocks, numberOfBinsEnergyHistogram, {lowerLimitEnergyHistogram, upperLimitEnergyHistogram},
+              sampleEnergyHistogramEvery, writeEnergyHistogramEvery);
+        }
+      }
+
+      if (value["ComputeNumberOfMoleculesHistogram"].is_boolean())
+      {
+        if (value["ComputeNumberOfMoleculesHistogram"].get<bool>())
+        {
+          size_t sampleNumberOfMoleculesHistogramEvery{ 1 };
+          if (value["SampleNumberOfMoleculesHistogramEvery"].is_number_unsigned())
+          {
+            sampleNumberOfMoleculesHistogramEvery = value["SampleNumberOfMoleculesHistogramEvery"].get<size_t>();
+          }
+
+          size_t writeNumberOfMoleculesHistogramEvery{ 5000 };
+          if (value["WriteNumberOfMoleculesHistogramEvery"].is_number_unsigned())
+          {
+            writeNumberOfMoleculesHistogramEvery = value["WriteNumberOfMoleculesHistogramEvery"].get<size_t>();
+          }
+
+          size_t minimumRangeNumberOfMoleculesHistogram{ 0 };
+          if (value["LowerLimitNumberOfMoleculesHistogram"].is_number_unsigned())
+          {
+            minimumRangeNumberOfMoleculesHistogram = value["LowerLimitNumberOfMoleculesHistogram"].get<size_t>();
+          }
+
+          size_t maximumRangeNumberOfMoleculesHistogram{ 200 };
+          if (value["UpperLimitNumberOfMoleculesHistogram"].is_number_unsigned())
+          {
+            maximumRangeNumberOfMoleculesHistogram = value["UpperLimitNumberOfMoleculesHistogram"].get<size_t>();
+          }
+
+          systems[systemId].averageNumberOfMoleculesHistogram = 
+            PropertyNumberOfMoleculesHistogram(jsonNumberOfBlocks, 
+                                    {minimumRangeNumberOfMoleculesHistogram, maximumRangeNumberOfMoleculesHistogram}, 
+                                    systems[systemId].components.size(),
+                                    sampleNumberOfMoleculesHistogramEvery, writeNumberOfMoleculesHistogramEvery);
+        }
+      }
+
+      if (value["ComputeRDF"].is_boolean())
+      {
+        if (value["ComputeRDF"].get<bool>())
+        {
+          size_t sampleRDFEvery{10};
+          if (value["SampleRDFEvery"].is_number_unsigned())
+          {
+            sampleRDFEvery = value["SampleRDFEvery"].get<size_t>();
+          }
+
+          size_t writeRDFEvery{5000};
+          if (value["WriteRDFEvery"].is_number_unsigned())
+          {
+            writeRDFEvery = value["WriteRDFEvery"].get<size_t>();
+          }
+
+          size_t numberOfBinsRDF{128};
+          if (value["NumberOfBinsRDF"].is_number_unsigned())
+          {
+            numberOfBinsRDF = value["NumberOfBinsRDF"].get<size_t>();
+          }
+
+          double rangeRDF{15.0};
+          if (value["UpperLimitRDF"].is_number_float())
+          {
+            rangeRDF = value["UpperLimitRDF"].get<double>();
+          }
+
+          systems[systemId].propertyRadialDistributionFunction =
+              PropertyRadialDistributionFunction(jsonNumberOfBlocks, systems[systemId].forceField.pseudoAtoms.size(),
+                                                 numberOfBinsRDF, rangeRDF, sampleRDFEvery, writeRDFEvery);
+        }
+      }
+
+      if (value["ComputeConventionalRDF"].is_boolean())
+      {
+        if (value["ComputeConventionalRDF"].get<bool>())
+        {
+          size_t sampleConventionalRDFEvery{10};
+          if (value["SampleConventionalRDFEvery"].is_number_unsigned())
+          {
+            sampleConventionalRDFEvery = value["SampleConventionalRDFEvery"].get<size_t>();
+          }
+
+          size_t writeConventionalRDFEvery{5000};
+          if (value["WriteConventionalRDFEvery"].is_number_unsigned())
+          {
+            writeConventionalRDFEvery = value["WriteConventionalRDFEvery"].get<size_t>();
+          }
+
+          size_t numberOfBinsConventionalRDF{128};
+          if (value["NumberOfBinsConventionalRDF"].is_number_unsigned())
+          {
+            numberOfBinsConventionalRDF = value["NumberOfBinsConventionalRDF"].get<size_t>();
+          }
+
+          double rangeConventionalRDF{15.0};
+          if (value["RangeConventionalRDF"].is_number_float())
+          {
+            rangeConventionalRDF = value["RangeConventionalRDF"].get<double>();
+          }
+
+
+          systems[systemId].propertyConventionalRadialDistributionFunction =
+              PropertyConventionalRadialDistributionFunction(
+                  jsonNumberOfBlocks, systems[systemId].forceField.pseudoAtoms.size(), numberOfBinsConventionalRDF,
+                  rangeConventionalRDF, sampleConventionalRDFEvery, writeConventionalRDFEvery);
+        }
+      }
+
+
+      if (value["ComputeMSD"].is_boolean())
+      {
+        if (value["ComputeMSD"].get<bool>())
+        {
+          size_t sampleMSDEvery{ 10 };
+          if (value["SampleMSDEvery"].is_number_unsigned())
+          {
+            sampleMSDEvery = value["SampleMSDEvery"].get<size_t>();
+          }
+
+          size_t writeMSDEvery{ 5000 };
+          if (value["WriteMSDEvery"].is_number_unsigned())
+          {
+            writeMSDEvery = value["WriteMSDEvery"].get<size_t>();
+          }
+
+          size_t numberOfBlockElementsMSD{ 25 };
+          if (value["NumberOfBlockElementsMSD"].is_number_unsigned())
+          {
+            numberOfBlockElementsMSD = value["NumberOfBlockElementsMSD"].get<size_t>();
+          }
+
+          systems[systemId].propertyMSD = 
+            PropertyMeanSquaredDisplacement(systems[systemId].components.size(), 
+                systems[systemId].moleculePositions.size(), sampleMSDEvery, writeMSDEvery, numberOfBlockElementsMSD);
+        }
+      }
+
+      if (value["ComputeDensityGrid"].is_boolean())
+      {
+        if (value["ComputeDensityGrid"].get<bool>())
+        {
+          size_t sampleDensityGridEvery{10};
+          if (value["SampleDensityGridEvery"].is_number_unsigned())
+          {
+            sampleDensityGridEvery = value["SampleDensityGridEvery"].get<size_t>();
+          }
+
+          size_t writeDensityGridEvery{5000};
+          if (value["WriteDensityGridEvery"].is_number_unsigned())
+          {
+            writeDensityGridEvery = value["WriteDensityGridEvery"].get<size_t>();
+          }
+
+          int3 densityGridSize{128, 128, 128};
+          if (value["DensityGridSize"].is_array())
+          {
+            densityGridSize = parseInt3("DensityGridSize", value["DensityGridSize"]);
+          }
+
+          std::vector<size_t> densityGridPseudoAtomsList{};
+          if (value["DensityGridPseudoAtomsList"].is_array())
+          {
+            std::vector<std::string> string_list = value["DensityGridPseudoAtomsList"].get<std::vector<std::string>>();
+            for (std::string string : string_list)
+            {
+              std::optional<size_t> atomType = systems[systemId].forceField.findPseudoAtom(string);
+              if (atomType.has_value())
+              {
+                densityGridPseudoAtomsList.push_back(atomType.value());
+              }
+            }
+          }
+
+          systems[systemId].propertyDensityGrid = PropertyDensityGrid(
+              systems[systemId].frameworkComponents.size(), systems[systemId].components.size(), densityGridSize,
+              sampleDensityGridEvery, writeDensityGridEvery, densityGridPseudoAtomsList);
+        }
+      }
+
+      if (value["OutputPDBMovie"].is_boolean())
+      {
+        if (value["OutputPDBMovie"].get<bool>())
+        {
+          size_t sampleMovieEvery{1};
+          if (value["SampleMovieEvery"].is_number_unsigned())
+          {
+            sampleMovieEvery = value["SampleMovieEvery"].get<size_t>();
+          }
+
+          systems[systemId].samplePDBMovie = SampleMovie(systemId, sampleMovieEvery);
+        }
+      }
+
+
+      if (value["Ensemble"].is_string())
+      {
+        size_t thermostatChainLength{ 5 };
+        size_t numberOfYoshidaSuzukiSteps{ 5 };
+
+        std::string ensembleString = value["Ensemble"].get<std::string>();
+        if (caseInSensStringCompare(ensembleString, "NVT"))
+        {
+          systems[systemId].thermostat = Thermostat(systems[systemId].temperature, thermostatChainLength, numberOfYoshidaSuzukiSteps, 
+              systems[systemId].timeStep, systems[systemId].translationalDegreesOfFreedom, systems[systemId].rotationalDegreesOfFreedom);
+        }
+      }
+
+      if (value["TimeStep"].is_number_float())
+      {
+        systems[systemId].timeStep = value["TimeStep"].get<double>();
+      }
+
+      systemId++;
+    }
   }
 
   // Post-compute
