@@ -29,6 +29,7 @@ _deps
 test_*
 restart_data.bin
 examples/*/*/run
+**/run
 
 dependencies.sh
 examples/*/*/output/
