@@ -49,7 +49,8 @@ target_link_libraries(unit_tests_symmetrykit PRIVATE
                       libs::raspakit
                       ${BLAS_LIBRARIES}
                       ${LAPACK_LIBRARIES}
-                      ${HDF5_CXX_LIBRARIES}
+                      /usr/local/lib/libhdf5_cpp.a
+                      /usr/local/lib/libhdf5.a
                       GTest::gtest
                       GTest::gtest_main
                       GTest::gmock
@@ -60,6 +61,7 @@ target_link_libraries(unit_tests_symmetrykit PRIVATE
                       ${LLVM_LIBS}/c++/libc++abi.a
                       ${LLVM_LIBS}/libunwind.a
                       ${LLVM_LIBS}/../../../libomp/${LLVM_VERSION}/lib/libomp.a
+                      -lz
                       -lpthread
 )
 endif()

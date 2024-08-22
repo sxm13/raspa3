@@ -43,13 +43,15 @@ elseif (APPLE)
         libs::raspakit
         ${BLAS_LIBRARIES}
         ${LAPACK_LIBRARIES}
-        ${HDF5_CXX_LIBRARIES}
+        /usr/local/lib/libhdf5_cpp.a
+      	/usr/local/lib/libhdf5.a
         -nostdlib++
         ${LLVM_LIBS}/c++/libc++experimental.a
         ${LLVM_LIBS}/c++/libc++.a
         ${LLVM_LIBS}/c++/libc++abi.a
         ${LLVM_LIBS}/libunwind.a
         ${LLVM_LIBS}/../../../libomp/${LLVM_VERSION}/lib/libomp.a
+        -lz
         -lpthread
 )
 endif()
