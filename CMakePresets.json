@@ -27,6 +27,37 @@
       }
     },
     {
+      "name": "windows-intel",
+      "description": "Sets compilers, build type",
+      "inherits": [
+        "base"
+      ],
+      "cacheVariables": {
+        "CMAKE_OSX_ARCHITECTURES": "x86_64",
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=lld",
+        "CMAKE_INSTALL_PREFIX": "C:/Program Files",
+        "PACKAGE_INSTALL_PREFIX": "C:/Program Files",
+        "CMAKE_CXX_FLAGS_RELEASE": "-DNDEBUG -stdlib=libc++ -fvisibility=hidden -fexperimental-library -Xclang -fopenmp -g -O3 -march=core-avx2 -mfma  -fomit-frame-pointer -ffast-math",
+        "OpenMP_CXX_FLAGS": "-Xclang -fopenmp=libomp",
+        "BLAS_LIBRARIES" : "C:/vcpkg/installed/x64-windows-static/lib/blas.dll",
+        "LAPACK_LIBRARIES" : "C:/vcpkg/installed/x64-windows-static/lib/lapack.dll",
+        "HDF5_USE_STATIC_LIBRARIES" : true,
+        "HDF5_ROOT" : "C:/vcpkg/installed/x64-windows-static/",
+        "CMAKE_BUILD_WITH_INSTALL_RPATH": true,
+        "BUILD_MAC_PACKAGE": true,
+        "BUILD_TESTING": true
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "macOS"
+          ]
+        }
+      }
+    },
+    {
       "name": "macos-intel",
       "description": "Sets compilers, build type",
       "inherits": [

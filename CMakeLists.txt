@@ -44,15 +44,17 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(PROJECT_WARNINGS_CXX ${GCC_WARNINGS})
 endif()
 
-execute_process (
-  COMMAND bash -c "llvm-config --libdir"
-  OUTPUT_VARIABLE LLVM_LIBS
-)
-
-execute_process (
-  COMMAND bash -c "llvm-config --version"
-  OUTPUT_VARIABLE LLVM_VERSION
-)
+if(NOT WIN32)
+  execute_process (
+    COMMAND bash -c "llvm-config --libdir"
+    OUTPUT_VARIABLE LLVM_LIBS
+  )
+  
+  execute_process (
+    COMMAND bash -c "llvm-config --version"
+    OUTPUT_VARIABLE LLVM_VERSION
+  )
+endif()
 
 add_subdirectory(src)
 add_subdirectory(data)

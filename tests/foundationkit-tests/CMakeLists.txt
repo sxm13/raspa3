@@ -24,7 +24,7 @@ if (LINUX)
                         -lz
                         -lpthread
 )
-elseif (Win32)
+elseif (WIN32)
   target_link_libraries(unit_tests_foundationkit
                         PUBLIC
                         libs::raspakit
