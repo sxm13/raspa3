@@ -9,8 +9,8 @@ set yrange[0:]
 set lmargin 10
 set bmargin 4
 set xtics 0, 1000,5000
-ax=2.50741
-bx=141.503
+ax=1.6653
+bx=5.76825
 f(x)=ax*2*x+bx
-plot f(x) notitle with li lt 9 lw 2,'MSDOrderN/System_0/msd_onsager_methane_0_methane_0.dat' us 1:4 title 'D_C(y)' with po lt 10 lw 2 pt 1 ps 2.0,'MSDOrderN/System_0/msd_self_total.dat' us 1:4 title 'D_S(y)' with po lt 12 lw 1 pt 7 ps 1.0
+plot f(x) notitle with li lt 9 lw 2,'msd/msd_onsager_methane_methane.s0.data' us 1:4 title 'D_C(y)' with po lt 10 lw 2 pt 1 ps 2.0,'msd/msd_self_methane.s0.data' us 1:4 title 'D_S(y)' with po lt 12 lw 1 pt 7 ps 1.0
 pause -1 "Hit return to continue"

@@ -1,0 +1,13 @@
+set encoding iso_8859_1
+set key top left Left reverse width 0.5 samplen 0.5 height 0.3 box
+set xlabel 'Time, {/Helvetica-Italic t} / ps' font "Helvetica,20"
+set ylabel 'Mean square displacement / {\305}^2' offset 0.0,0 font "Helvetica,20"
+set xrange[0:5000]
+set yrange[0:200]
+#set format x "10^{%T}"
+#set format y "10^{%T}"
+set lmargin 9.5
+set bmargin 4
+set xtics 0, 2500,15000
+plot 'msd/msd_self_methane.s0.data' us 1:3 title 'D_S(x)' with po lt 12 lc "magenta" lw 1 pt 7 ps 1.0,'msd/msd_self_methane.s0.data' us 1:4 title 'D_S(y)' with po lt 12 lc "blue" lw 1 pt 7 ps 1.0,'msd/msd_self_methane.s0.data' us 1:5 title 'D_S(z)' with po lt 12 lc "navy" lw 1 pt 7 ps 1.0
+pause -1 "Hit return to continue"

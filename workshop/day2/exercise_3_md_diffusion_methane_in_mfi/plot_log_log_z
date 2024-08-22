@@ -15,5 +15,5 @@ set label 'slope of 2' at 0.01,20
 set arrow from 0.2,50 to 2.2,150 front lt -1 lw 3
 ax=0.325
 f(x)=ax*2*x
-plot f(x) notitle with li lt 9 lw 2,15*(x**2) notitle with li lt 9 lw 2,'MSDOrderN/System_0/msd_onsager_methane_0_methane_0.dat' us 1:5 title 'D_C' with po lt 10 lw 2 pt 1 ps 2.0,'MSDOrderN/System_0/msd_self_total.dat' us 1:5 title 'D_S' with po lt 12 lw 1 pt 7 ps 1.0
+plot f(x) notitle with li lt 9 lw 2,15*(x**2) notitle with li lt 9 lw 2,'msd/msd_onsager_methane_methane.s0.data' us 1:5 title 'D_C' with po lt 10 lw 2 pt 1 ps 2.0,'msd/msd_self_methane.s0.data' us 1:5 title 'D_S' with po lt 12 lw 1 pt 7 ps 1.0
 pause -1 "Hit return to continue"
