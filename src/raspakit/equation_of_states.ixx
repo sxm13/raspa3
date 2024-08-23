@@ -2,12 +2,14 @@ module;
 
 #ifdef USE_LEGACY_HEADERS
 #include <vector>
+#include <fstream>
 #endif
 
 export module equation_of_states;
 
 #ifndef USE_LEGACY_HEADERS
 import <vector>;
+import <fstream>;
 #endif
 
 import archive;

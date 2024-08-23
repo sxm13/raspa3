@@ -18,6 +18,7 @@ module;
 #include <string>
 #include <tuple>
 #include <vector>
+#include <filesystem>
 #endif
 
 module property_rdf;
@@ -40,6 +41,7 @@ import <cmath>;
 import <exception>;
 import <source_location>;
 import <print>;
+import <filesystem>;
 #endif
 
 import archive;
@@ -61,12 +63,12 @@ void PropertyRadialDistributionFunction::sample(const SimulationBox &simulationB
 
   if (moleculeAtoms.empty()) return;
 
-  for (std::span<const Atom>::iterator it1 = frameworkAtoms.begin(); it1 != frameworkAtoms.end(); ++it1)
+  for (std::span<Atom>::iterator it1 = frameworkAtoms.begin(); it1 != frameworkAtoms.end(); ++it1)
   {
     posA = it1->position;
     gradientA = it1->gradient;
     size_t typeA = static_cast<size_t>(it1->type);
-    for (std::span<const Atom>::iterator it2 = moleculeAtoms.begin(); it2 != moleculeAtoms.end(); ++it2)
+    for (std::span<Atom>::iterator it2 = moleculeAtoms.begin(); it2 != moleculeAtoms.end(); ++it2)
     {
       posB = it2->position;
       gradientB = it2->gradient;
@@ -93,7 +95,7 @@ void PropertyRadialDistributionFunction::sample(const SimulationBox &simulationB
     }
   }
 
-  for (std::span<const Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end() - 1; ++it1)
+  for (std::span<Atom>::iterator it1 = moleculeAtoms.begin(); it1 != moleculeAtoms.end() - 1; ++it1)
   {
     posA = it1->position;
     gradientA = it1->gradient;
@@ -101,7 +103,7 @@ void PropertyRadialDistributionFunction::sample(const SimulationBox &simulationB
     size_t compA = static_cast<size_t>(it1->componentId);
     size_t typeA = static_cast<size_t>(it1->type);
 
-    for (std::span<const Atom>::iterator it2 = it1 + 1; it2 != moleculeAtoms.end(); ++it2)
+    for (std::span<Atom>::iterator it2 = it1 + 1; it2 != moleculeAtoms.end(); ++it2)
     {
       size_t molB = static_cast<size_t>(it2->moleculeId);
       size_t compB = static_cast<size_t>(it2->componentId);

@@ -23,11 +23,31 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run.cmake.in ${CMAKE_CURRENT_SOURCE_D
 
 
 install(DIRECTORY basic DESTINATION share/raspa3/examples 
-        COMPONENT examples-basic
+        COMPONENT examples
         PATTERN "run" EXCLUDE
         PERMISSIONS OWNER_READ GROUP_READ)
 
 install(DIRECTORY basic DESTINATION share/raspa3/examples 
-        COMPONENT examples-basic
+        COMPONENT examples
+        PATTERN "run" 
+        PERMISSIONS  OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ)
+
+install(DIRECTORY non-basic DESTINATION share/raspa3/examples 
+        COMPONENT examples
+        PATTERN "run" EXCLUDE
+        PERMISSIONS OWNER_READ GROUP_READ)
+
+install(DIRECTORY non-basic DESTINATION share/raspa3/examples 
+        COMPONENT examples
+        PATTERN "run" 
+        PERMISSIONS  OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ)
+
+install(DIRECTORY advanced DESTINATION share/raspa3/examples 
+        COMPONENT examples
+        PATTERN "run" EXCLUDE
+        PERMISSIONS OWNER_READ GROUP_READ)
+
+install(DIRECTORY advanced DESTINATION share/raspa3/examples 
+        COMPONENT examples
         PATTERN "run" 
         PERMISSIONS  OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ)

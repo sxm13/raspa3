@@ -4,6 +4,7 @@ module;
 #include <cstddef>
 #include <optional>
 #include <span>
+#include <vector>
 #endif
 
 export module mc_moves_random_rotation;
@@ -11,7 +12,7 @@ export module mc_moves_random_rotation;
 #ifndef USE_LEGACY_HEADERS
 import <cstddef>;
 import <optional>;
-import <span>;
+import <vector>;
 #endif
 
 import randomnumbers;

@@ -17,6 +17,7 @@ module;
 #include <string>
 #include <tuple>
 #include <vector>
+#include <filesystem>
 #endif
 
 module property_density_grid;
@@ -38,6 +39,7 @@ import <exception>;
 import <source_location>;
 import <print>;
 import <mdspan>;
+import <filesystem>;
 #endif
 
 import archive;

@@ -18,6 +18,7 @@ module;
 #include <string>
 #include <tuple>
 #include <vector>
+#include <filesystem>
 #endif
 
 module property_msd;
@@ -40,6 +41,7 @@ import <cmath>;
 import <exception>;
 import <source_location>;
 import <print>;
+import <filesystem>;
 #endif
 
 import archive;

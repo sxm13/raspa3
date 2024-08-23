@@ -52,7 +52,7 @@ void MCMoveStatisticsSystem::optimizeAcceptance()
   ParallelTemperingSwap.optimizeAcceptance(0.01, 1.5);
 }
 
-std::string formatStatistics(const std::string name, const MoveStatistics<double> &move)
+static std::string formatStatistics(const std::string name, const MoveStatistics<double> &move)
 {
   std::ostringstream stream;
   std::print(stream, "    {} total:        {:10}\n", name, move.totalCounts);
@@ -64,7 +64,7 @@ std::string formatStatistics(const std::string name, const MoveStatistics<double
   return stream.str();
 }
 
-nlohmann::json jsonStatistics(const MoveStatistics<double> &move)
+static nlohmann::json jsonStatistics(const MoveStatistics<double> &move)
 {
   nlohmann::json status;
   status["all"] = move.allCounts;

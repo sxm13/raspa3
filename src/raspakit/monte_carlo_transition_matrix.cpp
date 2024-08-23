@@ -107,7 +107,7 @@ void MonteCarloTransitionMatrix::initialize()
     std::filesystem::create_directories(directoryName);
 
     std::string fileNameString =
-        std::format("output/system_{}/output_{}_{}.data", system.systemId, system.temperature, system.input_pressure);
+        std::format("output/system_{}/output_{}_{}.txt", system.systemId, system.temperature, system.input_pressure);
     streams.emplace_back(fileNameString, std::ios::out);
   }
 

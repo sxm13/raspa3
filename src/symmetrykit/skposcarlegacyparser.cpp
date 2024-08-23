@@ -23,7 +23,7 @@ import skasymmetricatom;
 import characterset;
 import skcell;
 
-std::string& tolower(std::string& s)
+static std::string& tolower(std::string& s)
 {
   for (auto& c : s)
   {
@@ -33,7 +33,7 @@ std::string& tolower(std::string& s)
   return s;
 }
 
-std::vector<std::string> split(const std::string txt, char ch)
+static std::vector<std::string> split(const std::string txt, char ch)
 {
   size_t pos = txt.find(ch);
   size_t initialPos = 0;

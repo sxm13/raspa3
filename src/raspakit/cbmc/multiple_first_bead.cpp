@@ -9,6 +9,7 @@ module;
 #include <span>
 #include <tuple>
 #include <vector>
+#include <stdexcept>
 #endif
 
 module cbmc_multiple_first_bead;
@@ -22,6 +23,7 @@ import <numeric>;
 import <iterator>;
 import <span>;
 import <tuple>;
+import <stdexcept>;
 #endif
 
 import cbmc_util;

@@ -33,7 +33,7 @@ import skparser;
 import skstructure;
 import skcell;
 
-inline std::string& tolower(std::string& s)
+static std::string& tolower(std::string& s)
 {
   for (auto& c : s)
   {
@@ -43,7 +43,7 @@ inline std::string& tolower(std::string& s)
   return s;
 }
 
-inline std::vector<std::string> split(const std::string txt, char ch)
+static std::vector<std::string> split(const std::string txt, char ch)
 {
   size_t pos = txt.find(ch);
   size_t initialPos = 0;
@@ -78,7 +78,7 @@ inline bool caseInSensStringCompare(const std::string& str1, const std::string& 
                                                   [](auto a, auto b) { return std::tolower(a) == std::tolower(b); });
 }
 
-inline std::string trim2(const std::string& s)
+inline static std::string trim2(const std::string& s)
 {
   auto start = s.begin();
   while (start != s.end() && std::isspace(*start))

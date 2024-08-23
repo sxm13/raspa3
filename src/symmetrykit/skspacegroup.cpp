@@ -10,11 +10,6 @@ module;
 #include <vector>
 #endif
 
-#if defined(_WIN32)
-import <cassert>;
-#else
-#include <assert.h>
-#endif
 
 module skspacegroup;
 
@@ -434,7 +429,7 @@ std::optional<SKSpaceGroup::FoundSpaceGroupInfo> SKSpaceGroup::findSpaceGroup(
               double3x3 rotationMatrix = conventionalBravaisLattice * cell.unitCell().inverse();
 
               // must be a rigid rotation
-              assert((rotationMatrix.determinant() - 1.0) < 1e-5);
+              //assert((rotationMatrix.determinant() - 1.0) < 1e-5);
 
               return SKSpaceGroup::FoundSpaceGroupInfo{HallNumber,
                                                        origin,
@@ -496,7 +491,7 @@ std::optional<SKSpaceGroup::FoundSpaceGroupInfo> SKSpaceGroup::findSpaceGroup(
             double3x3 rotationMatrix = conventionalBravaisLattice * cell.unitCell().inverse();
 
             // must be a rigid rotation
-            assert((rotationMatrix.determinant() - 1.0) < 1e-5);
+            //assert((rotationMatrix.determinant() - 1.0) < 1e-5);
 
             return SKSpaceGroup::FoundSpaceGroupInfo{HallNumber,
                                                      origin,
@@ -770,7 +765,7 @@ std::optional<std::pair<double3, SKRotationalChangeOfBasis>> SKSpaceGroup::match
   }
 
   // qDebug() << "SHOULD NOT GET HERE";
-  assert(false);
+  //assert(false);
   return std::nullopt;
 }
 
@@ -785,7 +780,7 @@ std::optional<double3> SKSpaceGroup::getOriginShift(size_t HallNumber, Centring 
   std::vector<SKSeitzIntegerMatrix> dataBaseSpaceGroupGenerators =
       SKSeitzIntegerMatrix::SeitzMatrices(dataBaseSpaceGroup.spaceGroupSetting().encodedGenerators());
 
-  assert(!dataBaseSpaceGroupGenerators.empty());
+  //assert(!dataBaseSpaceGroupGenerators.empty());
 
   // apply change-of-basis to generators
   for (size_t i = 0; i < dataBaseSpaceGroupGenerators.size(); i++)

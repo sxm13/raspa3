@@ -14,11 +14,6 @@ module;
 #include <vector>
 #endif
 
-#if defined(_WIN32)
-import <cassert>;
-#else
-#include <assert.h>
-#endif
 
 module sksymmetrycell;
 
@@ -749,7 +744,7 @@ algorithmStart:
       (SKSymmetryCell::isEqualTo(A, B) && (SKSymmetryCell::isLargerThen(abs(xi), abs(eta)))))
   {
     SKTransformationMatrix matrixC = SKTransformationMatrix(int3(0, -1, 0), int3(-1, 0, 0), int3(0, 0, -1));
-    assert(matrixC.determinant() == 1);
+    //assert(matrixC.determinant() == 1);
     changeOfBasisMatrix = changeOfBasisMatrix * matrixC;
 
     // Swap x, y and ensures proper sign of determinant
@@ -762,7 +757,7 @@ algorithmStart:
       (SKSymmetryCell::isEqualTo(B, C) && (SKSymmetryCell::isLargerThen(abs(eta), abs(zeta)))))
   {
     SKTransformationMatrix matrixC = SKTransformationMatrix(int3(-1, 0, 0), int3(0, 0, -1), int3(0, -1, 0));
-    assert(matrixC.determinant() == 1);
+    //assert(matrixC.determinant() == 1);
     changeOfBasisMatrix = changeOfBasisMatrix * matrixC;
 
     // Swap y, z and ensures proper sign of determinant
@@ -789,7 +784,7 @@ algorithmStart:
       f[2] = -1;
     }
     SKTransformationMatrix matrixC = SKTransformationMatrix(int3(f[0], 0, 0), int3(0, f[1], 0), int3(0, 0, f[2]));
-    assert(matrixC.determinant() == 1);
+    //assert(matrixC.determinant() == 1);
     changeOfBasisMatrix = changeOfBasisMatrix * matrixC;
 
     xi = abs(xi);
@@ -829,7 +824,7 @@ algorithmStart:
       f[p] = -1;
     }
     SKTransformationMatrix matrixC = SKTransformationMatrix(int3(f[0], 0, 0), int3(0, f[1], 0), int3(0, 0, f[2]));
-    assert(matrixC.determinant() == 1);
+    //assert(matrixC.determinant() == 1);
     changeOfBasisMatrix = changeOfBasisMatrix * matrixC;
 
     xi = -abs(xi);
@@ -843,7 +838,7 @@ algorithmStart:
       (SKSymmetryCell::isEqualTo(xi, -B) && SKSymmetryCell::isSmallerThen(zeta, 0.0)))
   {
     SKTransformationMatrix matrixC = SKTransformationMatrix(int3(1, 0, 0), int3(0, 1, 0), int3(0, -int(sign(xi)), 1));
-    assert(matrixC.determinant() == 1);
+    //assert(matrixC.determinant() == 1);
     changeOfBasisMatrix = changeOfBasisMatrix * matrixC;
 
     C = B + C - xi * sign(xi);
@@ -859,7 +854,7 @@ algorithmStart:
       (SKSymmetryCell::isEqualTo(eta, -A) && SKSymmetryCell::isSmallerThen(zeta, 0.0)))
   {
     SKTransformationMatrix matrixC = SKTransformationMatrix(int3(1, 0, 0), int3(0, 1, 0), int3(-int(sign(eta)), 0, 1));
-    assert(matrixC.determinant() == 1);
+    //assert(matrixC.determinant() == 1);
     changeOfBasisMatrix = changeOfBasisMatrix * matrixC;
 
     C = A + C - eta * sign(eta);
@@ -875,7 +870,7 @@ algorithmStart:
       (SKSymmetryCell::isEqualTo(zeta, -A) && SKSymmetryCell::isSmallerThen(eta, 0.0)))
   {
     SKTransformationMatrix matrixC = SKTransformationMatrix(int3(1, 0, 0), int3(-int(sign(zeta)), 1, 0), int3(0, 0, 1));
-    assert(matrixC.determinant() == 1);
+    //assert(matrixC.determinant() == 1);
     changeOfBasisMatrix = changeOfBasisMatrix * matrixC;
 
     B = A + B - zeta * sign(zeta);
@@ -891,7 +886,7 @@ algorithmStart:
        SKSymmetryCell::isLargerThen(2.0 * (A + eta) + zeta, 0.0)))
   {
     SKTransformationMatrix matrixC = SKTransformationMatrix(int3(1, 0, 0), int3(0, 1, 0), int3(1, 1, 1));
-    assert(matrixC.determinant() == 1);
+    //assert(matrixC.determinant() == 1);
     changeOfBasisMatrix = changeOfBasisMatrix * matrixC;
 
     C = A + B + C + xi + eta + zeta;

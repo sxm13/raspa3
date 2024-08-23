@@ -11,6 +11,7 @@ module;
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #include <VersionHelpers.h>
 #include <intrin.h>
 #include <sysinfoapi.h>

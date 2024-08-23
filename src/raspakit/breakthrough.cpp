@@ -595,7 +595,7 @@ void Breakthrough::createPlotScript()
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
   std::ofstream stream_graphs(std::format("Breakthrough/System_{}/make_graphs.bat", system.systemId));
-  stream_graphs << "set PATH=%PATH%;C:\\Program Files\\gnuplot\\bin;" +
+  stream_graphs << "set PATH=%PATH%;C:\\Program Files\\gnuplot\\bin;" <<
                        "C:\\Program Files\\ffmpeg-master-latest-win64-gpl\\bin;C:\\Program Files\\ffmpeg\\bin\n";
   stream_graphs << "gnuplot.exe plot_breakthrough\n";
 
@@ -615,7 +615,7 @@ void Breakthrough::createPlotScript()
   stream << "set encoding utf8\n";
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
   stream << "set xlabel 'Dimensionless time, {/Arial-Italic τ}={/Arial-Italic tv/L} / [-]' font \"Arial,14\"\n";
-  stream << "set ylabel 'Concentration exit gas, {/Arial-Italic c}_i/" +
+  stream << "set ylabel 'Concentration exit gas, {/Arial-Italic c}_i/" <<
                 "{/Arial-Italic c}_{i,0} / [-]' offset 0.0,0 font \"Arial,14\"\n";
   stream << "set key outside top center horizontal samplen 2.5 height 0.5 spacing 1.5 font 'Arial, 10'\n";
 #else
@@ -741,7 +741,7 @@ std::string movieScriptTemplate(std::string s)
   stream << "   set /A argCount+=1\n";
   stream << "   set \"argVec[!argCount!]=%%~x\"'n";
   stream << ")\n";
-  stream << "set PATH=%PATH%;C:\\Program Files\\gnuplot\\bin;" +
+  stream << "set PATH=%PATH%;C:\\Program Files\\gnuplot\\bin;" <<
                 "C:\\Program Files\\ffmpeg-master-latest-win64-gpl\\bin;C:\\Program Files\\ffmpeg\\bin\n";
   stream << "gnuplot.exe -c plot_column_" << s
          << " %argVec[1]% %argVec[2]% %argVec[3]% | ffmpeg.exe "

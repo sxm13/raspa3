@@ -155,7 +155,7 @@ void MonteCarlo::createOutputFiles()
   for (System& system : systems)
   {
     std::string fileNameString =
-        std::format("output/output_{}_{}.s{}.data", system.temperature, system.input_pressure, system.systemId);
+        std::format("output/output_{}_{}.s{}.txt", system.temperature, system.input_pressure, system.systemId);
     streams.emplace_back(fileNameString, std::ios::out);
     fileNameString =
         std::format("output/output_{}_{}.s{}.json", system.temperature, system.input_pressure, system.systemId);

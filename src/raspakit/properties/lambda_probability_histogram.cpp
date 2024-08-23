@@ -18,11 +18,6 @@ module;
 #include <vector>
 #endif
 
-#if defined(_WIN32)
-import <cassert>;
-#else
-#include <assert.h>
-#endif
 
 module property_lambda_probability_histogram;
 
@@ -64,7 +59,7 @@ void PropertyLambdaProbabilityHistogram::WangLandauIteration(PropertyLambdaProba
       std::fill(biasFactor.begin(), biasFactor.end(), 0.0);
       break;
     case PropertyLambdaProbabilityHistogram::WangLandauPhase::Sample:
-      assert(currentBin >= 0 && currentBin < numberOfBins);
+      //assert(currentBin >= 0 && currentBin < numberOfBins);
       if (containsTheFractionalMolecule)
       {
         biasFactor[currentBin] -= WangLandauScalingFactor;

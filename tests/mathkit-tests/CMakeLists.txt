@@ -27,15 +27,13 @@ elseif (WIN32)
   target_link_libraries(unit_tests_mathkit
                         PUBLIC
                         libs::raspakit
-                        -static-libstdc++
                         ${BLAS_LIBRARIES}
                         ${LAPACK_LIBRARIES}
                         ${HDF5_CXX_LIBRARIES}
-                        OpenMP::OpenMP_CXX
-                        -l:libc++.a
-                        -l:libc++abi.a
-                        -lm
-                        -lpthread
+                        GTest::gtest 
+                        GTest::gtest_main 
+                        ${llvm_libs}
+                        -nostdlib++
 )
 elseif (APPLE)
 target_link_libraries(unit_tests_mathkit PRIVATE 

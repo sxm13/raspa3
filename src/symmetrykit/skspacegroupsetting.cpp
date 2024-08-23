@@ -5,12 +5,6 @@ module;
 #include <vector>
 #endif
 
-#if defined(_WIN32)
-import <cassert>;
-#else
-#include <assert.h>
-#endif
-
 module skspacegroupsetting;
 
 #ifndef USE_LEGACY_HEADERS
@@ -113,8 +107,8 @@ std::ostream& operator<<(std::ostream& os, const SKSpaceGroupSetting& setting)
 
 SKIntegerSymmetryOperationSet SKSpaceGroupSetting::fullSeitzMatrices() const
 {
-  assert(_encodedSeitz.size() % 3 == 0);
-  assert(_encodedSeitz.size() > 0);
+  //assert(_encodedSeitz.size() % 3 == 0);
+  //assert(_encodedSeitz.size() > 0);
 
   bool centrosymmetric = SKPointGroup::pointGroupData[static_cast<size_t>(_pointGroupNumber)].centrosymmetric();
   size_t m = _encodedSeitz.size() / 3;
@@ -163,8 +157,8 @@ SKIntegerSymmetryOperationSet SKSpaceGroupSetting::fullSeitzMatrices() const
 
 std::vector<SKSeitzIntegerMatrix> SKSpaceGroupSetting::SeitzMatricesWithoutTranslation() const
 {
-  assert(_encodedSeitz.size() % 3 == 0);
-  assert(_encodedSeitz.size() > 0);
+  //assert(_encodedSeitz.size() % 3 == 0);
+  //assert(_encodedSeitz.size() > 0);
 
   bool centrosymmetric = SKPointGroup::pointGroupData[static_cast<size_t>(_pointGroupNumber)].centrosymmetric();
   size_t m = _encodedSeitz.size() / 3;

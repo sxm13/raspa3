@@ -4,6 +4,7 @@ module;
 #include <cstddef>
 #include <optional>
 #include <span>
+#include <vector>
 #endif
 
 export module mc_moves_rotation;
@@ -12,6 +13,7 @@ export module mc_moves_rotation;
 import <cstddef>;
 import <optional>;
 import <span>;
+import <vector>;
 #endif
 
 import randomnumbers;

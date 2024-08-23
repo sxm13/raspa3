@@ -13,6 +13,7 @@ module;
 #include <ranges>
 #include <source_location>
 #include <vector>
+#include <filesystem>
 #endif
 
 module property_energy_histogram;
@@ -29,6 +30,7 @@ import <vector>;
 import <algorithm>;
 import <print>;
 import <format>;
+import <filesystem>;
 #endif
 
 import double4;

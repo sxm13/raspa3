@@ -1,10 +1,5 @@
 module;
 
-#if defined(_WIN32)
-import <cassert>;
-#else
-#include <assert.h>
-#endif
 
 export module scaling;
 

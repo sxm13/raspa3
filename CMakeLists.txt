@@ -9,6 +9,14 @@ project(raspa3
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+find_package(LLVM CONFIG REQUIRED)
+list(APPEND CMAKE_MODULE_PATH "{LLVM_CMAKE_DIR}")
+#include(handleLLVMOptions)
+#add_definitions(${LLVM_DEFINITIONS})
+#target_include_directories(main PRIVATE ${LLVM_INCLUDE_DIRS})
+#llvm_map_components_to_libnames(llvm_libs Support Core IRReader ...)
+#target_link_libraries(main PRIVATE ${llvm_libs})
+
 find_package(BLAS)
 find_package(LAPACK)
 
@@ -16,7 +24,9 @@ if(LAPACK_FOUND AND BLAS_FOUND)
   set(lapackblas_libraries ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 endif()
 
+if(NOT WIN32)
 find_package(OpenMP REQUIRED)
+endif()
 
 find_package(HDF5 REQUIRED COMPONENTS CXX)
 include_directories(${HDF5_INCLUDE_DIRS})

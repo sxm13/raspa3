@@ -26,16 +26,11 @@ elseif (WIN32)
   target_link_libraries(${PROJECT_NAME}
         PUBLIC
         libs::raspakit
-        -static-libstdc++
         ${BLAS_LIBRARIES}
         ${LAPACK_LIBRARIES}
         ${HDF5_CXX_LIBRARIES}
-        OpenMP::OpenMP_CXX
+	${llvm_libs}
         -nostdlib++
-        -l:libc++.a
-        -l:libc++abi.a
-        -lm
-        -lpthread
 )
 elseif (APPLE)
   target_link_libraries(${PROJECT_NAME}

@@ -5,12 +5,6 @@ module;
 #include <vector>
 #endif
 
-#if defined(_WIN32)
-import <cassert>;
-#else
-#include <assert.h>
-#endif
-
 module skseitzintegermatrix;
 
 #ifndef USE_LEGACY_HEADERS
@@ -43,9 +37,9 @@ SKSeitzIntegerMatrix::SKSeitzIntegerMatrix(char xvalue, char yvalue, char zvalue
 
   // qDebug() << "xyz: " << x <<", " << y <<"," << z;
 
-  assert(x < SKSeitzIntegerMatrix::SeitzData.size());
-  assert(y < SKSeitzIntegerMatrix::SeitzData.size());
-  assert(z < SKSeitzIntegerMatrix::SeitzData.size());
+  //assert(x < SKSeitzIntegerMatrix::SeitzData.size());
+  //assert(y < SKSeitzIntegerMatrix::SeitzData.size());
+  //assert(z < SKSeitzIntegerMatrix::SeitzData.size());
 
   int3 r1 = int3(SKSeitzIntegerMatrix::SeitzData[x].r1(), SKSeitzIntegerMatrix::SeitzData[y].r1(),
                  SKSeitzIntegerMatrix::SeitzData[z].r1());

@@ -70,7 +70,7 @@ void MCMoveStatisticsParticles::optimizeMCMoves()
   GibbsSwapMove_CFCMC.optimizeAcceptance(0.0, 1.0);
 }
 
-std::string formatStatistics(const std::string name, const MoveStatistics<double> &move)
+static std::string formatStatistics(const std::string name, const MoveStatistics<double> &move)
 {
   std::ostringstream stream;
   std::print(stream, "    {} all:          {:10}\n", name, move.allCounts);
@@ -83,7 +83,7 @@ std::string formatStatistics(const std::string name, const MoveStatistics<double
   return stream.str();
 }
 
-std::string formatStatistics(const std::string name, const MoveStatistics<double3> &move)
+static std::string formatStatistics(const std::string name, const MoveStatistics<double3> &move)
 {
   std::ostringstream stream;
   std::print(stream, "    {} all:          {:10}\n", name, move.allCounts);
@@ -102,7 +102,7 @@ std::string formatStatistics(const std::string name, const MoveStatistics<double
   return stream.str();
 }
 
-nlohmann::json jsonStatistics(const MoveStatistics<double> &move)
+static nlohmann::json jsonStatistics(const MoveStatistics<double> &move)
 {
   nlohmann::json status;
   status["all"] = move.allCounts;
@@ -114,7 +114,7 @@ nlohmann::json jsonStatistics(const MoveStatistics<double> &move)
   return status;
 }
 
-nlohmann::json jsonStatistics(const MoveStatistics<double3> &move)
+static nlohmann::json jsonStatistics(const MoveStatistics<double3> &move)
 {
   nlohmann::json status;
   status["all"] = move.allCounts;

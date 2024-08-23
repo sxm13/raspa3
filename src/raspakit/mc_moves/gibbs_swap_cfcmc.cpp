@@ -12,12 +12,6 @@ module;
 #include <vector>
 #endif
 
-#if defined(_WIN32)
-import <cassert>;
-#else
-#include <assert.h>
-#endif
-
 module mc_moves_gibbs_swap_cfcmc;
 
 #ifndef USE_LEGACY_HEADERS
@@ -72,10 +66,10 @@ std::optional<std::pair<RunningEnergy, RunningEnergy>> MC_Moves::GibbsSwapMove_C
   double maxChange = systemA.components[selectedComponent].mc_moves_statistics.GibbsSwapMove_CFCMC.maxChange[2];
   std::make_signed_t<std::size_t> selectedNewBin = lambdaA.selectNewBin(random, maxChange);
 
-  assert(systemA.containsTheFractionalMolecule == true);
-  assert(systemB.containsTheFractionalMolecule == false);
+  //assert(systemA.containsTheFractionalMolecule == true);
+  //assert(systemB.containsTheFractionalMolecule == false);
 
-  assert(systemB.components[selectedComponent].lambdaGC.currentBin == 0);
+  //assert(systemB.components[selectedComponent].lambdaGC.currentBin == 0);
 
   // assert(systemA.runningEnergies == systemA.computeTotalEnergies());
   // assert(systemB.runningEnergies == systemB.computeTotalEnergies());

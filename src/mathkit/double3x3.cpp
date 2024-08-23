@@ -210,7 +210,7 @@ double trunc_acos(double x)
   return acos(x);
 }
 
-double sign(double x) { return (x < 0.0 ? -1.0 : 1.0); }
+static double sign(double x) { return (x < 0.0 ? -1.0 : 1.0); }
 
 double angle(double x, double y)
 {

@@ -11,11 +11,6 @@ module;
 #include <type_traits>
 #endif
 
-#if defined(_WIN32)
-import <cassert>;
-#else
-#include <assert.h>
-#endif
 
 export module grids;
 

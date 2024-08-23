@@ -3,6 +3,7 @@ module;
 #ifdef USE_LEGACY_HEADERS
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #endif
 
@@ -12,6 +13,7 @@ export module hdf5;
 #ifndef USE_LEGACY_HEADERS
 import iostream;
 import vector;
+import algorithm;
 #endif
 
 /*!

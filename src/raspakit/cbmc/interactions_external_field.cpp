@@ -59,7 +59,7 @@ import threadpool;
   {
     if (atoms.empty()) return energySum;
 
-    for (std::span<const Atom>::iterator it1 = atoms.begin(); it1 != atoms.end(); ++it1)
+    for (std::span<Atom>::iterator it1 = atoms.begin(); it1 != atoms.end(); ++it1)
     {
       [[maybe_unused]] size_t molA = static_cast<size_t>(it1->moleculeId);
       [[maybe_unused]] size_t compA = static_cast<size_t>(it1->componentId);

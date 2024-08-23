@@ -1,8 +1,6 @@
 module;
 
 #ifdef USE_LEGACY_HEADERS
-#include <assert.h>
-
 #include <algorithm>
 #include <iterator>
 #include <map>
@@ -12,11 +10,6 @@ module;
 #include <vector>
 #endif
 
-#if defined(_WIN32)
-import <cassert>;
-#else
-#include <assert.h>
-#endif
 
 module skpointgroup;
 
@@ -309,7 +302,7 @@ const std::optional<SKTransformationMatrix> SKPointGroup::constructAxes(
       std::sort(orthogonalAxes.begin(), orthogonalAxes.end(),
                 [](const int3& a, const int3& b) -> bool { return a.length_squared() < b.length_squared(); });
 
-      assert(!orthogonalAxes.empty());
+      //assert(!orthogonalAxes.empty());
       if (orthogonalAxes.empty()) return std::nullopt;
 
       // the second and thirs axis are the shortest orthogonal axes

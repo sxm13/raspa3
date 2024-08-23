@@ -21,9 +21,6 @@ module;
 #include <type_traits>
 #include <utility>
 #include <vector>
-#if defined(_WIN32)
-#include <cassert.h>
-#endif
 #include <complex>
 #include <exception>
 #include <print>
@@ -57,9 +54,6 @@ import <cstddef>;
 import <type_traits>;
 import <utility>;
 import <functional>;
-#if defined(_WIN32)
-import <cassert>;
-#endif
 import <exception>;
 import <source_location>;
 import <complex>;

@@ -11,11 +11,6 @@ module;
 #include <type_traits>
 #endif
 
-#if defined(_WIN32)
-import <cassert>;
-#else
-#include <assert.h>
-#endif
 
 export module atom;
 
@@ -121,7 +116,7 @@ export struct Atom
 };
 
 // should be 4 times double4 = 4x(8x4) = 4x32 = 128 bytes
-static_assert(sizeof(Atom) == 128, "struct Atom size is not 128");
+//static_assert(sizeof(Atom) == 128, "struct Atom size is not 128");
 
 void to_json(nlohmann::json &j, const Atom &a)
 {

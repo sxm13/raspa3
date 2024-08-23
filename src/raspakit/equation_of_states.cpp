@@ -4,6 +4,7 @@ module;
 #include <cmath>
 #include <format>
 #include <iostream>
+#include <fstream>
 #include <optional>
 #include <print>
 #include <source_location>
@@ -17,6 +18,7 @@ import <vector>;
 import <cmath>;
 import <optional>;
 import <iostream>;
+import <fstream>;
 import <source_location>;
 import <format>;
 import <print>;

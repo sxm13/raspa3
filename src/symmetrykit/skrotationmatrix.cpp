@@ -1,17 +1,9 @@
 module;
 
 #ifdef USE_LEGACY_HEADERS
-#include <assert.h>
-
 #include <iostream>
 #include <tuple>
 #include <vector>
-#endif
-
-#if defined(_WIN32)
-import <cassert>;
-#else
-#include <assert.h>
 #endif
 
 module skrotationmatrix;
