@@ -9,13 +9,10 @@ project(raspa3
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+if(WIN32)
 find_package(LLVM CONFIG REQUIRED)
 list(APPEND CMAKE_MODULE_PATH "{LLVM_CMAKE_DIR}")
-#include(handleLLVMOptions)
-#add_definitions(${LLVM_DEFINITIONS})
-#target_include_directories(main PRIVATE ${LLVM_INCLUDE_DIRS})
-#llvm_map_components_to_libnames(llvm_libs Support Core IRReader ...)
-#target_link_libraries(main PRIVATE ${llvm_libs})
+endif()
 
 find_package(BLAS)
 find_package(LAPACK)
