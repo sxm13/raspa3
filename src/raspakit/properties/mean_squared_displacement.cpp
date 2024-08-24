@@ -185,7 +185,7 @@ void PropertyMeanSquaredDisplacement::writeOutput(size_t systemId, const std::ve
 
   for (size_t i = 0; i < components.size(); ++i)
   {
-    std::ofstream stream_msd_self_output(std::format("msd/msd_self_{}.s{}.data", components[i].name, systemId));
+    std::ofstream stream_msd_self_output(std::format("msd/msd_self_{}.s{}.txt", components[i].name, systemId));
 
     stream_msd_self_output << std::format("# msd, number of counts: {}\n", countMSD);
     stream_msd_self_output << "# column 1: time [ps]\n";
@@ -221,7 +221,7 @@ void PropertyMeanSquaredDisplacement::writeOutput(size_t systemId, const std::ve
   {
     for (size_t j = 0; j < components.size(); ++j)
     {
-      std::ofstream stream_msd_collective_output(std::format("msd/msd_onsager_{}_{}.s{}.data", components[i].name, components[j].name, systemId));
+      std::ofstream stream_msd_collective_output(std::format("msd/msd_onsager_{}_{}.s{}.txt", components[i].name, components[j].name, systemId));
 
       stream_msd_collective_output << std::format("# msd, number of counts: {}\n", countMSD);
       stream_msd_collective_output << "# column 1: time [ps]\n";

@@ -239,7 +239,7 @@ void PropertyRadialDistributionFunction::writeOutput(const ForceField &forceFiel
     {
       if (pairCount[atomTypeA + atomTypeB * numberOfPseudoAtoms] > 0)
       {
-        std::ofstream stream_rdf_output(std::format("rdf/rdf_{}_{}.s{}.data", forceField.pseudoAtoms[atomTypeA].name,
+        std::ofstream stream_rdf_output(std::format("rdf/rdf_{}_{}.s{}.txt", forceField.pseudoAtoms[atomTypeA].name,
                                                     forceField.pseudoAtoms[atomTypeB].name, systemId));
 
         stream_rdf_output << std::format("# rdf, number of counts: {}\n", totalNumberOfCounts);

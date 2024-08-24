@@ -143,7 +143,7 @@ void PropertyEnergyHistogram::writeOutput(size_t systemId, size_t currentCycle)
 
   std::filesystem::create_directory("energy_histogram");
 
-  std::ofstream stream_output(std::format("energy_histogram/energy_histogram.s{}.data", systemId));
+  std::ofstream stream_output(std::format("energy_histogram/energy_histogram.s{}.txt", systemId));
 
   stream_output << std::format("# energy_histogram, number of counts: {}\n", totalNumberOfCounts);
   stream_output << "# column 1: energy [K]\n";

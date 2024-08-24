@@ -1142,7 +1142,7 @@ void MixturePrediction::run(std::ostream &stream)
   std::vector<std::ofstream> streams;
   for (size_t i = 0; i < Ncomp; i++)
   {
-    std::string fileName = std::format("MixturePrediction/System_{}/component_{}_{}.data", system.systemId,
+    std::string fileName = std::format("MixturePrediction/System_{}/component_{}_{}.txt", system.systemId,
                                        std::to_string(i), components[i].name);
     // FIX TODO
     // streams.emplace_back(std::ofstream{ fileName });
@@ -1217,7 +1217,7 @@ void MixturePrediction::createPureComponentsPlotScript()
   stream << "plot \\\n";
   for (size_t i = 0; i < Ncomp; i++)
   {
-    std::string fileName = "component_" + std::to_string(i) + "_" + components[i].name + ".data";
+    std::string fileName = "component_" + std::to_string(i) + "_" + components[i].name + ".txt";
     stream << "    "
            << "\"" << fileName << "\""
            << " us ($1):($2)"
@@ -1269,7 +1269,7 @@ void MixturePrediction::createMixturePlotScript()
   stream << "plot \\\n";
   for (size_t i = 0; i < Ncomp; i++)
   {
-    std::string fileName = "component_" + std::to_string(i) + "_" + components[i].name + ".data";
+    std::string fileName = "component_" + std::to_string(i) + "_" + components[i].name + ".txt";
     stream << "    "
            << "\"" << fileName << "\""
            << " us ($1):($3)"
@@ -1321,7 +1321,7 @@ void MixturePrediction::createMixtureAdsorbedMolFractionPlotScript()
   stream << "plot \\\n";
   for (size_t i = 0; i < Ncomp; i++)
   {
-    std::string fileName = "component_" + std::to_string(i) + "_" + components[i].name + ".data";
+    std::string fileName = "component_" + std::to_string(i) + "_" + components[i].name + ".txt";
     stream << "    "
            << "\"" << fileName << "\""
            << " us ($1):($5)"

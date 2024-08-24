@@ -318,12 +318,6 @@ void InputReader::parseBreakthrough(const nlohmann::basic_json<nlohmann::raspa_m
       }
       double T = value["ExternalTemperature"].get<double>();
 
-      bool useChargesFromCIFFile = true;
-      if (value.contains("UseChargesFromCIFFile"))
-      {
-        useChargesFromCIFFile = value["UseChargesFromCIFFile"].get<bool>();
-      }
-
       std::optional<double> P{};
       if (value.contains("ExternalPressure"))
       {
@@ -821,7 +815,7 @@ void InputReader::parseMolecularSimulations(const nlohmann::basic_json<nlohmann:
       }
       double T = value["ExternalTemperature"].get<double>();
 
-      bool useChargesFromCIFFile = true;
+      bool useChargesFromCIFFile = false;
       if (value.contains("UseChargesFromCIFFile"))
       {
         useChargesFromCIFFile = value["UseChargesFromCIFFile"].get<bool>();

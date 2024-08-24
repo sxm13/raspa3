@@ -194,7 +194,7 @@ void PropertyNumberOfMoleculesHistogram::writeOutput(size_t systemId, std::vecto
 
   std::filesystem::create_directory("number_of_molecules_histogram");
 
-  std::ofstream stream_output(std::format("number_of_molecules_histogram/number_of_molecules_histogram_histogram.s{}.data", systemId));
+  std::ofstream stream_output(std::format("number_of_molecules_histogram/number_of_molecules_histogram_histogram.s{}.txt", systemId));
 
   stream_output << std::format("# number_of_molecules_histogram, number of counts: {}\n", totalNumberOfCounts);
   stream_output << "# column 1: number of molecules [-]\n";

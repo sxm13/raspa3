@@ -63,7 +63,7 @@ void MixturePredictionSimulation::run()
     MixturePrediction mixture(system);
 
     std::string fileNameString =
-        std::format("output/system_{}/output_{}_{}.data", system.systemId, system.temperature, system.input_pressure);
+        std::format("output/system_{}/output_{}_{}.txt", system.systemId, system.temperature, system.input_pressure);
     std::ofstream fstream(fileNameString, std::ios::out);
     std::ostream stream(fstream.rdbuf());
     // std::ostream stream(std::cout.rdbuf());

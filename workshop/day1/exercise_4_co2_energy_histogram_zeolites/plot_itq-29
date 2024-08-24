@@ -10,6 +10,6 @@ set xlabel 'Energy, {/Helvetica-Italic U} / K' font "Helvetica,20"
 set ylabel 'Frequency, -' offset -1.5,0 font "Helvetica,20"
 set bmargin 3.5
 set lmargin 5
-plot '300K/itq-29/energy_histogram/energy_histogram.s0.data' us 1:2 title '300K'  with li lc "magenta" lt -1 lw 3,\
-     '600K/itq-29/energy_histogram/energy_histogram.s0.data' us 1:2 title '600K'  with li lc "navy" lt 0 lw 3
+plot '300K/itq-29/energy_histogram/energy_histogram.s0.txt' us 1:2 title '300K'  with li lc "magenta" lt -1 lw 3,\
+     '600K/itq-29/energy_histogram/energy_histogram.s0.txt' us 1:2 title '600K'  with li lc "navy" lt 0 lw 3
 pause -1 "Hit return to continue"

@@ -181,7 +181,7 @@ void TransitionMatrix::writeStatistics()
 
   std::string dirname = "TMMC/";
   // std::string dirname=std::print("TMMC/System_{}/", systemId);
-  std::string fname = dirname + "/" + "TMMC_Statistics.data";
+  std::string fname = dirname + "/" + "TMMC_Statistics.txt";
 
   std::filesystem::path directoryName = cwd / dirname;
   std::filesystem::path fileName = cwd / fname;

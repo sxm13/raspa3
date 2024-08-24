@@ -259,12 +259,12 @@ void Breakthrough::run(std::ostream &stream)
   std::vector<std::ofstream> streams;
   for (size_t i = 0; i < Ncomp; i++)
   {
-    std::string fileName = std::format("Breakthrough/System_{}/component_{}_{}.data", system.systemId,
+    std::string fileName = std::format("Breakthrough/System_{}/component_{}_{}.txt", system.systemId,
                                        std::to_string(i), components[i].name);
     streams.emplace_back(std::ofstream{fileName});
   }
 
-  std::ofstream movieStream(std::format("Breakthrough/System_{}/column.data", system.systemId));
+  std::ofstream movieStream(std::format("Breakthrough/System_{}/column.txt", system.systemId));
 
   for (size_t step = 0; (step < Nsteps || autoSteps); ++step)
   {
@@ -652,7 +652,7 @@ void Breakthrough::createPlotScript()
   stream << "plot \\\n";
   for (size_t i = 0; i < Ncomp; i++)
   {
-    std::string fileName = "component_" + std::to_string(i) + "_" + components[i].name + ".data";
+    std::string fileName = "component_" + std::to_string(i) + "_" + components[i].name + ".txt";
     stream << "    "
            << "\"" << fileName << "\""
            << " us ($1):($3) every ev"
@@ -668,7 +668,7 @@ void Breakthrough::createPlotScript()
   stream << "plot \\\n";
   for (size_t i = 0; i < Ncomp; i++)
   {
-    std::string fileName = "component_" + std::to_string(i) + "_" + components[i].name + ".data";
+    std::string fileName = "component_" + std::to_string(i) + "_" + components[i].name + ".txt";
     stream << "    "
            << "\"" << fileName << "\""
            << " us ($2):($3) every ev"
@@ -827,19 +827,19 @@ void Breakthrough::createMovieScriptColumnV()
   stream << "set bmargin 4\n";
   stream << "set title '" << displayName << " {/:Italic T}=" << T << " K, {/:Italic p_t}=" << p_total * 1e-3
          << " kPa'\n";
-  stream << "stats 'column.data' us 2 nooutput\n";
+  stream << "stats 'column.txt' us 2 nooutput\n";
   stream << "max=STATS_max\n";
-  stream << "stats 'column.data' us 1 nooutput\n";
+  stream << "stats 'column.txt' us 1 nooutput\n";
   stream << "set xrange[0:STATS_max]\n";
   stream << "set yrange[0:1.1*max]\n";
   stream << "ev=int(ARG1)\n";
   stream << "do for [i=0:int((STATS_blocks-2)/ev)] {\n";
   stream << "  plot \\\n";
   stream << "    "
-         << "'column.data'"
+         << "'column.txt'"
          << " us 1:2 index ev*i notitle with li lt 1,\\\n";
   stream << "    "
-         << "'column.data'"
+         << "'column.txt'"
          << " us 1:2 index ev*i notitle with po lt 1\n";
   stream << "}\n";
 }
@@ -896,19 +896,19 @@ void Breakthrough::createMovieScriptColumnPt()
   stream << "set bmargin 4\n";
   stream << "set title '" << displayName << " {/:Italic T}=" << T << " K, {/:Italic p_t}=" << p_total * 1e-3
          << " kPa'\n";
-  stream << "stats 'column.data' us 3 nooutput\n";
+  stream << "stats 'column.txt' us 3 nooutput\n";
   stream << "max=STATS_max\n";
-  stream << "stats 'column.data' us 1 nooutput\n";
+  stream << "stats 'column.txt' us 1 nooutput\n";
   stream << "set xrange[0:STATS_max]\n";
   stream << "set yrange[0:1.1*max]\n";
   stream << "ev=int(ARG1)\n";
   stream << "do for [i=0:int((STATS_blocks-2)/ev)] {\n";
   stream << "  plot \\\n";
   stream << "    "
-         << "'column.data'"
+         << "'column.txt'"
          << " us 1:3 index ev*i notitle with li lt 1,\\\n";
   stream << "    "
-         << "'column.data'"
+         << "'column.txt'"
          << " us 1:3 index ev*i notitle with po lt 1\n";
   stream << "}\n";
 }
@@ -965,15 +965,15 @@ void Breakthrough::createMovieScriptColumnQ()
   stream << "set bmargin 4\n";
   stream << "set key title '" << displayName << " {/:Italic T}=" << T << " K, {/:Italic p_t}=" << p_total * 1e-3
          << " kPa'\n";
-  stream << "stats 'column.data' nooutput\n";
+  stream << "stats 'column.txt' nooutput\n";
   stream << "max = 0.0;\n";
   stream << "do for [i=4:STATS_columns:6] {\n";
-  stream << "  stats 'column.data' us i nooutput\n";
+  stream << "  stats 'column.txt' us i nooutput\n";
   stream << "  if (max<STATS_max) {\n";
   stream << "    max=STATS_max\n";
   stream << "  }\n";
   stream << "}\n";
-  stream << "stats 'column.data' us 1 nooutput\n";
+  stream << "stats 'column.txt' us 1 nooutput\n";
   stream << "set xrange[0:STATS_max]\n";
   stream << "set yrange[0:1.1*max]\n";
   stream << "ev=int(ARG1)\n";
@@ -982,14 +982,14 @@ void Breakthrough::createMovieScriptColumnQ()
   for (size_t i = 0; i < Ncomp; i++)
   {
     stream << "    "
-           << "'column.data'"
+           << "'column.txt'"
            << " us 1:" << std::to_string(4 + i * 6) << " index ev*i notitle "
            << " with li lt " << i + 1 << ",\\\n";
   }
   for (size_t i = 0; i < Ncomp; i++)
   {
     stream << "    "
-           << "'column.data'"
+           << "'column.txt'"
            << " us 1:" << std::to_string(4 + i * 6) << " index ev*i title '" << components[i].name
            << " (y_i=" << components[i].molFraction << ")'"
            << " with po lt " << i + 1 << (i < Ncomp - 1 ? ",\\" : "") << "\n";
@@ -1049,15 +1049,15 @@ void Breakthrough::createMovieScriptColumnQeq()
   stream << "set bmargin 4\n";
   stream << "set key title '" << displayName << " {/:Italic T}=" << T << " K, {/:Italic p_t}=" << p_total * 1e-3
          << " kPa'\n";
-  stream << "stats 'column.data' nooutput\n";
+  stream << "stats 'column.txt' nooutput\n";
   stream << "max = 0.0;\n";
   stream << "do for [i=5:STATS_columns:6] {\n";
-  stream << "  stats 'column.data' us i nooutput\n";
+  stream << "  stats 'column.txt' us i nooutput\n";
   stream << "  if (max<STATS_max) {\n";
   stream << "    max=STATS_max\n";
   stream << "  }\n";
   stream << "}\n";
-  stream << "stats 'column.data' us 1 nooutput\n";
+  stream << "stats 'column.txt' us 1 nooutput\n";
   stream << "set xrange[0:STATS_max]\n";
   stream << "set yrange[0:1.1*max]\n";
   stream << "ev=int(ARG1)\n";
@@ -1066,14 +1066,14 @@ void Breakthrough::createMovieScriptColumnQeq()
   for (size_t i = 0; i < Ncomp; i++)
   {
     stream << "    "
-           << "'column.data'"
+           << "'column.txt'"
            << " us 1:" << std::to_string(5 + i * 6) << " index ev*i notitle "
            << " with li lt " << i + 1 << ",\\\n";
   }
   for (size_t i = 0; i < Ncomp; i++)
   {
     stream << "    "
-           << "'column.data'"
+           << "'column.txt'"
            << " us 1:" << std::to_string(5 + i * 6) << " index ev*i title '" << components[i].name
            << " (y_i=" << components[i].molFraction << ")'"
            << " with po lt " << i + 1 << (i < Ncomp - 1 ? ",\\" : "") << "\n";
@@ -1133,15 +1133,15 @@ void Breakthrough::createMovieScriptColumnP()
   stream << "set bmargin 4\n";
   stream << "set key title '" << displayName << " {/:Italic T}=" << T << " K, {/:Italic p_t}=" << p_total * 1e-3
          << " kPa'\n";
-  stream << "stats 'column.data' nooutput\n";
+  stream << "stats 'column.txt' nooutput\n";
   stream << "max = 0.0;\n";
   stream << "do for [i=6:STATS_columns:6] {\n";
-  stream << "  stats 'column.data' us i nooutput\n";
+  stream << "  stats 'column.txt' us i nooutput\n";
   stream << "  if (max<STATS_max) {\n";
   stream << "    max=STATS_max\n";
   stream << "  }\n";
   stream << "}\n";
-  stream << "stats 'column.data' us 1 nooutput\n";
+  stream << "stats 'column.txt' us 1 nooutput\n";
   stream << "set xrange[0:STATS_max]\n";
   stream << "set yrange[0:1.1*max]\n";
   stream << "ev=int(ARG1)\n";
@@ -1150,14 +1150,14 @@ void Breakthrough::createMovieScriptColumnP()
   for (size_t i = 0; i < Ncomp; i++)
   {
     stream << "    "
-           << "'column.data'"
+           << "'column.txt'"
            << " us 1:" << std::to_string(6 + i * 6) << " index ev*i notitle "
            << " with li lt " << i + 1 << ",\\\n";
   }
   for (size_t i = 0; i < Ncomp; i++)
   {
     stream << "    "
-           << "'column.data'"
+           << "'column.txt'"
            << " us 1:" << std::to_string(6 + i * 6) << " index ev*i title '" << components[i].name
            << " (y_i=" << components[i].molFraction << ")'"
            << " with po lt " << i + 1 << (i < Ncomp - 1 ? ",\\" : "") << "\n";
@@ -1217,15 +1217,15 @@ void Breakthrough::createMovieScriptColumnPnormalized()
   stream << "set bmargin 4\n";
   stream << "set key title '" << displayName << " {/:Italic T}=" << T << " K, {/:Italic p_t}=" << p_total * 1e-3
          << " kPa'\n";
-  stream << "stats 'column.data' nooutput\n";
+  stream << "stats 'column.txt' nooutput\n";
   stream << "max = 0.0;\n";
   stream << "do for [i=7:STATS_columns:6] {\n";
-  stream << "  stats 'column.data' us i nooutput\n";
+  stream << "  stats 'column.txt' us i nooutput\n";
   stream << "  if (max<STATS_max) {\n";
   stream << "    max=STATS_max\n";
   stream << "  }\n";
   stream << "}\n";
-  stream << "stats 'column.data' us 1 nooutput\n";
+  stream << "stats 'column.txt' us 1 nooutput\n";
   stream << "set xrange[0:STATS_max]\n";
   stream << "set yrange[0:1.1*max]\n";
   stream << "ev=int(ARG1)\n";
@@ -1234,14 +1234,14 @@ void Breakthrough::createMovieScriptColumnPnormalized()
   for (size_t i = 0; i < Ncomp; i++)
   {
     stream << "    "
-           << "'column.data'"
+           << "'column.txt'"
            << " us 1:" << std::to_string(7 + i * 6) << " index ev*i notitle "
            << " with li lt " << i + 1 << ",\\\n";
   }
   for (size_t i = 0; i < Ncomp; i++)
   {
     stream << "    "
-           << "'column.data'"
+           << "'column.txt'"
            << " us 1:" << std::to_string(7 + i * 6) << " index ev*i title '" << components[i].name
            << " (y_i=" << components[i].molFraction << ")'"
            << " with po lt " << i + 1 << (i < Ncomp - 1 ? ",\\" : "") << "\n";
@@ -1302,11 +1302,11 @@ void Breakthrough::createMovieScriptColumnDpdt()
   stream << "set bmargin 4\n";
   stream << "set key title '" << displayName << " {/:Italic T}=" << T << " K, {/:Italic p_t}=" << p_total * 1e-3
          << " kPa'\n";
-  stream << "stats 'column.data' nooutput\n";
+  stream << "stats 'column.txt' nooutput\n";
   stream << "max = -1e10;\n";
   stream << "min = 1e10;\n";
   stream << "do for [i=8:STATS_columns:6] {\n";
-  stream << "  stats 'column.data' us i nooutput\n";
+  stream << "  stats 'column.txt' us i nooutput\n";
   stream << "  if (STATS_max>max) {\n";
   stream << "    max=STATS_max\n";
   stream << "  }\n";
@@ -1314,7 +1314,7 @@ void Breakthrough::createMovieScriptColumnDpdt()
   stream << "    min=STATS_min\n";
   stream << "  }\n";
   stream << "}\n";
-  stream << "stats 'column.data' us 1 nooutput\n";
+  stream << "stats 'column.txt' us 1 nooutput\n";
   stream << "set xrange[0:STATS_max]\n";
   stream << "set yrange[1.1*min:1.1*max]\n";
   stream << "ev=int(ARG1)\n";
@@ -1323,14 +1323,14 @@ void Breakthrough::createMovieScriptColumnDpdt()
   for (size_t i = 0; i < Ncomp; i++)
   {
     stream << "    "
-           << "'column.data'"
+           << "'column.txt'"
            << " us 1:" << std::to_string(8 + i * 6) << " index ev*i notitle "
            << " with li lt " << i + 1 << ",\\\n";
   }
   for (size_t i = 0; i < Ncomp; i++)
   {
     stream << "    "
-           << "'column.data'"
+           << "'column.txt'"
            << " us 1:" << std::to_string(8 + i * 6) << " index ev*i title '" << components[i].name
            << " (y_i=" << components[i].molFraction << ")'"
            << " with po lt " << i + 1 << (i < Ncomp - 1 ? ",\\" : "") << "\n";
@@ -1391,12 +1391,12 @@ void Breakthrough::createMovieScriptColumnDqdt()
   stream << "set bmargin 4\n";
   stream << "set key title '" << displayName << " {/:Italic T}=" << T << " K, {/:Italic p_t}=" << p_total * 1e-3
          << " kPa'\n";
-  stream << "stats 'column.data' nooutput\n";
+  stream << "stats 'column.txt' nooutput\n";
   stream << "max = -1e10;\n";
   stream << "min = 1e10;\n";
   stream << "min = 10000000000000.0;\n";
   stream << "do for [i=9:STATS_columns:6] {\n";
-  stream << "  stats 'column.data' us i nooutput\n";
+  stream << "  stats 'column.txt' us i nooutput\n";
   stream << "  if (STATS_max>max) {\n";
   stream << "    max=STATS_max\n";
   stream << "  }\n";
@@ -1404,7 +1404,7 @@ void Breakthrough::createMovieScriptColumnDqdt()
   stream << "    min=STATS_min\n";
   stream << "  }\n";
   stream << "}\n";
-  stream << "stats 'column.data' us 1 nooutput\n";
+  stream << "stats 'column.txt' us 1 nooutput\n";
   stream << "set xrange[0:STATS_max]\n";
   stream << "set yrange[1.1*min:1.1*max]\n";
   stream << "ev=int(ARG1)\n";
@@ -1413,14 +1413,14 @@ void Breakthrough::createMovieScriptColumnDqdt()
   for (size_t i = 0; i < Ncomp; i++)
   {
     stream << "    "
-           << "'column.data'"
+           << "'column.txt'"
            << " us 1:" << std::to_string(9 + i * 6) << " index ev*i notitle "
            << " with li lt " << i + 1 << ",\\\n";
   }
   for (size_t i = 0; i < Ncomp; i++)
   {
     stream << "    "
-           << "'column.data'"
+           << "'column.txt'"
            << " us 1:" << std::to_string(9 + i * 6) << " index ev*i title '" << components[i].name
            << " (y_i=" << components[i].molFraction << ")'"
            << " with po lt " << i + 1 << (i < Ncomp - 1 ? ",\\" : "") << "\n";

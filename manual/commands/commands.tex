@@ -108,15 +108,15 @@ like energy conservation and stress are printed.
 
 \begin{itemize}
 \item{\verb+"ExternalTemperature" : floating-point-number+}\\
-The external temperature in Kelvin for the system. Default: 298 K.
+The external temperature in Kelvin for the system. Default: \verb+298+
 \item{\verb+"ExternalPressure" : floating-point-number+}\\
-The external pressure in Pascal for the system. Default: 0 Pa.
+The external pressure in Pascal for the system. Default: \verb+0+
 \item{\verb+"ThermostatChainLength" : integer+}\\
-The length of the chain to thermostat the system. Default: 5.
+The length of the chain to thermostat the system. Default: \verb+5+
 \item{\verb+"NumberOfYoshidaSuzukiSteps" : integer+}\\
-The number of Yoshida/Suzuki multiple timesteps. Default: 5.
+The number of Yoshida/Suzuki multiple timesteps. Default: \verb+5+
 \item{\verb+"TimeScaleParameterThermostat" : floating-point-number+}\\
-The time scale on which the system thermostat evolves. Default: 0.15 ps.
+The time scale on which the system thermostat evolves. Default: \verb+0.15+
 \end{itemize}
 
 \subsection{Box/Framework options}
@@ -178,6 +178,9 @@ Sets the method to compute charges. The string can be:
     Switches on the Ewald summation for the charge calculation.
   \end{itemize}
 \item{\verb+"UseChargesFromCIFFile" : boolean+}
+Whether to use the charges defined in the CIF-file or via the force-field. 
+Using this option allows for individual charges for each framework atom, even when having the same atom-type.
+Default: \verb+false+
 \end{itemize}
 
 \subsection{System MC-moves}
@@ -196,7 +199,7 @@ The volumes are changed by a random change in $\ln(V_I/V_{II})$.
 
 \begin{itemize}
 \item{\verb+"TimeStep" : floating-point-number+}\\
-The time step in picoseconds for MD integration. Default value: 0.0005 ps (0.5 fs).
+The time step in picoseconds for MD integration. Default value: \verb+0.0005+
 \item{\verb+"Ensemble" : string+}\\
 Sets the ensemble. The ensemble string can be:
   \begin{itemize}
@@ -218,7 +221,7 @@ Sets whether or not to output simulation snapshots to pdb movies.\\
 Output is written to the directory \verb+movies+.
 \begin{itemize}
 \item{\verb+"SampleMovieEvery" : integer+}\\
-Sample the movie every [integer] cycles. Default: 1.
+Sample the movie every [integer] cycles. Default: \verb+1+
 \end{itemize}
 
 \subsubsection{Histogram of the energy}
@@ -231,15 +234,15 @@ the Coulombic energy, and the polarization energy.\\
 Output is written to  the directory \verb+energy_histogram+.
 \begin{itemize}
 \item{\verb+"SampleEnergyHistogramEvery" : integer+}\\
-Sample the energy histogram of the system every [integer] cycles. Default: 1.
+Sample the energy histogram of the system every [integer] cycles. Default: \verb+1+
 \item{\verb+"WriteEnergyHistogramEvery" : integer+}\\
-Writes the energy histogram of the system every [integer] cycles. Default: 5000.
+Writes the energy histogram of the system every [integer] cycles. Default: \verb+5000+
 \item{\verb+"NumberOfBinsEnergyHistogram" : integer+}\\
-Sets the number of elements of the histogram. Default: 128.
+Sets the number of elements of the histogram. Default: \verb+128+
 \item{\verb+"LowerLimitEnergyHistogram" : floating-point-number+}\\
-The lower limit of the histogram. Default: -5000.
+The lower limit of the histogram. Default: \verb+-5000+
 \item{\verb+"UpperLimitEnergyHistogram" : floating-point-number+}\\
-The upper limit of the histogram. Default: 1000.
+The upper limit of the histogram. Default: \verb+1000+
 \end{itemize}
 
 \subsubsection{Histogram of the number of molecules}
@@ -251,13 +254,13 @@ In open ensembles the number of molecules fluctuates.\\
 Output is written to the directory \verb+number_of_molecules_histogram+.
 \begin{itemize}
 \item{\verb+"SampleNumberOfMoleculesHistogramEvery" : integer+}\\
-Sample the histogram every [integer] cycles. Default: 1.
+Sample the histogram every [integer] cycles. Default: \verb+1+
 \item{\verb+"WriteNumberOfMoleculesHistogramEvery" : integer+}\\
-Output the histogram every [integer] cycles. Default: 5000.
+Output the histogram every [integer] cycles. Default: \verb+5000+
 \item{\verb+"LowerLimitNumberOfMoleculesHistogram" : floating-point-number+}\\
-The lower limit of the histograms. Default: 0.
+The lower limit of the histograms. Default: \verb+0+
 \item{\verb+"UpperLimitNumberOfMoleculesHistogram" : floating-point-number+}\\
-The upper limit of the histograms. Default: 200.
+The upper limit of the histograms. Default: \verb+200+
 \end{itemize}
 
 \subsubsection{Radial Distribution Function (RDF) force-based}
@@ -268,13 +271,13 @@ Sets whether or not to compute the radial distribution function (RDF).\\
 Output is written to the directory \verb+rdf+.
 \begin{itemize}
 \item{\verb+"SampleRDFEvery" : integer+}\\
-Sample the rdf every [integer] cycles. Default: 10.
+Sample the rdf every [integer] cycles. Default: \verb+10+
 \item{\verb+"WriteRDFEvery" : integer+}\\
-Output the rdf every [integer] cycles. Default: 5000.
+Output the rdf every [integer] cycles. Default: \verb+5000+
 \item{\verb+"NumberOfBinsRDF" : integer+}\\
-Sets the number of elements of the rdf. Default: 128.
+Sets the number of elements of the rdf. Default: \verb+128+
 \item{\verb+"UpperLimitRDF" : floating-point-number+}\\
-The upper limit of the rdf. Default: 15.0.
+The upper limit of the rdf. Default: \verb+15.0+
 \end{itemize}
 
 
@@ -286,13 +289,13 @@ Sets whether or not to compute the radial distribution function (RDF).\\
 Output is written to the directory \verb+conventional_rdf+.
 \begin{itemize}
 \item{\verb+"SampleConventionalRDFEvery" : integer+}\\
-Sample the rdf every [integer] cycles. Default: 10.
+Sample the rdf every [integer] cycles. Default: \verb+10+
 \item{\verb+"WriteConventionalRDFEvery" : integer+}\\
-Output the rdf every [integer] cycles. Default: 5000.
+Output the rdf every [integer] cycles. Default: \verb+5000+
 \item{\verb+"NumberOfBinsConventionalRDF" : integer+}\\
-Sets the number of elements of the rdf. Default: 128.
+Sets the number of elements of the rdf. Default: \verb+128+
 \item{\verb+"UpperLimitConventionalRDF" : floating-point-number+}\\
-The upper limit of the rdf. Default: 15.0.
+The upper limit of the rdf. Default: \verb+15.0+
 \end{itemize}
 
 \subsubsection{Mean-Squared Displacement (MSD) order-N}
@@ -303,11 +306,11 @@ Sets whether or not to compute the mean-squared displacement (MSD).\\
 Output is written to the directory \verb+msd+.
 \begin{itemize}
 \item{\verb+"SampleMSDEvery" : integer+}\\
-Sample the msd every [integer] cycles. Default: 10.
+Sample the msd every [integer] cycles. Default: \verb+10+
 \item{\verb+"WriteMSDEvery" : integer+}\\
-Output the msd every [integer] cycles. Default: 5000.
+Output the msd every [integer] cycles. Default: \verb+5000+
 \item{\verb+"NumberOfBlockElementsMSD" : integer+}\\
-The number of elements per block of the msd. Default: 25.0.
+The number of elements per block of the msd. Default: \verb+25.0+
 \end{itemize}
 
 \subsubsection{Density grids}
@@ -318,13 +321,11 @@ Sets whether or not to compute the density grids.\\
 Output is written to the directory \verb+density_grids+.
 \begin{itemize}
 \item{\verb+"SampleDensityGridEvery" : integer+}\\
-Sample the density grids every [integer] cycles. Default: 10.
+Sample the density grids every [integer] cycles. Default: \verb+10+
 \item{\verb+"WriteDensityGridEvery" : integer+}\\
-Output the density grids every [integer] cycles. Default: 5000.
+Output the density grids every [integer] cycles. Default: \verb+5000+
 \item{\verb+"DensityGridSize" : [integer, integer, integer]+}\\
-Sets the size of the density grids. Default: [128, 128, 128].
-\item{\verb+"DensityGridPseudoAtomsList" : [string]+}\\
-The list of pseudo-atoms for which to compute the density grids.
+Sets the size of the density grids. Default: \verb+[128, 128, 128]+
 \end{itemize}
 
 

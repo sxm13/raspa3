@@ -212,7 +212,7 @@ void PropertyConventionalRadialDistributionFunction::writeOutput(
     {
       if (pairCount[atomTypeA + atomTypeB * numberOfPseudoAtoms] > 0)
       {
-        std::ofstream stream_rdf_output(std::format("conventional_rdf/rdf_{}_{}.s{}.data",
+        std::ofstream stream_rdf_output(std::format("conventional_rdf/rdf_{}_{}.s{}.txt",
                                                     forceField.pseudoAtoms[atomTypeA].name,
                                                     forceField.pseudoAtoms[atomTypeB].name, systemId));
 
