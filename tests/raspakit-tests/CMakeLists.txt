@@ -42,12 +42,25 @@ if (LINUX)
                         -lz
                         -lpthread
 )
-elseif (WIN32)
+elseif (WIN32 AND ${CMAKE_SYSTEM_PROCESSOR} MATCHES "AMD64")
   target_link_libraries(unit_tests_raspakit
                         PUBLIC
                         libs::raspakit
                         ${BLAS_LIBRARIES}
                         ${LAPACK_LIBRARIES}
+                        ${HDF5_CXX_LIBRARIES}
+                        GTest::gtest
+                        GTest::gtest_main
+                        ${llvm_libs}
+                        -nostdlib++
+)
+elseif (WIN32 AND ${CMAKE_SYSTEM_PROCESSOR} MATCHES "ARM64")
+  target_link_libraries(unit_tests_raspakit
+                        PUBLIC
+                        libs::raspakit
+                        ${BLAS_LIBRARIES}
+                        ${LAPACK_LIBRARIES}
+                        C:/vcpkg/installed/arm64-windows/lib/libf2c.lib
                         ${HDF5_CXX_LIBRARIES}
                         GTest::gtest
                         GTest::gtest_main

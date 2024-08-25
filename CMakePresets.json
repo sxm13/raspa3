@@ -27,6 +27,43 @@
       }
     },
     {
+      "name": "windows-arm64",
+      "description": "Sets compilers, build type",
+      "environment": {
+      "PATH": "C:/Program Files/LLVM/bin;$penv{PATH}"
+      },
+      "inherits": [
+        "base"
+      ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE" : "Release",
+	"CMAKE_C_COMPILER": "clang.exe",
+        "CMAKE_CXX_COMPILER": "clang++.exe",
+        "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=lld",
+        "CMAKE_INSTALL_PREFIX": "C:/Program Files",
+        "PACKAGE_INSTALL_PREFIX": "C:/Program Files",
+        "CMAKE_CXX_FLAGS_RELEASE": "-DNDEBUG -fvisibility=hidden -fexperimental-library -g -O3 -fomit-frame-pointer -ffast-math",
+	"BLA_SIZEOF_INTEGER" : "8",
+        "BLAS_LIBRARIES" : "C:/vcpkg/installed/arm64-windows-static/lib/openblas.lib",
+        "LAPACK_LIBRARIES" : "C:/vcpkg/installed/arm64-windows/lib/lapack.lib",
+        "HDF5_USE_STATIC_LIBRARIES" : false,
+        "HDF5_ROOT" : "C:/vcpkg/installed/arm64-windows",
+        "ZLIB_INCLUDE_DIR": "C:/vcpkg/installed/arm64-windows-static/include",
+        "ZLIB_LIBRARY": "C:/vcpkg/installed/arm64-windows-static/lib/zlib.lib",
+        "CMAKE_BUILD_WITH_INSTALL_RPATH": true,
+        "BUILD_WINDOWS_PACKAGE": true,
+        "BUILD_TESTING": true,
+        "BUILD_PYTHON": false
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "windows"
+          ]
+        }
+      }
+    },
+    {
       "name": "windows-intel",
       "description": "Sets compilers, build type",
       "environment": {
