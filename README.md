@@ -72,10 +72,12 @@ cd examples/basic/1_mc_methane_in_box<br>
 
 cmake --list-presets<br>
 Available configure presets:<br>
-> "macos-intel"<br>
-> "macos-intel-debug"<br>
+> "macos-x64"<br>
+> "macos-x64-debug"<br>
 > "macos-apple-silicon"<br>
 > "macos-apple-silicon-debug"<br>
+> "windows-x64"<br>
+> "windows-arm64"<br>
 > "linux"<br>
 > "linux-carbon"<br>
 > "linux-opensuse-leap-15.2"<br>
@@ -130,7 +132,7 @@ ctest --test-dir build/tests/raspakit-tests --verbose
 ### macOS
 brew install llvm ninja cmake doxygen graphviz lapack pybind11<br>
 cmake -B --preset macos-apple-silicon<br>
-(or cmake -B --preset macos-intel)<br>
+(or cmake -B --preset macos-x64)<br>
 ninja -C build<br>
 ninja -C build install<br>
 ctest --test-dir build/tests/raspakit-tests --verbose

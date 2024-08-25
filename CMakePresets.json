@@ -64,7 +64,7 @@
       }
     },
     {
-      "name": "windows-intel",
+      "name": "windows-x64",
       "description": "Sets compilers, build type",
       "environment": {
       "PATH": "C:/vcpkg/installed/x64-windows/tools/llvm;$penv{PATH}"
@@ -103,7 +103,7 @@
       }
     },
     {
-      "name": "macos-intel",
+      "name": "macos-x64",
       "description": "Sets compilers, build type",
       "inherits": [
         "base"
@@ -130,7 +130,7 @@
       }
     },
     {
-      "name": "macos-intel-debug",
+      "name": "macos-x64-debug",
       "description": "Sets compilers, build type",
       "inherits": [
         "base"
@@ -157,7 +157,7 @@
       }
     },
     {
-      "name": "macos-intel-profile",
+      "name": "macos-x64-profile",
       "description": "Sets compilers, build type",
       "inherits": [
         "base"
