@@ -3,19 +3,19 @@
 
 \section{Design philosophy}
 
-RASPA3 is a molecular simulation code for computing adsorption and diffusion in nanoporous materials, 
+\texttt{RASPA3} is a molecular simulation code for computing adsorption and diffusion in nanoporous materials, 
 and thermodynamic and transport properties of fluids. 
 It implements force field based classical Monte Carlo/Molecular Dynamics in various ensembles.
-RASPA3 can be used for the simulation of molecules in gases, fluids, zeolites, aluminosilicates,
+\texttt{RASPA3} can be used for the simulation of molecules in gases, fluids, zeolites, aluminosilicates,
 metal-organic frameworks, and carbon nanotubes.
-One of the main applications of RASPA3 is to compute adsorption isotherms and to 
+One of the main applications of \texttt{RASPA3} is to compute adsorption isotherms and to 
 understand the atomic-level mechanism of adsorption and separations.
 
 
-RASPA3 is redesigned and rewritten from the ground up in C++23, based on the following ideas:
+\texttt{RASPA3} is redesigned and rewritten from the ground up in \texttt{C++23}, based on the following ideas:
 \begin{itemize}
   \item{Composition and value semantics}\\
-  Major improvements in efficiency result from the implementation of C++ code based on composition 
+    Major improvements in efficiency result from the implementation of \texttt{C++} code based on composition 
   and value semantics (in contrast to inheritance and reference semantics). Composition is a structural 
   approach in which complex objects are built from simple building blocks. Value semantics avoid 
   sharing mutable state and upholds the independence of values to support local reasoning. 
@@ -27,45 +27,45 @@ RASPA3 is redesigned and rewritten from the ground up in C++23, based on the fol
   memory patterns and access safety. Lifetimes of objects are coupled with composition, eliminating the 
   need for explicit memory management. These lead to better compiler optimization and therefore performance of the code.
   \item{Correctness and accuracy}\\
-  For all the techniques and algorithms available in RASPA3 we have implemented the 'best' ones available in literature. 
-  For example, RASPA3 uses Configurational-Bias Monte-Carlo, it uses the Ewald summation for electrostatics,
+    For all the techniques and algorithms available in \texttt{RASPA3} we have implemented the 'best' ones available in literature. 
+    For example, \texttt{RASPA3} uses Configurational-Bias Monte-Carlo, it uses the Ewald summation for electrostatics,
   molecular dynamics is based on 'symplectic' integrators, all Monte-Carlo moves obey detailed balance etc.
   Unit tests test the smallest functional units of code and prevent developers breaking existing code when 
   refactoring or adding new code.
-  The unit tests in RASPA3 are arranged hierarchically. Atoms are placed at several distances and the 
+    The unit tests in \texttt{RASPA3} are arranged hierarchically. Atoms are placed at several distances and the 
   Lennard-Jones potentials are tested and compared with the analytically computed energy. 
   Then molecules are placed within a zeolite framework at predetermined positions and compared to the 
-  energies computed with RASPA2.
+    energies computed with \texttt{RASPA2}.
   The various energy routines used in biased-sampling are tested by comparing to the general routines.
   The various routines for the gradients are tested by comparing the computed gradients to the values 
   computed by finite difference schemes based on the energy. Likewise, the strain-derivative tensor 
   (related to the pressure) is tested by comparing to the values computed by finite difference schemes 
   based on the energy of a strained cell.
   \item{Input made easy}\\
-  The input of RASPA3 has been changed to JSON format. 
-  JSON stands for JavaScript Object Notation. It is a lightweight data-interchange format in plain text 
+    The input of \texttt{RASPA3} has been changed to \texttt{JSON} format. 
+    \texttt{JSON} stands for \texttt{JavaScript Object Notation}. It is a lightweight data-interchange format in plain text 
   written in JavaScript object notation. It is language independent.
   The requirements for the input files is kept as minimal as possible. 
   Only for more advanced options extra commands in the input file are
   needed. Also the format of the input is straightforward. Default settings are usually the best ones. 
   Fugacity coefficients and excess adsorption are automatically computed.
   \item{Output made easy}\\
-  Similarly, the JSON format is now also used for the output. Where previously all initial data 
-  (e.g. hardware info, unit conversion factors) and statistics (e.g. CPU timings, MC move statistics) 
-  were written to a text file, these are now written as a nested dictionary to a JSON file.
+    Similarly, the \texttt{JSON} format is now also used for the output. Where previously all initial data 
+    (e.g. hardware info, unit conversion factors) and statistics (e.g. \texttt{CPU} timings, \texttt{MC} move statistics) 
+    were written to a text file, these are now written as a nested dictionary to a \texttt{JSON} file.
   \item{Integrated simulation environment}\\
-  The RASPA3 C++ simulation engine is made available to Python via a Pybind11 interface. 
-  For use in Python, RASPA3 is built as a shared library, allowing its functions to be used by Python 
+    The \texttt{RASPA3} \texttt{C++} simulation engine is made available to \texttt{Python} via a \texttt{Pybind11} interface. 
+    For use in \texttt{Python}, \texttt{RASPA3} is built as a shared library, allowing its functions to be used by \texttt{Python}
   users and enabling seamless interactions with the simulation routines.
-  Through the API, the library allows for invocation of RASPA3's simulation routines from Python scripts, 
-  calling the same simulation routines as via the JSON input. This execution directly from Python enables 
-  the ability to prototype simulation settings and incorporate RASPA3 into existing workflows.
+    Through the API, the library allows for invocation of \texttt{RASPA3}'s simulation routines from \texttt{Python} scripts, 
+    calling the same simulation routines as via the \texttt{JSON} input. This execution directly from \texttt{Python} enables 
+    the ability to prototype simulation settings and incorporate \texttt{RASPA3} into existing workflows.
   Extension and modification of the code is relatively straightforward.
 \end{itemize}
 
 \section{Units and conventions}
 \begin{itemize}
-\item{The standard units in RASPA from which all other units are derived are:}\\
+  \item{The standard units in \texttt{RASPA} from which all other units are derived are:}\\
 \vskip 0.1cm
 \begin{tabularx}{\linewidth}{l|l|l|l}
  quantity & symbol & unit & value\\
@@ -108,38 +108,37 @@ The Boltzmann's constant $k_B$ is
 \end{equation}
 with the Boltzmann constant as $1.380650324\times10^{-23}$ in units of J/K, and $k_B=0.8314464919$ in internal units.
 
-\item{Numbering is based on the C-convention, i.e. starting from zero.}
+\item{Numbering is based on the \texttt{C}-convention, i.e. starting from zero.}
 \item{Files in the current directory always have preference.}\\
 Sometimes one would like to try various parameters for force field fitting for example. In order to avoid
 making a lot of directories for each force field it is more convenient to have the 
-'pseudo\_atoms.def', 'force\_field\_mixing\_rule.def'
-and 'force\_field.def' files in the \emph{current} directory.
+'\texttt{force\_field.def}' file in the \emph{current} directory.
 \end{itemize}
 
-\section{Compiling and installing RASPA}
+\section{Compiling and installing \texttt{RASPA}}
 
 \subsection{Requirements}
 
-CMake 3.28 and later support C++ modules. 
-C++20 named modules are now supported by the Ninja Generator 1.11 or newer in combination 
-with the LLVM/Clang 16.0 and newer, MSVC toolset 14.34 and newer, or GCC 14 and newer. 
-We recommend LLVM/Clang 18 or higher for compiling RASPA3. This version has support 
+\texttt{CMake 3.28} and later support \texttt{C++} modules. 
+\texttt{C++20} named modules are now supported by the \texttt{Ninja Generator 1.11} or newer in combination 
+with the \texttt{LLVM/Clang 16.0} and newer, \texttt{MSVC toolset 14.34} and newer, or \texttt{GCC 14} and newer. 
+We recommend LLVM/Clang 18 or higher for compiling \texttt{RASPA3}. This version has support 
 for \verb+std::format+, \verb+std::print+, and \verb+std::jthread+. 
-The output-files of RASPA3 are in UTF-8 encoding and contain unicode characters (e.g. for \AA).
-RASPA3 depends on
+The output-files of \texttt{RASPA3} are in \texttt{UTF-8} encoding and contain unicode characters (e.g. for \AA).
+\texttt{RASPA3} depends on
 \begin{itemize}
-\item{C++23 compliant compiler}
-\item{Cmake 3.28}
-\item{Ninja Generator 1.11}
-\item{Openmp}
-\item{hdf5}
-\item{lapack and blas (64-bit integers)}
-\item{pybind11}
+  \item{\texttt{C++23} compliant compiler}
+  \item{\texttt{Cmake 3.28}}
+  \item{\texttt{Ninja Generator 1.11}}
+  \item{\texttt{Openmp}}
+  \item{\texttt{hdf5}}
+  \item{\texttt{lapack} and \texttt{blas} (64-bit integers)}
+  \item{\texttt{pybind11}}
 \end{itemize}
 
-\subsection{RASPA from 'git'}
+\subsection{\texttt{RASPA} from '\texttt{git}'}
 
-Working with 'git' and a remote repository  means that you will have to distinguish between two locations of the code:
+Working with '\texttt{git}' and a remote repository  means that you will have to distinguish between two locations of the code:
 \begin{enumerate}
  \item{The repository (visible to everyone)}
  \item{your local copy (only visible to you)}
@@ -154,7 +153,7 @@ After that, you can update the code by using
      git pull
 \end{verbatim}
 
-\subsection{Installing RASPA}
+\subsection{Installing \texttt{RASPA}}
 
 Download one of the precompiled packages from
 \begin{framed}
@@ -163,18 +162,22 @@ Download one of the precompiled packages from
   \end{quote}
 \end{framed}
 In Figure \ref{fig: binary_packages} one can find the list of packages. 
-These include packages for macOS (both intel and apple silicon), and many linux distributions
+These include packages for \texttt{macOS} (both \texttt{intel} and \texttt{apple silicon}),
+windows (both \texttt{intel} en \texttt{arm64}) and many \texttt{Linux} distributions.
 
 \begin{figure}[p]
  \centering
-  \includegraphics[width=0.85\linewidth]{introduction/figure_binary_packages.pdf}
-  \caption{List of available binary packages: Linux distributions based on Red Hat and OpenSUSE (rpm-packages), Debian (deb-packages), and Arch Linux (tar.zst packages), and installers for intel- and apple-silicon macs.}
+  \includegraphics[width=0.95\linewidth]{introduction/raspa3_releases.png}
+  \caption{List of available binary packages: \texttt{Linux} distributions based on \texttt{Red Hat} and 
+  \texttt{OpenSUSE} (\texttt{rpm}-packages), \texttt{Debian} (\texttt{deb}-packages), and \texttt{Arch} \texttt{Linux} 
+  (\texttt{tar.zst} packages), installers for \texttt{intel}- and \texttt{apple-silicon} macs,
+  and installers for \texttt{intel}- and \texttt{arm64-Windows} computers.}
   \label{fig: binary_packages}
 \end{figure}
 \begin{table}[p]
   \scriptsize
   \begin{tabularx}{\linewidth}{X}
-    \multicolumn{1}{c}{Archlinux}\\
+    \multicolumn{1}{c}{\texttt{Archlinux}}\\
     \hline
       \verb+pacman -Sy\verb+\\
       \verb+pacman -S wget\verb+\\
@@ -185,7 +188,7 @@ These include packages for macOS (both intel and apple silicon), and many linux 
 \vspace*{0.5 cm}
 \newline
   \begin{tabularx}{\linewidth}{c|X}
-  \multicolumn{2}{c}{Redhat}\\
+    \multicolumn{2}{c}{\texttt{Redhat}}\\
    \hline
   9 & \verb+yum install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.el9.x86_64.rpm+\\
      \hline
@@ -199,7 +202,7 @@ These include packages for macOS (both intel and apple silicon), and many linux 
 \vspace*{0.5 cm}
 \newline
   \begin{tabularx}{\linewidth}{c|X}
-  \multicolumn{2}{c}{Fedora}\\
+    \multicolumn{2}{c}{\texttt{Fedora}}\\
    \hline
   40 & \verb+dnf install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.fc40.x86_64.rpm+\\
      \hline
@@ -217,7 +220,7 @@ These include packages for macOS (both intel and apple silicon), and many linux 
 \vspace*{0.5 cm}
 \newline
   \begin{tabularx}{\linewidth}{X}
-    \multicolumn{1}{c}{OpenSUSE Tumbleweed (Signature verification failed: choose 'ignore')}\\
+    \multicolumn{1}{c}{\texttt{OpenSUSE Tumbleweed} (Signature verification failed: choose 'ignore')}\\
    \hline
     \verb+zypper update+\\
     \verb+zypper install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.opensuse-tumbleweed.x86_64.rpm+\\
@@ -226,7 +229,7 @@ These include packages for macOS (both intel and apple silicon), and many linux 
 \vspace*{0.5 cm}
 \newline
   \begin{tabularx}{\linewidth}{c|X}
-  \multicolumn{2}{c}{OpenSUSE Leap (Signature verification failed: choose 'ignore')}\\
+    \multicolumn{2}{c}{\texttt{OpenSUSE Leap} (Signature verification failed: choose 'ignore')}\\
    \hline
   15.5 & \verb+zypper install https://github.com/iRASPA/RASPA3/releases/download/v3.0.0/raspa-3.0.0-1.opensuse-leap-15.5.x86_64.rpm+\\
      \hline
@@ -240,7 +243,7 @@ These include packages for macOS (both intel and apple silicon), and many linux 
 \vspace*{0.5 cm}
 \newline
   \begin{tabularx}{\linewidth}{c|X}
-  \multicolumn{2}{c}{Ubuntu}\\
+    \multicolumn{2}{c}{\texttt{Ubuntu}}\\
    \hline
   24 & \verb+apt update+\\
      & \verb+apt install wget+\\
@@ -261,7 +264,7 @@ These include packages for macOS (both intel and apple silicon), and many linux 
 \vspace*{0.5 cm}
 \newline
   \begin{tabularx}{\linewidth}{c|X}
-  \multicolumn{2}{c}{Debian}\\
+    \multicolumn{2}{c}{\texttt{Debian}}\\
    \hline
   12 & \verb+apt update+\\
      & \verb+apt install wget+\\
@@ -281,49 +284,51 @@ These include packages for macOS (both intel and apple silicon), and many linux 
   \caption{Install instructions for binary packages.}
 \end{table}
 
-\subsection{Compiling RASPA}
+\subsection{Compiling \texttt{RASPA}}
 
-Using \verb+cmake --list-presets+ you can see the list of CMake presets.
+Using \verb+cmake --list-presets+ you can see the list of \texttt{CMake} presets.
 These include
 \begin{itemize}
-  \item{"macos-intel"}
-  \item{"macos-intel-debug"}
-  \item{"macos-apple-silicon"}
-  \item{"macos-apple-silicon-debug"}
-  \item{"linux"}
-  \item{"linux-opensuse-leap-15.2"}
-  \item{"linux-opensuse-leap-15.3"}
-  \item{"linux-opensuse-leap-15.4"}
-  \item{"linux-opensuse-leap-15.5"}
-  \item{"linux-opensuse-tumbleweed"}
-  \item{"linux-archlinux"}
-  \item{"linux-redhat-6"}
-  \item{"linux-redhat-7"}
-  \item{"linux-redhat-8"}
-  \item{"linux-redhat-9"}
-  \item{"linux-debian-12"}
-  \item{"linux-debian-11"}
-  \item{"linux-debian-10"}
-  \item{"linux-ubuntu-24"}
-  \item{"linux-ubuntu-22"}
-  \item{"linux-ubuntu-20"}
-  \item{"linux-fedora-35"}
-  \item{"linux-fedora-36"}
-  \item{"linux-fedora-37"}
-  \item{"linux-fedora-38"}
-  \item{"linux-fedora-39"}
-  \item{"linux-fedora-40"}
+  \item{"\texttt{macos-x64"}}
+  \item{"\texttt{macos-x64-debug"}}
+  \item{"\texttt{macos-apple-silicon"}}
+  \item{"\texttt{macos-apple-silicon-debug"}}
+  \item{"\texttt{windows-x64"}}
+  \item{"\texttt{windows-arm64"}}
+  \item{"\texttt{linux"}}
+  \item{"\texttt{linux-opensuse-leap-15.2"}}
+  \item{"\texttt{linux-opensuse-leap-15.3"}}
+  \item{"\texttt{linux-opensuse-leap-15.4"}}
+  \item{"\texttt{linux-opensuse-leap-15.5"}}
+  \item{"\texttt{linux-opensuse-tumbleweed"}}
+  \item{"\texttt{linux-archlinux"}}
+  \item{"\texttt{linux-redhat-6"}}
+  \item{"\texttt{linux-redhat-7"}}
+  \item{"\texttt{linux-redhat-8"}}
+  \item{"\texttt{linux-redhat-9"}}
+  \item{"\texttt{linux-debian-12"}}
+  \item{"\texttt{linux-debian-11"}}
+  \item{"\texttt{linux-debian-10"}}
+  \item{"\texttt{linux-ubuntu-24"}}
+  \item{"\texttt{linux-ubuntu-22"}}
+  \item{"\texttt{linux-ubuntu-20"}}
+  \item{"\texttt{linux-fedora-35"}}
+  \item{"\texttt{linux-fedora-36"}}
+  \item{"\texttt{linux-fedora-37"}}
+  \item{"\texttt{linux-fedora-38"}}
+  \item{"\texttt{linux-fedora-39"}}
+  \item{"\texttt{linux-fedora-40"}}
 \end{itemize}
 
 \noindent
-Installation on macOS is then accomplished for example by
+Installation on recent \texttt{macOS} computers is then accomplished for example by
 \begin{framed}
 \begin{verbatim}
-cmake -B build --preset macos-intel
+cmake -B build --preset macos-apple-silicon
 ninja -C build install
 \end{verbatim}
 \end{framed}
-or on linux
+or on \texttt{Linux}
 \begin{framed}
 \begin{verbatim}
 cmake -B build --preset linux-ubuntu-22
@@ -346,7 +351,7 @@ ninja -C build package
 \end{framed}
 
 \noindent
-Doxygen code documentation can be created with
+\texttt{Doxygen} code documentation can be created with
 \begin{framed}
 \begin{verbatim}
 ninja -C build documentation
@@ -377,7 +382,7 @@ dnf install -y pybind11-devel
 dnf install -y hdf5 hdf5-devel hdf5-static python3-h5py python3-tables
 \end{verbatim}
 
-\paragraph{Installing required packages on macOS using Homebrew}
+\paragraph{Installing required packages on \texttt{macOS} using \texttt{Homebrew}}
 
 \begin{verbatim}
 dnf install -y wget git rpm-build
@@ -390,20 +395,20 @@ dnf install -y pybind11-devel hdf5
 \end{verbatim}
 
 
-\subsection{Running RASPA\label{Introduction: running RASPA}}
-Running RASPA is based on two files:
+\subsection{Running \texttt{RASPA}\label{Introduction: running RASPA}}
+Running \texttt{RASPA} is based on two files:
 \begin{itemize}
- \item{A 'run' file to execute the program}\\
+  \item{A '\texttt{run}' file to execute the program}\\
   an example file is:
 \begin{verbatim}
 #! /bin/sh -f
 export RASPA_DIR=/usr/share/raspa3
 /usr/bin/raspa3
 \end{verbatim}
-  This type of file is know as a 'shell script'. RASPA needs the variable 'RASPA\_DIR' to be set in order
-  to look up the molecules, frameworks, etc. The scripts sets the variable and runs RASPA. RASPA can then be run
+    This type of file is know as a '\texttt{shell script}'. \texttt{RASPA} needs the variable '\texttt{RASPA\_DIR}' to be set in order
+    to look up the molecules, frameworks, etc. The scripts sets the variable and runs \texttt{RASPA}. \texttt{RASPA} can then be run
   from any directory you would like.
- \item{An 'input'-file describing the type of simulation and the parameters}\\
+ \item{An input-file describing the type of simulation and the parameters}\\
   In the same directory as the 'run'-file, there needs to be a file called \verb+simulation.json+. An example file is:
 \begin{verbatim}
 {
@@ -436,7 +441,7 @@ export RASPA_DIR=/usr/share/raspa3
   ]
 }
 \end{verbatim}
-  This tells RASPA to run a Monte-Carlo simulation of 100 methane molecules in a $30\times30\times30$ \AA\ cubic box (with 90$^\circ$ angles)
+    This tells \texttt{RASPA} to run a Monte-Carlo simulation of 100 methane molecules in a $30\times30\times30$ \AA\ cubic box (with 90$^\circ$ angles)
   at 300 Kelvin. It will start with 1000 cycles to initialize the system,
     10000 cycles to equilibrate the system, and will use 100000 cycle to obtain thermodynamic properties
   of interest. Every 1000 cycles a status-report is printed to the output. The Monte-Carlo program will use only the 'translation move'
@@ -444,9 +449,9 @@ export RASPA_DIR=/usr/share/raspa3
   \end{itemize}
 
 
-In order to run it on a cluster using a queuing system one needs an additional file 'bsub.job' (arbitrary name)
+In order to run it on a cluster using a queuing system one needs an additional file '\texttt{bsub.job}' (arbitrary name)
 \begin{itemize}
- \item{'gridengine'}
+  \item{'\texttt{gridengine}'}
   \begin{verbatim}
      #!/bin/bash
      # Serial sample script for Grid Engine
@@ -459,8 +464,8 @@ In order to run it on a cluster using a queuing system one needs an additional f
      export RASPA_DIR=/usr/share/raspa3
      /usr/bin/raspa3
   \end{verbatim}
-The job can be submitted using 'qsub bsub.job'.
- \item{'torque'}
+    The job can be submitted using '\texttt{qsub bsub.job}'.
+  \item{'\texttt{torque}'}
   \begin{verbatim}
      #!/bin/bash
      #PBS -N Test
@@ -474,8 +479,8 @@ The job can be submitted using 'qsub bsub.job'.
      export RASPA_DIR=/usr/share/raspa3
      /usr/bin/raspa3
   \end{verbatim}
-The job can be submitted using 'qsub bsub.job'.
- \item{'slurm'}
+    The job can be submitted using '\texttt{qsub bsub.job}'.
+  \item{'\texttt{slurm}'}
 \begin{verbatim}
   #!/bin/bash 
   #SBATCH -N 1
@@ -488,22 +493,22 @@ The job can be submitted using 'qsub bsub.job'.
   export RASPA_DIR=/usr/share/raspa3
   /usr/bin/raspa3
 \end{verbatim}
-The job can be submitted using 'sbatch bsub.job'.
+    The job can be submitted using '\texttt{sbatch bsub.job}'.
 \end{itemize}
 
 
-\section{Output from RASPA}
-RASPA generates output from the simulation. Some data is just information on the status, while other data are written because you
+\section{Output from \texttt{RASPA}}
+\texttt{RASPA} generates output from the simulation. Some data is just information on the status, while other data are written because you
 specifically asked the program to compute it for you. The output is written to be used with other programs like:
 \begin{itemize}
- \item{gnuplot}
- \item{iRASPA}
- \item{VMD}
+  \item{\texttt{gnuplot}}
+  \item{\texttt{iRASPA}}
+  \item{\texttt{VMD}}
 \end{itemize}
 
-\section{Citing RASPA}
+\section{Citing \texttt{RASPA}}
 
-If you are using RASPA and would like to cite it in your journal articles or book-chapters, then for RASPA:
+If you are using \texttt{RASPA} and would like to cite it in your journal articles or book-chapters, then for \texttt{RASPA}:
 
 \begin{quote}
 Y.A. Ran, S. Sharma, S.R.G. Balestra, Z. Li, S. Calero, T.J.H Vlugt, R.Q. Snurr, and D. Dubbeldam

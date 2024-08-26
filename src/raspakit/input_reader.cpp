@@ -567,9 +567,9 @@ void InputReader::parseMolecularSimulations(const nlohmann::basic_json<nlohmann:
         }
       }
 
-      if (item["GibbsCFCMCSwapProbability"].is_number_float())
+      if (item["Gibbs_CFCMC_SwapProbability"].is_number_float())
       {
-        double probabilityGibbsSwapMove_CFCMC = item["GibbsCFCMCSwapProbability"].get<double>();
+        double probabilityGibbsSwapMove_CFCMC = item["Gibbs_CFCMC_SwapProbability"].get<double>();
         for (size_t i = 0; i < move_probabilities.size(); ++i)
         {
           move_probabilities[i].probabilityGibbsSwapMove_CFCMC = probabilityGibbsSwapMove_CFCMC;

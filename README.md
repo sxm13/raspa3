@@ -31,11 +31,12 @@
 
 Drs. Youri Ran, University of Amsterdam<br>
 Drs. Shrinjay Sharma, Delft University of Technology<br>
+Dr. Salvador R.G. Balestra, Universidad Pablo de Olavide<br>
 Drs. Zhao Li, Northwestern University<br>
-Dr. David Dubbeldam, University of Amsterdam<br>
 Prof. Sofia Calero,  Eindhoven University of Technology<br>
 Prof. Thijs Vlugt, Delft University of Technology<br>
-Prof. Randall Q. Snurr, Northwestern University
+Prof. Randall Q. Snurr, Northwestern University<br>
+Dr. David Dubbeldam, University of Amsterdam
 
 # contributors
 

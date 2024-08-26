@@ -51,10 +51,10 @@
 
 \begin{itemize}
 \item{\verb+"SimulationType" : "MonteCarlo"+}\\
-Starts the Monte Carlo part of RASPA. The particular ensemble is not specified but implicitly deduced from
-the specified Monte Carlo moves. Note that a MD-move can be used for hybrid MC/MD.
+  Starts the Monte Carlo part of \texttt{RASPA}. The particular ensemble is not specified but implicitly deduced from
+    the specified Monte Carlo moves. Note that a \texttt{MD}-move can be used for hybrid \texttt{MC}/\texttt{MD}.
 \item{\verb+"SimulationType" : "MolecularDynamics"+}\\
-Starts the Molecular Dynamics part of RASPA. The ensemble must be explicitly specified.
+  Starts the Molecular Dynamics part of \texttt{RASPA}. The ensemble must be explicitly specified.
 \end{itemize}
 
 \subsection{Simulation duration}
@@ -71,7 +71,7 @@ The number of cycles used to initialize the system using Monte Carlo. This can b
 as well as Molecular Dynamics to quickly equilibrate the positions of the atoms in the system.
 \item{\verb+"NumberOfEquilibrationCycles" : integer+}\\
 For Molecular Dynamics  it is the number of MD steps to equilibrate the velocities in the systems. After this
-equilibration the production run is started. For Monte Carlo, in particular CFCMC, the equilibration-phase is used
+    equilibration the production run is started. For Monte Carlo, in particular \texttt{CFCMC}, the equilibration-phase is used
 to measure the biasing factors.
 \end{itemize}
 
@@ -135,7 +135,7 @@ The cell dimensions of rectangular box of system in Angstroms.
 \item{\verb+"BoxAngles" : [floating-point-number, floating-point-number, floating-point-number]+}\\
 The cell angles of rectangular box of system in Degrees.
 \item{\verb+"Name" : string+}\\
-Loads the framework with name \verb+string.cif+.
+For \verb+"Type" : "Framework"+, loads the framework with filename \verb+string.cif+.
 \item{\verb+"NumberOfUnitCells" : [integer, integer, integer]+}\\
 The number of unit cells in \verb+x+, \verb+y+, and \verb+z+ direction for the system. 
 The super-cell will contain the unit cells, and periodic boundary conditions
@@ -144,6 +144,10 @@ will be applied on the super-cell level (\emph{not} on a unit cell level).
 Sets the void fraction as measured by probing the structure with helium a room temperature. 
 This quantity has to be obtained from a separate simulation 
 and is essential to compute the \emph{excess}-adsorption during the simulation.
+\item{\verb+"UseChargesFromCIFFile" : boolean+}\\
+  Whether to use the charges defined in the \texttt{CIF}-file or via the force-field. 
+Using this option allows for individual charges for each framework atom, even when having the same atom-type.
+Default: \verb+false+
 \end{itemize}
 
 \subsection{Force field definitions}
@@ -177,20 +181,16 @@ Sets the method to compute charges. The string can be:
   \item{\verb+"Ewald"+}\\
     Switches on the Ewald summation for the charge calculation.
   \end{itemize}
-\item{\verb+"UseChargesFromCIFFile" : boolean+}
-Whether to use the charges defined in the CIF-file or via the force-field. 
-Using this option allows for individual charges for each framework atom, even when having the same atom-type.
-Default: \verb+false+
 \end{itemize}
 
-\subsection{System MC-moves}
+\subsection{System \texttt{MC}-moves}
 
 \begin{itemize}
 \item{\verb+"VolumeChangeProbability" : floating-point-number+}\\
 The probability per cycle to attempt a volume-change. 
 Rigid molecules are scaled by center-of-mass, while flexible molecules and the framework is atomically scaled.
 \item{\verb+"GibbVolumeChangeProbability" : floating-point-number+}\\
-The probability per cycle to attempt a Gibbs volume-change MC move during a Gibbs ensemble simulation. The total volume of the two boxes
+  The probability per cycle to attempt a Gibbs volume-change \texttt{MC} move during a Gibbs ensemble simulation. The total volume of the two boxes
 (usually one for the gas phase, one for the liquid phase) remains constant, but the individual volume of the boxes are changed.
 The volumes are changed by a random change in $\ln(V_I/V_{II})$.
 \end{itemize}
@@ -199,7 +199,7 @@ The volumes are changed by a random change in $\ln(V_I/V_{II})$.
 
 \begin{itemize}
 \item{\verb+"TimeStep" : floating-point-number+}\\
-The time step in picoseconds for MD integration. Default value: \verb+0.0005+
+  The time step in picoseconds for \texttt{MD} integration. Default value: \verb+0.0005+
 \item{\verb+"Ensemble" : string+}\\
 Sets the ensemble. The ensemble string can be:
   \begin{itemize}
@@ -344,7 +344,7 @@ The partial pressures for each component are computed from the total pressure an
 The fugacity coefficient for the current component. For values 0 (or by not specifying this line), the fugacity coefficients are automatically computed using the Peng-Robinson
 equation of state. Note the critical pressure, critical temperature, and acentric factor need to be specified in the molecule file.
 \item{\verb+"IdealGasRosenbluthWeight" : floating-point-number+}\\
-The ideal Rosenbluth weight is the growth factor of the CBMC algorithm for a single chain in an empty box. The value only depends on temperature and therefore needs to be computed
+  The ideal Rosenbluth weight is the growth factor of the \texttt{CBMC} algorithm for a single chain in an empty box. The value only depends on temperature and therefore needs to be computed
 only once. For adsorption, specifying the value in advance is convenient because the applied pressure does not need to be corrected afterwards (the Rosenbluth weight corresponds to a shift
 in the chemical potential reference value, and the chemical potential is directly obtained from the fugacity). For equimolar mixtures this is essential.
 \item{\verb+"CreateNumberOfMolecules" : integer+}\\
@@ -353,7 +353,7 @@ Note these molecules are \emph{in addition} to anything read in by using a resta
 is used the amount here should be put back to zero. A warning, putting this value unreasonably high results in an infinite loop. 
 The routine accepts molecules that are grown causing no overlap (energy smaller than `EnergyOverlapCriteria'). 
 Also the initial starting configurations are far from optimal and substantial equilibration is needed to reduce the energy.
-However, the CBMC growth is able to reach very high densities.
+    However, the \texttt{CBMC} growth is able to reach very high densities.
 \item{\verb+"BlockingPockets" : [[3 x floating-point-number, floating-point-number]]+}\\
 Block certain pockets in the simulation volume. The growth of a molecule is not allowed in a blocked pocket. 
 A typical example is the sodalite cages in FAU and LTA-type zeolites,
@@ -372,7 +372,7 @@ For example, blocking pockets for ITQ-29 for small molecules are specified as:
 \end{verbatim}
 \end{itemize}
 
-\subsection{Component MC-moves}
+\subsection{Component \texttt{\textbf{MC}}-moves}
 
 \begin{itemize}
 
@@ -402,10 +402,17 @@ The swap move imposes a chemical equilibrium between the system and
 an imaginary particle reservoir for the current component. 
 The move starts with multiple first bead, and
 grows the remainder of the molecule using biasing.
+\item{\verb+"CFCMC_SwapProbability" : floating-point-number+}\\
+  The relative probability to attempt a insertion or deletion move via \texttt{CFCMC} scheme.
+\item{\verb+"CFCMC_CBMC_SwapProbability" : floating-point-number+}\\
+  The relative probability to attempt a insertion or deletion move via \texttt{CB/CFCMC} scheme.
 \item{\verb+GibbsSwapProbability" : floating-point-number+}\\
 The relative probability to attempt a Gibbs swap MC move for the current component. 
 The `GibbsSwapMove' transfers a randomly selected particle from one box to the other
-(50\% probability to transfer a particle from box I to II, an 50\% visa versa).
+    (50\% probability to transfer a particle from box \texttt{I} to \texttt{II}, an 50\% visa versa).
+\item{\verb+Gibbs_CFCMC_SwapProbability" : floating-point-number+}\\
+The relative probability to attempt a Gibbs swap MC move for the current component
+    using the \texttt{CFCMC} scheme.
 \item{\verb+"WidomProbability" : floating-point-number+}\\
 The relative probability to attempt a Widom particle insertion move for the current component. 
 The Widom particle insertion moves measure the chemical potential
