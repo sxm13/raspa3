@@ -385,6 +385,7 @@ std::string HardwareInfo::writeInfo()
     std::print(stream, "Processor Architecture ARM64\n");
 #endif
 
+#if defined(__x86_64__) || (_M_64__)
   int CPUInfo[4] = {-1};
   unsigned nExIds, i = 0;
   char CPUBrandString[0x40];
@@ -404,6 +405,7 @@ std::string HardwareInfo::writeInfo()
   }
   // string includes manufacturer, model and clockspeed
   std::print(stream, "CPU Type:{}\n", CPUBrandString);
+#endif
 
   MEMORYSTATUSEX statex;
   statex.dwLength = sizeof(statex);
