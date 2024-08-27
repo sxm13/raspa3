@@ -1,0 +1,9 @@
+set xrange[0:15]
+set encoding iso_8859_1
+set key top right Left reverse width 2 height 0.5 samplen 1.5 spacing 1.1 box
+set title "Radial Distribution Function as a function of density"
+set xlabel 'Radial distance, {/Helvetica-Italic r} / {\305}' font "Helvetica,20"
+set ylabel 'Frequency, -' offset 0,0 font "Helvetica,20"
+set bmargin 3.5
+plot "100mol_uc/conventional_rdf/rdf_CH4_CH4.s0.txt" us 1:2 title '100 mol/uc'  with li lc "magenta" lt -1 lw 2,"200mol_uc/conventional_rdf/rdf_CH4_CH4.s0.txt" us 1:2 title '200 mol/uc'  with li lc "navy" lt -1 lw 2,"400mol_uc/conventional_rdf/rdf_CH4_CH4.s0.txt" us 1:2 title '400 mol/uc'  with li lc "blue" lt -1 lw 2
+pause -1 "Hit return to continue"

@@ -1,7 +1,8 @@
 {
   "SimulationType" : "MonteCarlo",
-  "NumberOfCycles" : 1000000,
-  "NumberOfInitializationCycles" : 50000,
+  "NumberOfCycles" : 50000,
+  "NumberOfEquilibrationCycles" : 25000,
+  "NumberOfInitializationCycles" : 5000,
   "PrintEvery" : 5000,
   
   "Systems" : [
@@ -31,11 +32,14 @@
       "Name" : "CO2",
       "FugacityCoefficient" : 1.0,
 
+      "ThermodynamicIntegration" : true,
+
       "TranslationProbability" : 0.5,
       "RotationProbability" : 0.5,
       "ReinsertionProbability" : 0.5,
       "WdomProbability" : 1.0,
-      "SwapProbability" : 1.0,
+
+      "CFCMC_CBMC_SwapProbability" : 1.0,
 
       "blockingPockets" : [
            [0.0,       0.0,        0.0,       4.0],
