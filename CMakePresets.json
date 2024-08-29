@@ -118,8 +118,9 @@
         "CMAKE_CXX_FLAGS_RELEASE": "-DNDEBUG -stdlib=libc++ -fvisibility=hidden -fexperimental-library -Xclang -fopenmp -g -O3 -march=core-avx2 -mfma  -fomit-frame-pointer -ffast-math",
         "OpenMP_CXX_FLAGS": "-Xclang -fopenmp=libomp",
         "CMAKE_BUILD_WITH_INSTALL_RPATH": true,
-        "BUILD_MAC_PACKAGE": true,
-        "BUILD_TESTING": true
+        "BUILD_MAC_PACKAGE": false,
+        "BUILD_TESTING": true,
+        "BUILD_PYTHON": false
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -200,7 +201,7 @@
         "OpenMP_CXX_FLAGS": "-Xclang -fopenmp",
         "OpenMP_libomp_LIBRARY": "/opt/homebrew/Cellar/libomp/18.1.8/lib/libomp.a",
         "CMAKE_BUILD_WITH_INSTALL_RPATH": true,
-        "BUILD_MAC_PACKAGE": true,
+        "BUILD_MAC_PACKAGE": false,
         "BUILD_TESTING": true
       },
       "vendor": {
