@@ -206,7 +206,7 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC_CBMC(R
       return {std::nullopt, double3(0.0, 1.0, 0.0)};
     }
 
-    if(system.insideBlockedPockets(system.components[selectedComponent], growData->atom))
+    if((system.insideBlockedPockets(system.components[selectedComponent], growData->atom)) && newLambda > 0.0)
     {
       // reject, set fractional molecule back to old state
       std::copy(oldFractionalMolecule.begin(), oldFractionalMolecule.end(), fractionalMolecule.begin());
@@ -515,6 +515,11 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC_CBMC(R
     system.components[selectedComponent].mc_moves_statistics.swapMove_CFCMC_CBMC.totalCounts[2] += 1;
 
     std::span<Atom> molecule = system.spanOfMolecule(selectedComponent, indexFractionalMolecule);
+
+    if(system.insideBlockedPockets(system.components[selectedComponent], molecule))
+    {
+      return {std::nullopt, double3(0.0, 1.0, 0.0)};
+    }
 
     std::vector<Atom> trialPositions(molecule.begin(), molecule.end());
     std::transform(molecule.begin(), molecule.end(), trialPositions.begin(),

@@ -131,6 +131,16 @@
       }
     },
     {
+      "name": "macos-x64-package",
+      "description": "Mac create installer",
+      "inherits": [
+        "macos-x64"
+      ],
+      "cacheVariables": {
+        "BUILD_MAC_PACKAGE": true
+      }
+    },
+    {
       "name": "macos-x64-debug",
       "description": "Sets compilers, build type",
       "inherits": [
@@ -210,6 +220,16 @@
             "macOS"
           ]
         }
+      }
+    },
+    {
+      "name": "macos-apple-silicon-package",
+      "description": "Mac create installer",
+      "inherits": [
+        "macos-apple-silicon"
+      ],
+      "cacheVariables": {
+        "BUILD_MAC_PACKAGE": true
       }
     },
     {

@@ -1,12 +1,15 @@
- 1) flexible molecules
- 2) reaction ensemble
- 3) identity change
- 4) make routines cutoff-dependence for dual-cutoff method
- 5) polarization
- 6) grids for rigid frameworks
- 7) cell-lists for rigid frameworks
- 8) partial molar volumes
- 9) zeo++-type calculations
+ 1) tail-corrections for CFCMC
+ 2) MC/MD hybrid move
+ 3) flexible molecules
+ 4) reaction ensemble
+ 5) identity change
+ 6) make routines cutoff-dependent for dual-cutoff method
+ 7) polarization
+ 8) grids for rigid frameworks
+ 9) cell-lists for rigid frameworks
+10) partial molar volumes
+11) zeo++-type calculations
+12) partial molar enthalpies/volumes
 
 tests
 =====
