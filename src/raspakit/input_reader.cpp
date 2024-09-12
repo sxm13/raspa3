@@ -627,18 +627,7 @@ void InputReader::parseMolecularSimulations(const nlohmann::basic_json<nlohmann:
         jsonNumberOfLambdaBins = parsed_data["NumberOfLambdaBins"].get<size_t>();
       }
 
-      // Explicit notation listing the properties as an array of the values for the particular systems
-      // ========================================================================================================
 
-      if (item["CreateNumberOfMolecules"].is_array())
-      {
-        std::vector<size_t> initialNumberOfMolecule =
-            parseList<size_t>(jsonNumberOfSystems, "CreateNumberOfMolecules", item["CreateNumberOfMolecules"]);
-        for (size_t i = 0; i != jsonNumberOfSystems; ++i)
-        {
-          jsonCreateNumberOfMolecules[i][componentId] = initialNumberOfMolecule[i];
-        }
-      }
 
       // construct Component
       for (size_t i = 0; i != jsonNumberOfSystems; ++i)
@@ -676,6 +665,24 @@ void InputReader::parseMolecularSimulations(const nlohmann::basic_json<nlohmann:
         }
       }
 
+      if (item["IdealGasRosenbluthWeight"].is_number_float())
+      {
+        double ideal_gas_rosenbluth_weight = item["IdealGasRosenbluthWeight"].get<double>();
+        for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+        {
+          jsonComponents[i][componentId].idealGasRosenbluthWeight = ideal_gas_rosenbluth_weight;
+        }
+      }
+
+      if (item["MolFraction"].is_number_float())
+      {
+        double mol_fraction = item["MolFraction"].get<double>();
+        for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+        {
+          jsonComponents[i][componentId].molFraction = mol_fraction;
+        }
+      }
+
       if (item["ThermodynamicIntegration"].is_boolean())
       {
         bool thermodynamic_integration = item["ThermodynamicIntegration"].get<bool>();
@@ -707,6 +714,50 @@ void InputReader::parseMolecularSimulations(const nlohmann::basic_json<nlohmann:
           {
             jsonComponents[i][componentId].blockingPockets.push_back(double4(data[0], data[1], data[2], data[3]));
           }
+        }
+      }
+
+
+      // Explicit notation listing the properties as an array of the values for the particular systems
+      // ========================================================================================================
+
+      if (item["FugacityCoefficient"].is_array())
+      {
+        std::vector<double> fugacity_coefficients =
+            parseList<double>(jsonNumberOfSystems, "FugacityCoefficient", item["FugacityCoefficient"]);
+        for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+        {
+          jsonComponents[i][componentId].fugacityCoefficient = fugacity_coefficients[i];
+        }
+      }
+
+      if (item["IdealGasRosenbluthWeight"].is_array())
+      {
+        std::vector<double> ideal_gas_rosenbluth_weight =
+            parseList<double>(jsonNumberOfSystems, "IdealGasRosenbluthWeight", item["IdealGasRosenbluthWeight"]);
+        for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+        {
+          jsonComponents[i][componentId].idealGasRosenbluthWeight = ideal_gas_rosenbluth_weight[i];
+        }
+      }
+
+      if (item["MolFraction"].is_array())
+      {
+        std::vector<double> mol_fractions =
+            parseList<double>(jsonNumberOfSystems, "MolFraction", item["MolFraction"]);
+        for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+        {
+          jsonComponents[i][componentId].molFraction = mol_fractions[i];
+        }
+      }
+
+      if (item["CreateNumberOfMolecules"].is_array())
+      {
+        std::vector<size_t> initialNumberOfMolecule =
+            parseList<size_t>(jsonNumberOfSystems, "CreateNumberOfMolecules", item["CreateNumberOfMolecules"]);
+        for (size_t i = 0; i != jsonNumberOfSystems; ++i)
+        {
+          jsonCreateNumberOfMolecules[i][componentId] = initialNumberOfMolecule[i];
         }
       }
 

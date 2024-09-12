@@ -66,7 +66,6 @@ endif()
 add_subdirectory(src)
 add_subdirectory(data)
 add_subdirectory(examples)
-add_subdirectory(workshop)
 
 if(NOT DEFINED SKIP_EXECUTABLE)
   add_subdirectory(app)
