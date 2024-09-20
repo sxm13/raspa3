@@ -484,8 +484,8 @@ void System::createInitialMolecules([[maybe_unused]] RandomNumber& random)
         {
           Component::GrowType growType = components[componentId].growType;
           growData = CBMC::growMoleculeSwapInsertion(
-              random, this->hasExternalField, this->components, this->forceField, this->simulationBox,
-              this->spanOfFrameworkAtoms(), this->spanOfMoleculeAtoms(), this->beta, growType, forceField.cutOffVDW,
+              random, frameworkComponents, components[componentId], hasExternalField, components, forceField, simulationBox,
+              spanOfFrameworkAtoms(), spanOfMoleculeAtoms(), beta, growType, forceField.cutOffVDW,
               forceField.cutOffCoulomb, componentId, numberOfMoleculesPerComponent[componentId], 0.0, 1uz,
               numberOfTrialDirections);
         } while (!growData || growData->energies.potentialEnergy() > forceField.overlapCriteria);
@@ -504,8 +504,8 @@ void System::createInitialMolecules([[maybe_unused]] RandomNumber& random)
         {
           Component::GrowType growType = components[componentId].growType;
           growData = CBMC::growMoleculeSwapInsertion(
-              random, this->hasExternalField, this->components, this->forceField, this->simulationBox,
-              this->spanOfFrameworkAtoms(), this->spanOfMoleculeAtoms(), this->beta, growType, forceField.cutOffVDW,
+              random, frameworkComponents, components[componentId], hasExternalField, components, forceField, simulationBox,
+              spanOfFrameworkAtoms(), spanOfMoleculeAtoms(), beta, growType, forceField.cutOffVDW,
               forceField.cutOffCoulomb, componentId, numberOfMoleculesPerComponent[componentId], 1.0, 0uz,
               numberOfTrialDirections);
 
@@ -533,9 +533,10 @@ bool System::insideBlockedPockets(const Component &component, std::span<const At
       double3 pos = framework.simulationBox.cell * double3(component.blockingPockets[i].x, component.blockingPockets[i].y, component.blockingPockets[i].z);
       for(const Atom &atom : molecule_atoms)
       {
+        double lambda = atom.scalingVDW;
         double3 dr = atom.position - pos;
         dr = framework.simulationBox.applyPeriodicBoundaryConditions(dr);
-        if(dr.length_squared() < radius_squared) 
+        if(dr.length_squared() < lambda * radius_squared)
         {
           return true;
         }

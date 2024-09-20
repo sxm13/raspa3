@@ -59,19 +59,19 @@ export struct PropertyLambdaProbabilityHistogram
 
   PropertyLambdaProbabilityHistogram() {};
 
-  PropertyLambdaProbabilityHistogram(size_t numberOfBlocks, size_t numberOfBins)
+  PropertyLambdaProbabilityHistogram(size_t numberOfBlocks, size_t numberOfSamplePoints)
       : numberOfBlocks(numberOfBlocks),
-        numberOfBins(numberOfBins),
-        jump_bins(numberOfBins / 2),
+        numberOfSamplePoints(numberOfSamplePoints),
+        jump_bins(numberOfSamplePoints / 2),
         currentBin(0),
-        delta(1.0 / static_cast<double>(numberOfBins - 1)),
-        histogram(numberOfBins),
-        biasFactor(numberOfBins),
-        bookKeepingLambda(std::vector<std::vector<double>>(numberOfBlocks, std::vector<double>(numberOfBins))),
+        delta(1.0 / static_cast<double>(numberOfSamplePoints - 1)),
+        histogram(numberOfSamplePoints),
+        biasFactor(numberOfSamplePoints),
+        bookKeepingLambda(std::vector<std::vector<double>>(numberOfBlocks, std::vector<double>(numberOfSamplePoints))),
         bookKeepingDensity(std::vector<std::pair<double, double>>(numberOfBlocks)),
         computeDUdlambda(false),
         bookKeepingDUdlambda(std::vector<std::vector<std::pair<double3, double>>>(
-            numberOfBlocks, std::vector<std::pair<double3, double>>(numberOfBins)))
+            numberOfBlocks, std::vector<std::pair<double3, double>>(numberOfSamplePoints)))
   {
   }
 
@@ -80,7 +80,7 @@ export struct PropertyLambdaProbabilityHistogram
   uint64_t versionNumber{1};
   size_t numberOfBlocks;
 
-  size_t numberOfBins;
+  size_t numberOfSamplePoints;
   size_t jump_bins;
   size_t currentBin;
   double delta;
@@ -131,7 +131,7 @@ export struct PropertyLambdaProbabilityHistogram
   inline int selectNewBin(RandomNumber &random, double scale) const
   {
     return static_cast<int>(currentBin) +
-           static_cast<int>(scale * static_cast<double>(numberOfBins) * 2.0 * (random.uniform() - 0.5));
+           static_cast<int>(scale * static_cast<double>(numberOfSamplePoints) * 2.0 * (random.uniform() - 0.5));
   }
 
   inline void setCurrentBin(size_t index) { currentBin = index; }
@@ -274,7 +274,7 @@ export struct PropertyLambdaProbabilityHistogram
 
   std::vector<double> averagedProbabilityHistogram(size_t blockIndex) const
   {
-    std::vector<double> averagedData(numberOfBins);
+    std::vector<double> averagedData(numberOfSamplePoints);
     std::transform(bookKeepingLambda[blockIndex].begin(), bookKeepingLambda[blockIndex].end(), averagedData.begin(),
                    [&](const double &sample) { return sample; });
     return averagedData;
@@ -282,14 +282,14 @@ export struct PropertyLambdaProbabilityHistogram
 
   std::vector<double> averagedProbabilityHistogram() const
   {
-    std::vector<double> summedBlocks(numberOfBins);
+    std::vector<double> summedBlocks(numberOfSamplePoints);
     for (size_t blockIndex = 0; blockIndex != numberOfBlocks; ++blockIndex)
     {
       std::transform(summedBlocks.begin(), summedBlocks.end(), bookKeepingLambda[blockIndex].begin(),
                      summedBlocks.begin(), [](const double &a, const double &b) { return a + b; });
     }
 
-    std::vector<double> average(numberOfBins);
+    std::vector<double> average(numberOfSamplePoints);
     std::transform(summedBlocks.begin(), summedBlocks.end(), average.begin(),
                    [&](const double &sample) { return sample / static_cast<double>(numberOfBlocks); });
 
@@ -302,26 +302,26 @@ export struct PropertyLambdaProbabilityHistogram
     double intermediateStandardNormalDeviate = standardNormalDeviates[degreesOfFreedom][chosenConfidenceLevel];
     std::vector<double> average = averagedProbabilityHistogram();
 
-    std::vector<double> sumOfSquares(numberOfBins);
+    std::vector<double> sumOfSquares(numberOfSamplePoints);
     for (size_t blockIndex = 0; blockIndex != numberOfBlocks; ++blockIndex)
     {
       std::vector<double> blockAverage = averagedProbabilityHistogram(blockIndex);
-      for (size_t binIndex = 0; binIndex != numberOfBins; ++binIndex)
+      for (size_t binIndex = 0; binIndex != numberOfSamplePoints; ++binIndex)
       {
         double value = blockAverage[binIndex] - average[binIndex];
         sumOfSquares[binIndex] += value * value;
       }
     }
-    std::vector<double> standardDeviation(numberOfBins);
+    std::vector<double> standardDeviation(numberOfSamplePoints);
     std::transform(sumOfSquares.cbegin(), sumOfSquares.cend(), standardDeviation.begin(),
                    [&](const double &sumofsquares)
                    { return std::sqrt(sumofsquares / static_cast<double>(degreesOfFreedom)); });
 
-    std::vector<double> standardError(numberOfBins);
+    std::vector<double> standardError(numberOfSamplePoints);
     std::transform(standardDeviation.cbegin(), standardDeviation.cend(), standardError.begin(),
                    [&](const double &sigma) { return sigma / sqrt(static_cast<double>(numberOfBlocks)); });
 
-    std::vector<double> confidenceIntervalError(numberOfBins);
+    std::vector<double> confidenceIntervalError(numberOfSamplePoints);
     std::transform(standardError.cbegin(), standardError.cend(), confidenceIntervalError.begin(),
                    [&](const double &error) { return intermediateStandardNormalDeviate * error; });
 
@@ -332,7 +332,7 @@ export struct PropertyLambdaProbabilityHistogram
 
   std::vector<double> averagedLandauFreeEnergyHistogram(size_t blockIndex, double beta) const
   {
-    std::vector<double> averagedData(numberOfBins);
+    std::vector<double> averagedData(numberOfSamplePoints);
     std::transform(bookKeepingLambda[blockIndex].cbegin(), bookKeepingLambda[blockIndex].cend(), averagedData.begin(),
                    [&](const double &sample) { return -std::log(sample) / beta; });
     return averagedData;
@@ -341,14 +341,14 @@ export struct PropertyLambdaProbabilityHistogram
   std::vector<double> averagedLandauFreeEnergyHistogram(double beta) const
   {
     // sum all blocks into one
-    std::vector<double> summedBlocks(numberOfBins);
+    std::vector<double> summedBlocks(numberOfSamplePoints);
     for (size_t blockIndex = 0; blockIndex != numberOfBlocks; ++blockIndex)
     {
       std::transform(summedBlocks.begin(), summedBlocks.end(), bookKeepingLambda[blockIndex].begin(),
                      summedBlocks.begin(), [](const double &a, const double &b) { return a + b; });
     }
 
-    std::vector<double> averagedData(numberOfBins);
+    std::vector<double> averagedData(numberOfSamplePoints);
     std::transform(summedBlocks.cbegin(), summedBlocks.cend(), averagedData.begin(), [&](const double &sample)
                    { return -std::log(sample / static_cast<double>(numberOfBlocks)) / beta; });
     return averagedData;
@@ -360,26 +360,26 @@ export struct PropertyLambdaProbabilityHistogram
     double intermediateStandardNormalDeviate = standardNormalDeviates[degreesOfFreedom][chosenConfidenceLevel];
     std::vector<double> average = averagedLandauFreeEnergyHistogram(beta);
 
-    std::vector<double> sumOfSquares(numberOfBins);
+    std::vector<double> sumOfSquares(numberOfSamplePoints);
     for (size_t blockIndex = 0; blockIndex != numberOfBlocks; ++blockIndex)
     {
       std::vector<double> blockAverage = averagedLandauFreeEnergyHistogram(blockIndex, beta);
-      for (size_t binIndex = 0; binIndex != numberOfBins; ++binIndex)
+      for (size_t binIndex = 0; binIndex != numberOfSamplePoints; ++binIndex)
       {
         double value = blockAverage[binIndex] - average[binIndex];
         sumOfSquares[binIndex] += value * value;
       }
     }
-    std::vector<double> standardDeviation(numberOfBins);
+    std::vector<double> standardDeviation(numberOfSamplePoints);
     std::transform(sumOfSquares.cbegin(), sumOfSquares.cend(), standardDeviation.begin(),
                    [&](const double &sumofsquares)
                    { return std::sqrt(sumofsquares / static_cast<double>(degreesOfFreedom)); });
 
-    std::vector<double> standardError(numberOfBins);
+    std::vector<double> standardError(numberOfSamplePoints);
     std::transform(standardDeviation.cbegin(), standardDeviation.cend(), standardError.begin(),
                    [&](const double &sigma) { return sigma / sqrt(static_cast<double>(numberOfBlocks)); });
 
-    std::vector<double> confidenceIntervalError(numberOfBins);
+    std::vector<double> confidenceIntervalError(numberOfSamplePoints);
     std::transform(standardError.cbegin(), standardError.cend(), confidenceIntervalError.begin(),
                    [&](const double &error) { return intermediateStandardNormalDeviate * error; });
 
@@ -390,7 +390,7 @@ export struct PropertyLambdaProbabilityHistogram
 
   double averagedExcessChemicalPotential(size_t blockIndex, double beta) const
   {
-    size_t lastBin = numberOfBins - 1;
+    size_t lastBin = numberOfSamplePoints - 1;
     double averagedProbabilityFirstValue = bookKeepingLambda[blockIndex][0];
     double averagedProbabilityLastValue = bookKeepingLambda[blockIndex][lastBin];
     return -std::log(averagedProbabilityLastValue / averagedProbabilityFirstValue) / beta;
@@ -398,14 +398,14 @@ export struct PropertyLambdaProbabilityHistogram
 
   double averagedExcessChemicalPotential(double beta) const
   {
-    std::vector<double> summedBlocks(numberOfBins);
+    std::vector<double> summedBlocks(numberOfSamplePoints);
     for (size_t blockIndex = 0; blockIndex != numberOfBlocks; ++blockIndex)
     {
       std::transform(summedBlocks.begin(), summedBlocks.end(), bookKeepingLambda[blockIndex].begin(),
                      summedBlocks.begin(), [](const double &a, const double &b) { return a + b; });
     }
 
-    size_t lastBin = numberOfBins - 1;
+    size_t lastBin = numberOfSamplePoints - 1;
     double averagedProbabilityFirstValue = summedBlocks[0];
     double averagedProbabilityLastValue = summedBlocks[lastBin];
     return -std::log(averagedProbabilityLastValue / averagedProbabilityFirstValue) / beta;
@@ -484,7 +484,7 @@ export struct PropertyLambdaProbabilityHistogram
 
   std::vector<double3> averagedDUdlambda(size_t blockIndex) const
   {
-    std::vector<double3> averagedData(numberOfBins);
+    std::vector<double3> averagedData(numberOfSamplePoints);
     std::transform(bookKeepingDUdlambda[blockIndex].cbegin(), bookKeepingDUdlambda[blockIndex].cend(),
                    averagedData.begin(), [&](const std::pair<double3, double> &sample)
                    { return sample.first / std::max(1.0, sample.second); });
@@ -493,14 +493,14 @@ export struct PropertyLambdaProbabilityHistogram
 
   std::vector<double3> averagedDUdlambda() const
   {
-    std::vector<std::pair<double3, double>> summedBlocks(numberOfBins);
+    std::vector<std::pair<double3, double>> summedBlocks(numberOfSamplePoints);
     for (size_t blockIndex = 0; blockIndex != numberOfBlocks; ++blockIndex)
     {
       std::transform(summedBlocks.begin(), summedBlocks.end(), bookKeepingDUdlambda[blockIndex].begin(),
                      summedBlocks.begin(), pair_sum_double3);
     }
 
-    std::vector<double3> averagedData(numberOfBins);
+    std::vector<double3> averagedData(numberOfSamplePoints);
     std::transform(summedBlocks.begin(), summedBlocks.end(), averagedData.begin(),
                    [&](std::pair<double3, double> &sample) { return sample.first / std::max(1.0, sample.second); });
     return averagedData;
@@ -512,26 +512,26 @@ export struct PropertyLambdaProbabilityHistogram
     double intermediateStandardNormalDeviate = standardNormalDeviates[degreesOfFreedom][chosenConfidenceLevel];
     std::vector<double3> average = averagedDUdlambda();
 
-    std::vector<double3> sumOfSquares(numberOfBins);
+    std::vector<double3> sumOfSquares(numberOfSamplePoints);
     for (size_t blockIndex = 0; blockIndex != numberOfBlocks; ++blockIndex)
     {
       std::vector<double3> blockAverage = averagedDUdlambda(blockIndex);
-      for (size_t binIndex = 0; binIndex != numberOfBins; ++binIndex)
+      for (size_t binIndex = 0; binIndex != numberOfSamplePoints; ++binIndex)
       {
         double3 value = blockAverage[binIndex] - average[binIndex];
         sumOfSquares[binIndex] += value * value;
       }
     }
-    std::vector<double3> standardDeviation(numberOfBins);
+    std::vector<double3> standardDeviation(numberOfSamplePoints);
     std::transform(sumOfSquares.cbegin(), sumOfSquares.cend(), standardDeviation.begin(),
                    [&](const double3 &sumofsquares)
                    { return sqrt(sumofsquares / static_cast<double>(degreesOfFreedom)); });
 
-    std::vector<double3> standardError(numberOfBins);
+    std::vector<double3> standardError(numberOfSamplePoints);
     std::transform(standardDeviation.cbegin(), standardDeviation.cend(), standardError.begin(),
                    [&](const double3 &sigma) { return sigma / sqrt(static_cast<double>(numberOfBlocks)); });
 
-    std::vector<double3> confidenceIntervalError(numberOfBins);
+    std::vector<double3> confidenceIntervalError(numberOfSamplePoints);
     std::transform(standardError.cbegin(), standardError.cend(), confidenceIntervalError.begin(),
                    [&](const double3 &error) { return intermediateStandardNormalDeviate * error; });
 
@@ -542,7 +542,7 @@ export struct PropertyLambdaProbabilityHistogram
 
   double averagedExcessChemicalPotentialDUdlambda(size_t blockIndex) const
   {
-    std::vector<double> averagedData(numberOfBins);
+    std::vector<double> averagedData(numberOfSamplePoints);
     std::transform(bookKeepingDUdlambda[blockIndex].begin(), bookKeepingDUdlambda[blockIndex].end(),
                    averagedData.begin(), [&](const std::pair<double3, double> &sample)
                    { return (sample.first.x + sample.first.y + sample.first.z) / std::max(1.0, sample.second); });
@@ -567,19 +567,19 @@ export struct PropertyLambdaProbabilityHistogram
     //{
     //     sum += 0.5 * (averagedData[i] + averagedData[i-1]);
     // }
-    // return sum / static_cast<double>(numberOfBins - 1);
+    // return sum / static_cast<double>(numberOfSamplePoints - 1);
   }
 
   double averagedExcessChemicalPotentialDUdlambda() const
   {
-    std::vector<std::pair<double3, double>> summedBlocks(numberOfBins);
+    std::vector<std::pair<double3, double>> summedBlocks(numberOfSamplePoints);
     for (size_t blockIndex = 0; blockIndex != numberOfBlocks; ++blockIndex)
     {
       std::transform(summedBlocks.begin(), summedBlocks.end(), bookKeepingDUdlambda[blockIndex].begin(),
                      summedBlocks.begin(), pair_sum_double3);
     }
 
-    std::vector<double> averagedData(numberOfBins);
+    std::vector<double> averagedData(numberOfSamplePoints);
     std::transform(summedBlocks.begin(), summedBlocks.end(), averagedData.begin(),
                    [&](std::pair<double3, double> &sample)
                    { return (sample.first.x + sample.first.y + sample.first.z) / std::max(1.0, sample.second); });
@@ -601,7 +601,7 @@ export struct PropertyLambdaProbabilityHistogram
     //{
     //     sum += 0.5 * (averagedData[i] + averagedData[i-1]);
     // }
-    // return sum / static_cast<double>(numberOfBins - 1);
+    // return sum / static_cast<double>(numberOfSamplePoints - 1);
   }
 
   std::pair<double, double> averageExcessChemicalPotentialDUdlambda() const

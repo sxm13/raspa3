@@ -79,7 +79,7 @@ std::optional<RunningEnergy> MC_Moves::reinsertionMove(RandomNumber &random, Sys
 
   time_begin = std::chrono::system_clock::now();
   std::optional<ChainData> growData = CBMC::growMoleculeReinsertion(
-      random, system.hasExternalField, system.components, system.forceField, system.simulationBox,
+      random, system.frameworkComponents, system.components[selectedComponent], system.hasExternalField, system.components, system.forceField, system.simulationBox,
       system.spanOfFrameworkAtoms(), system.spanOfMoleculeAtoms(), system.beta, cutOffVDW, cutOffCoulomb,
       selectedComponent, selectedMolecule, molecule, molecule_atoms, system.numberOfTrialDirections);
   time_end = std::chrono::system_clock::now();
@@ -100,7 +100,7 @@ std::optional<RunningEnergy> MC_Moves::reinsertionMove(RandomNumber &random, Sys
 
   time_begin = std::chrono::system_clock::now();
   ChainData retraceData = CBMC::retraceMoleculeReinsertion(
-      random, system.hasExternalField, system.components, system.forceField, system.simulationBox,
+      random, system.frameworkComponents, system.components[selectedComponent], system.hasExternalField, system.components, system.forceField, system.simulationBox,
       system.spanOfFrameworkAtoms(), system.spanOfMoleculeAtoms(), system.beta, cutOffVDW, cutOffCoulomb,
       selectedComponent, selectedMolecule, molecule, molecule_atoms, growData->storedR, system.numberOfTrialDirections);
   time_end = std::chrono::system_clock::now();
@@ -121,9 +121,11 @@ std::optional<RunningEnergy> MC_Moves::reinsertionMove(RandomNumber &random, Sys
   if (system.forceField.useDualCutOff)
   {
     energyNew = CBMC::computeExternalNonOverlappingEnergyDualCutOff(
+        system.frameworkComponents, system.components[selectedComponent], 
         system.hasExternalField, system.forceField, system.simulationBox, system.spanOfFrameworkAtoms(),
         system.spanOfMoleculeAtoms(), system.forceField.cutOffVDW, system.forceField.cutOffCoulomb, growData->atom);
     energyOld = CBMC::computeExternalNonOverlappingEnergyDualCutOff(
+        system.frameworkComponents, system.components[selectedComponent],
         system.hasExternalField, system.forceField, system.simulationBox, system.spanOfFrameworkAtoms(),
         system.spanOfMoleculeAtoms(), system.forceField.cutOffVDW, system.forceField.cutOffCoulomb, retraceData.atom);
     correctionFactorDualCutOff =

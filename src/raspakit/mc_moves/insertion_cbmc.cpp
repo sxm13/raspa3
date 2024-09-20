@@ -74,7 +74,7 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::insertionMoveCBMC(Ran
 
   time_begin = std::chrono::system_clock::now();
   std::optional<ChainData> growData = CBMC::growMoleculeSwapInsertion(
-      random, system.hasExternalField, system.components, system.forceField, system.simulationBox,
+      random, system.frameworkComponents, system.components[selectedComponent], system.hasExternalField, system.components, system.forceField, system.simulationBox,
       system.spanOfFrameworkAtoms(), system.spanOfMoleculeAtoms(), system.beta, growType, cutOffVDW, cutOffCoulomb,
       selectedComponent, selectedMolecule, 1.0, 0uz, system.numberOfTrialDirections);
   time_end = std::chrono::system_clock::now();

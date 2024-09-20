@@ -79,7 +79,7 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::deletionMoveCBMC(Rand
 
     time_begin = std::chrono::system_clock::now();
     ChainData retraceData = CBMC::retraceMoleculeSwapDeletion(
-        random, system.hasExternalField, system.components, system.forceField, system.simulationBox,
+        random, system.frameworkComponents, system.components[selectedComponent], system.hasExternalField, system.components, system.forceField, system.simulationBox,
         system.spanOfFrameworkAtoms(), system.spanOfMoleculeAtoms(), system.beta, cutOffVDW, cutOffCoulomb,
         selectedComponent, selectedMolecule, molecule, 1.0, system.numberOfTrialDirections);
     time_end = std::chrono::system_clock::now();

@@ -16,6 +16,8 @@ module;
 #include <sstream>
 #include <string>
 #include <vector>
+#include <ranges>
+#include <numeric>
 #endif
 
 
@@ -38,6 +40,8 @@ import <numbers>;
 import <optional>;
 import <complex>;
 import <print>;
+import <ranges>;
+import <numeric>;
 #endif
 
 import double3;
@@ -59,7 +63,7 @@ void PropertyLambdaProbabilityHistogram::WangLandauIteration(PropertyLambdaProba
       std::fill(biasFactor.begin(), biasFactor.end(), 0.0);
       break;
     case PropertyLambdaProbabilityHistogram::WangLandauPhase::Sample:
-      //assert(currentBin >= 0 && currentBin < numberOfBins);
+      //assert(currentBin >= 0 && currentBin < numberOfSamplePoints);
       if (containsTheFractionalMolecule)
       {
         biasFactor[currentBin] -= WangLandauScalingFactor;
@@ -107,15 +111,18 @@ std::string PropertyLambdaProbabilityHistogram::writeAveragesStatistics(double b
   std::ostringstream stream;
 
   double conv = Units::EnergyToKelvin;
-  size_t lastBin = numberOfBins - 1;
+  size_t lastBin = numberOfSamplePoints - 1;
 
   std::print(stream, "    Lambda histogram and bias:\n");
   std::print(stream, "    ---------------------------------------------------------------------------\n");
   std::pair<std::vector<double>, std::vector<double>> histogram_avg = averageProbabilityHistogram();
-  for (size_t i = 0; i < numberOfBins; ++i)
+
+  double totalHistogram = std::accumulate(histogram_avg.first.begin(), histogram_avg.first.end(), 0.0);
+  double normalize = static_cast<double>(numberOfSamplePoints) / totalHistogram;
+  for (size_t i = 0; i < numberOfSamplePoints; ++i)
   {
     std::print(stream, "{}{:2d}-{:4f} (lambda) P: {: .5e} +/- {:.5e} bias: {: .5e} [-]\n", "    ", i,
-               static_cast<double>(i) * delta, histogram_avg.first[i], histogram_avg.second[i], biasFactor[i]);
+               static_cast<double>(i) * delta, normalize * histogram_avg.first[i], normalize * histogram_avg.second[i], biasFactor[i]);
   }
   std::print(stream, "\n\n");
 
@@ -130,10 +137,18 @@ std::string PropertyLambdaProbabilityHistogram::writeAveragesStatistics(double b
 
   std::print(stream, "    Lambda statistics:\n");
   std::print(stream, "    ---------------------------------------------------------------------------\n");
-  for (size_t i = 0; i < numberOfBins; ++i)
+
+  double minimum_free_energy = 0.0;
+  auto minimum_iterator = std::ranges::min_element(freeEnergy.first);
+  if(minimum_iterator != freeEnergy.first.end())
+  {
+    minimum_free_energy = conv * (*minimum_iterator);
+  }
+
+  for (size_t i = 0; i < numberOfSamplePoints; ++i)
   {
     std::print(stream, "{}{:2d}-{:4f} (lambda) Free energy: {:.6e} +/- {:.6e} [K]\n", "    ", i,
-               static_cast<double>(i) * delta, conv * freeEnergy.first[i], conv * freeEnergy.second[i]);
+               static_cast<double>(i) * delta, conv * freeEnergy.first[i] - minimum_free_energy, conv * freeEnergy.second[i]);
   }
   std::print(stream, "    ---------------------------------------------------------------------------\n");
   std::print(stream, "    Excess chemical potential: (ln(P(lambda=1))-ln(P(lambda=0)))/Beta\n");
@@ -199,9 +214,9 @@ std::string PropertyLambdaProbabilityHistogram::writeDUdLambdaStatistics(double 
 
     double conv = Units::EnergyToKelvin;
     std::pair<std::vector<double3>, std::vector<double3>> dudlambda = averageDuDlambda();
-    for (size_t binIndex = 0; binIndex < numberOfBins; ++binIndex)
+    for (size_t binIndex = 0; binIndex < numberOfSamplePoints; ++binIndex)
     {
-      std::print(stream, "{}{:2d}-{:5f} (lambda) <dU/dlambda>: {: .6e} +/- {:.6e} [-]\n", "    ", binIndex,
+      std::print(stream, "{}{:2d}-{:5f} (lambda) <dU/dlambda>: {: .6e} +/- {:.6e} [K/-]\n", "    ", binIndex,
                  static_cast<double>(binIndex) * delta, conv * dudlambda.first[binIndex].x,
                  conv * dudlambda.second[binIndex].x);
     }
@@ -268,11 +283,11 @@ nlohmann::json PropertyLambdaProbabilityHistogram::jsonAveragesStatistics(
 {
   nlohmann::json status;
 
-  size_t lastBin = numberOfBins - 1;
+  size_t lastBin = numberOfSamplePoints - 1;
 
   /*
   std::pair<std::vector<double>, std::vector<double>> histogram_avg = averageProbabilityHistogram();
-  for (size_t i = 0; i < numberOfBins; ++i)
+  for (size_t i = 0; i < numberOfSamplePoints; ++i)
   {
     std::print(stream, "{}{:2d}-{:4f} (lambda) P: {: .5e} +/- {:.5e} bias: {: .5e} [-]\n", "    ", i,
                static_cast<double>(i) * delta, histogram_avg.first[i], histogram_avg.second[i], biasFactor[i]);
@@ -292,7 +307,7 @@ nlohmann::json PropertyLambdaProbabilityHistogram::jsonAveragesStatistics(
   /*
   std::print(stream, "    Lambda statistics:\n");
   std::print(stream, "    ---------------------------------------------------------------------------\n");
-  for (size_t i = 0; i < numberOfBins; ++i)
+  for (size_t i = 0; i < numberOfSamplePoints; ++i)
   {
     std::print(stream, "{}{:2d}-{:4f} (lambda) Free energy: {:.6e} +/- {:.6e} [K]\n", "    ", i,
                static_cast<double>(i) * delta, conv * freeEnergy.first[i], conv * freeEnergy.second[i]);
@@ -350,7 +365,7 @@ nlohmann::json PropertyLambdaProbabilityHistogram::jsonDUdLambdaStatistics(
     std::pair<std::vector<double3>, std::vector<double3>> dudlambda = averageDuDlambda();
 
     /*
-    for (size_t binIndex = 0; binIndex < numberOfBins; ++binIndex)
+    for (size_t binIndex = 0; binIndex < numberOfSamplePoints; ++binIndex)
     {
       std::print(stream, "{}{:2d}-{:5f} (lambda) <dU/dlambda>: {: .6e} +/- {:.6e} [-]\n", "    ", binIndex,
                  static_cast<double>(binIndex) * delta, conv * dudlambda.first[binIndex].x,
@@ -417,7 +432,7 @@ Archive<std::ofstream> &operator<<(Archive<std::ofstream> &archive, const Proper
   archive << p.versionNumber;
   archive << p.numberOfBlocks;
 
-  archive << p.numberOfBins;
+  archive << p.numberOfSamplePoints;
   archive << p.jump_bins;
   archive << p.currentBin;
   archive << p.delta;
@@ -445,7 +460,7 @@ Archive<std::ifstream> &operator>>(Archive<std::ifstream> &archive, PropertyLamb
   archive >> p.versionNumber;
   archive >> p.numberOfBlocks;
 
-  archive >> p.numberOfBins;
+  archive >> p.numberOfSamplePoints;
   archive >> p.jump_bins;
   archive >> p.currentBin;
   archive >> p.delta;

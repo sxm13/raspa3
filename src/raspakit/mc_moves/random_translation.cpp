@@ -74,6 +74,11 @@ std::optional<RunningEnergy> MC_Moves::randomTranslationMove(RandomNumber &rando
   std::pair<Molecule, std::vector<Atom>> trialMolecule =
       components[selectedComponent].translate(molecule, molecule_atoms, displacement);
 
+  if(system.insideBlockedPockets(system.components[selectedComponent], trialMolecule.second))
+  {
+    return std::nullopt;
+  }
+
   // compute external field energy contribution
   time_begin = std::chrono::system_clock::now();
   std::optional<RunningEnergy> externalFieldMolecule = Interactions::computeExternalFieldEnergyDifference(

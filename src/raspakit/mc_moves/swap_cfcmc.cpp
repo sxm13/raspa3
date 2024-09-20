@@ -75,7 +75,7 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC(Random
 
   size_t indexFractionalMolecule = system.indexOfGCFractionalMoleculesPerComponent_CFCMC(selectedComponent);
 
-  if (selectedNewBin >= std::make_signed_t<std::size_t>(lambda.numberOfBins))  // Insertion move
+  if (selectedNewBin >= std::make_signed_t<std::size_t>(lambda.numberOfSamplePoints))  // Insertion move
   {
     if (insertionDisabled)
     {
@@ -87,7 +87,7 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC(Random
     // (1) Unbiased: the fractional molecule with lambda=lambda_old is made integer (lambda=1) and deltaU is
     // computed (2) Unbiased: a new fractional molecule is inserted with lambda_new = epsilon
 
-    size_t newBin = static_cast<size_t>(selectedNewBin - std::make_signed_t<std::size_t>(lambda.numberOfBins));
+    size_t newBin = static_cast<size_t>(selectedNewBin - std::make_signed_t<std::size_t>(lambda.numberOfSamplePoints));
     double newLambda = deltaLambda * static_cast<double>(newBin);
 
     system.components[selectedComponent].mc_moves_statistics.swapMove_CFCMC.counts[0] += 1;
@@ -102,6 +102,13 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC(Random
     for (Atom& atom : fractionalMolecule)
     {
       atom.setScalingToInteger();
+    }
+
+    if((system.insideBlockedPockets(system.components[selectedComponent], fractionalMolecule)))
+    {
+      // reject, set fractional molecule back to old state
+      std::copy(oldFractionalMolecule.begin(), oldFractionalMolecule.end(), fractionalMolecule.begin());
+      return {std::nullopt, double3(0.0, 1.0, 0.0)};
     }
 
     // compute external field energy contribution
@@ -180,7 +187,7 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC(Random
     std::pair<Molecule, std::vector<Atom>> trialMolecule =
         system.components[selectedComponent].equilibratedMoleculeRandomInBox(random, system.simulationBox);
 
-    if((system.insideBlockedPockets(system.components[selectedComponent], trialMolecule.second)) && (newLambda > 0.0))
+    if((system.insideBlockedPockets(system.components[selectedComponent], trialMolecule.second)))
     {
       // reject, set fractional molecule back to old state
       std::copy(oldFractionalMolecule.begin(), oldFractionalMolecule.end(), fractionalMolecule.begin());
@@ -199,6 +206,13 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC(Random
                     atom.groupId = static_cast<uint8_t>(groupId);
                     atom.setScaling(newLambda);
                   });
+
+    if((system.insideBlockedPockets(system.components[selectedComponent], trialMolecule.second)))
+    {
+      // reject, set fractional molecule back to old state
+      std::copy(oldFractionalMolecule.begin(), oldFractionalMolecule.end(), fractionalMolecule.begin());
+      return {std::nullopt, double3(0.0, 1.0, 0.0)};
+    }
 
     // compute external field energy contribution
     time_begin = std::chrono::system_clock::now();
@@ -356,6 +370,13 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC(Random
         atom.groupId = uint8_t{0};
       }
 
+      if((system.insideBlockedPockets(system.components[selectedComponent], fractionalMolecule)))
+      {
+        // reject, set fractional molecule back to old state
+        std::copy(oldFractionalMolecule.begin(), oldFractionalMolecule.end(), fractionalMolecule.begin());
+        return {std::nullopt, double3(0.0, 1.0, 0.0)};
+      }
+
       // compute external field energy contribution
       time_begin = std::chrono::system_clock::now();
       std::optional<RunningEnergy> externalFieldDifferenceStep1 = Interactions::computeExternalFieldEnergyDifference(
@@ -432,7 +453,7 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC(Random
       std::vector<Atom> savedFractionalMolecule(newFractionalMolecule.begin(), newFractionalMolecule.end());
 
       // (2) Unbiased: A new fractional molecule is chosen with lambda_new = 1 - epsilon, deltaU is computed.
-      size_t newBin = static_cast<size_t>(selectedNewBin + std::make_signed_t<std::size_t>(lambda.numberOfBins));
+      size_t newBin = static_cast<size_t>(selectedNewBin + std::make_signed_t<std::size_t>(lambda.numberOfSamplePoints));
       double newLambda = deltaLambda * static_cast<double>(newBin);
 
       // get the groupIds from the fractional molecule, set new Lambda
@@ -579,10 +600,6 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC(Random
 
     std::span<Atom> molecule = system.spanOfMolecule(selectedComponent, indexFractionalMolecule);
 
-    if(system.insideBlockedPockets(system.components[selectedComponent], molecule) && newLambda > 0)
-    {
-      return {std::nullopt, double3(0.0, 1.0, 0.0)};
-    }
 
     std::vector<Atom> trialPositions(molecule.begin(), molecule.end());
     std::transform(molecule.begin(), molecule.end(), trialPositions.begin(),
@@ -591,6 +608,11 @@ std::pair<std::optional<RunningEnergy>, double3> MC_Moves::swapMove_CFCMC(Random
                      a.setScaling(newLambda);
                      return a;
                    });
+
+    if(system.insideBlockedPockets(system.components[selectedComponent], trialPositions))
+    {
+      return {std::nullopt, double3(0.0, 1.0, 0.0)};
+    }
 
     // compute external field energy contribution
     time_begin = std::chrono::system_clock::now();

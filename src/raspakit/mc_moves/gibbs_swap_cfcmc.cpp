@@ -616,7 +616,7 @@ std::optional<std::pair<RunningEnergy, RunningEnergy>> MC_Moves::GibbsSwapMove_C
     systemA.components[selectedComponent].mc_moves_statistics.GibbsSwapMove_CFCMC.totalCounts[2] += 1;
 
     if (selectedNewBin < 0) return std::nullopt;
-    if (selectedNewBin >= std::make_signed_t<std::size_t>(lambdaA.numberOfBins)) return std::nullopt;
+    if (selectedNewBin >= std::make_signed_t<std::size_t>(lambdaA.numberOfSamplePoints)) return std::nullopt;
 
     size_t newBin = static_cast<size_t>(selectedNewBin);
     double newLambda = deltaLambda * static_cast<double>(newBin);

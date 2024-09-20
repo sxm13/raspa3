@@ -32,11 +32,14 @@ import randomnumbers;
 import cbmc_first_bead_data;
 import cbmc_interactions;
 import running_energy;
+import framework;
+import component;
 import forcefield;
 import simulationbox;
 
 [[nodiscard]] std::optional<FirstBeadData> CBMC::growMoleculeMultipleFirstBeadSwapInsertion(
-    RandomNumber& random, bool hasExternalField, const ForceField& forceField, const SimulationBox& simulationBox,
+    RandomNumber &random, const std::vector<Framework> &frameworkComponents, const Component &component,
+    bool hasExternalField, const ForceField& forceField, const SimulationBox& simulationBox,
     std::span<const Atom> frameworkAtoms, std::span<const Atom> moleculeAtoms, double beta, double cutOff,
     double cutOffCoulomb, const Atom& atom, size_t numberOfTrialDirections) noexcept
 {
@@ -47,7 +50,8 @@ import simulationbox;
                 [&](Atom& a) { a.position = simulationBox.randomPosition(random); });
 
   const std::vector<std::pair<Atom, RunningEnergy>> externalEnergies =
-      computeExternalNonOverlappingEnergies(hasExternalField, forceField, simulationBox, frameworkAtoms, moleculeAtoms,
+      computeExternalNonOverlappingEnergies(frameworkComponents, component,
+                                            hasExternalField, forceField, simulationBox, frameworkAtoms, moleculeAtoms,
                                             cutOff, cutOffCoulomb, trialPositions);
 
   // if all positions over lap return failure
@@ -70,7 +74,8 @@ import simulationbox;
 }
 
 [[nodiscard]] FirstBeadData CBMC::retraceRigidMultipleFirstBeadSwapDeletion(
-    RandomNumber& random, bool hasExternalField, const ForceField& forcefield, const SimulationBox& simulationBox,
+    RandomNumber &random, const std::vector<Framework> &frameworkComponents, const Component &component,
+    bool hasExternalField, const ForceField& forcefield, const SimulationBox& simulationBox,
     std::span<const Atom> frameworkAtoms, std::span<const Atom> moleculeAtoms, double beta, double cutOff,
     double cutOffCoulomb, const Atom atom, double scaling, size_t numberOfTrialDirections) noexcept
 {
@@ -86,7 +91,8 @@ import simulationbox;
                 [&](Atom& a) { a.position = simulationBox.randomPosition(random); });
 
   const std::vector<std::pair<Atom, RunningEnergy>> externalEnergies =
-      computeExternalNonOverlappingEnergies(hasExternalField, forcefield, simulationBox, frameworkAtoms, moleculeAtoms,
+      computeExternalNonOverlappingEnergies(frameworkComponents, component,
+                                            hasExternalField, forcefield, simulationBox, frameworkAtoms, moleculeAtoms,
                                             cutOff, cutOffCoulomb, trialPositions);
 
   std::vector<double> logBoltmannFactors{};
@@ -101,7 +107,8 @@ import simulationbox;
 }
 
 [[nodiscard]] std::optional<FirstBeadData> CBMC::growRigidMultipleFirstBeadReinsertion(
-    RandomNumber& random, bool hasExternalField, const ForceField& forceField, const SimulationBox& simulationBox,
+    RandomNumber &random, const std::vector<Framework> &frameworkComponents, const Component &component,
+    bool hasExternalField, const ForceField& forceField, const SimulationBox& simulationBox,
     std::span<const Atom> frameworkAtoms, std::span<const Atom> moleculeAtoms, double beta, double cutOff,
     double cutOffCoulomb, const Atom& atom, size_t numberOfTrialDirections) noexcept
 {
@@ -110,7 +117,8 @@ import simulationbox;
                 [&](Atom& a) { a.position = simulationBox.randomPosition(random); });
 
   const std::vector<std::pair<Atom, RunningEnergy>> externalEnergies =
-      computeExternalNonOverlappingEnergies(hasExternalField, forceField, simulationBox, frameworkAtoms, moleculeAtoms,
+      computeExternalNonOverlappingEnergies(frameworkComponents, component,
+                                            hasExternalField, forceField, simulationBox, frameworkAtoms, moleculeAtoms,
                                             cutOff, cutOffCoulomb, trialPositions);
 
   if (externalEnergies.empty()) return std::nullopt;
@@ -135,14 +143,16 @@ import simulationbox;
 }
 
 [[nodiscard]] FirstBeadData CBMC::retraceRigidMultipleFirstBeadReinsertion(
-    [[maybe_unused]] RandomNumber& random, bool hasExternalField, const ForceField& forceField,
+    [[maybe_unused]] RandomNumber &random, const std::vector<Framework> &frameworkComponents, const Component &component,
+    bool hasExternalField, const ForceField& forceField,
     const SimulationBox& simulationBox, std::span<const Atom> frameworkAtoms, std::span<const Atom> moleculeAtoms,
     double beta, double cutOff, double cutOffCoulomb, const Atom& atom, double storedR, size_t numberOfTrialDirections)
 {
   std::vector<Atom> trialPositions({atom});
 
   const std::vector<std::pair<Atom, RunningEnergy>> externalEnergies =
-      computeExternalNonOverlappingEnergies(hasExternalField, forceField, simulationBox, frameworkAtoms, moleculeAtoms,
+      computeExternalNonOverlappingEnergies(frameworkComponents, component,
+                                            hasExternalField, forceField, simulationBox, frameworkAtoms, moleculeAtoms,
                                             cutOff, cutOffCoulomb, trialPositions);
   if (externalEnergies.empty())
   {
