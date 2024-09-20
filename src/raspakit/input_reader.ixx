@@ -9,6 +9,7 @@ module;
 #include <istream>
 #include <locale>
 #include <map>
+#include <set>
 #include <optional>
 #include <string>
 #include <unordered_set>
@@ -20,6 +21,7 @@ export module input_reader;
 #ifndef USE_LEGACY_HEADERS
 import <string>;
 import <map>;
+import <set>;
 import <unordered_set>;
 import <vector>;
 import <complex>;
@@ -123,4 +125,16 @@ export struct InputReader
   void parseFitting(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data);
   void parseMixturePrediction(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data);
   void parseBreakthrough(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data);
+
+  void validateInput(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data);
+
+  struct InsensitiveCompare { 
+    bool operator() (const std::string& a, const std::string& b) const {
+        return strcasecmp(a.c_str(), b.c_str()) < 0;
+    }
+  };
+
+  static const std::set<std::string, InsensitiveCompare> generalOptions;
+  static const std::set<std::string, InsensitiveCompare> systemOptions;
+  static const std::set<std::string, InsensitiveCompare> componentOptions;
 };

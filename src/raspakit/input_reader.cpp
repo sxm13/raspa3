@@ -13,6 +13,7 @@ module;
 #include <iostream>
 #include <iterator>
 #include <map>
+#include <set>
 #include <numbers>
 #include <optional>
 #include <print>
@@ -39,6 +40,7 @@ import <ios>;
 import <optional>;
 import <algorithm>;
 import <map>;
+import <set>;
 import <iterator>;
 import <functional>;
 import <print>;
@@ -174,6 +176,8 @@ InputReader::InputReader(const std::string inputFile) // : inputStream(inputFile
   {
     std::cerr << "parse error at byte " << ex.byte << std::endl;
   }
+
+  validateInput(parsed_data);
 
   if (parsed_data.contains("SimulationType") && parsed_data["SimulationType"].is_string())
   {
@@ -777,6 +781,17 @@ void InputReader::parseMolecularSimulations(const nlohmann::basic_json<nlohmann:
         forceFields[systemId] = ForceField::readForceField(name, "force_field.json");
       }
 
+      if (value.contains("CutOff") && value["CutOff"].is_number_float())
+      {
+        if (!forceFields[systemId].has_value())
+        {
+          throw std::runtime_error(std::format("[Input reader]: No forcefield specified or found'\n"));
+        }
+        forceFields[systemId]->cutOffVDW = value["CutOff"].get<double>();
+        forceFields[systemId]->cutOffCoulomb = value["CutOff"].get<double>();
+        forceFields[systemId]->preComputePotentialShift();
+      }
+
       if (value.contains("CutOffVDW") && value["CutOffVDW"].is_number_float())
       {
         if (!forceFields[systemId].has_value())
@@ -1348,6 +1363,84 @@ void InputReader::parseMolecularSimulations(const nlohmann::basic_json<nlohmann:
                             "range ({}-{})\n",
                             numberOfMolecules, systems[i].tmmc.minMacrostate, systems[i].tmmc.maxMacrostate));
           }
+        }
+      }
+    }
+  }
+}
+
+
+const std::set<std::string, InputReader::InsensitiveCompare> InputReader::generalOptions = {
+  "SimulationType", "ForceField", "NumberOfLambdaBins", "RestartFromBinaryFile", "RandomSeed",
+  "NumberOfCycles", "NumberOfInitializationCycles", "NumberOfEquilibrationCycles", 
+  "PrintEvery", "WriteBinaryRestartEvery", "RescaleWangLandauEvery", "OptimizeMCMovesEvery",
+  "ThreadingType", "NumberOfThreads", "Components", "Systems"
+};
+
+const std::set<std::string, InputReader::InsensitiveCompare> InputReader::systemOptions = {
+  "ForceField", "CutOff", "CutOffVDW", "CutOffCoulomb", "OmitEwaldFourier", "ComputePolarization", "ChargeMethod",
+  "VolumeMoveProbability", "GibbsVolumeMoveProbability", "ParallelTemperingSwapProbability", 
+  "Type", "ExternalTemperature", "ExternalPressure", "UseChargesFromCIFFile", 
+  "Framework", "Name", "NumberOfUnitCells", "HeliumVoidFraction",
+  "BoxLengths", "BoxAngles", "ExternalField",
+  "ComputeEnergyHistogram", "SampleEnergyHistogramEvery", "WriteEnergyHistogramEvery",
+  "NumberOfBinsEnergyHistogram", "LowerLimitEnergyHistogram", "UpperLimitEnergyHistogram",
+  "ComputeNumberOfMoleculesHistogram", "SampleNumberOfMoleculesHistogramEvery", "WriteNumberOfMoleculesHistogramEvery",
+  "LowerLimitNumberOfMoleculesHistogram", "UpperLimitNumberOfMoleculesHistogram",
+  "ComputeRDF", "SampleRDFEvery", "WriteRDFEvery", "NumberOfBinsRDF", "UpperLimitRDF",
+  "ComputeConventionalRDF", "SampleConventionalRDFEvery", "WriteConventionalRDFEvery", 
+  "NumberOfBinsConventionalRDF", "RangeConventionalRDF",
+  "ComputeMSD", "SampleMSDEvery", "WriteMSDEvery", "NumberOfBlockElementsMSD",
+  "ComputeDensityGrid", "SampleDensityGridEvery", "WriteDensityGridEvery", "DensityGridSize",
+  "DensityGridPseudoAtomsList", "OutputPDBMovie", "SampleMovieEvery",
+  "Ensemble", "TimeStep"
+};
+
+
+const std::set<std::string, InputReader::InsensitiveCompare> InputReader::componentOptions = {
+  "Name", "Type", "MoleculeDefinition",
+  "TranslationProbability", "RandomTranslationProbability", "RotationProbability", "RandomRotationProbability",
+  "ReinsertionProbability", "SwapConventionalProbability", "SwapProbability",
+  "CFCMC_SwapProbability", "CFCMC_CBMC_SwapProbability", "GibbsSwapProbability", "Gibbs_CFCMC_SwapProbability",
+  "WidomProbability", "CFCMC_WidomProbability", "CFCMC_CBMC_WidomProbability",
+  "CreateNumberOfMolecules", "StartingBead", "FugacityCoefficient", "IdealGasRosenbluthWeight",
+  "MolFraction", "ThermodynamicIntegration", "BlockingPockets"
+};
+
+
+void InputReader::validateInput(const nlohmann::basic_json<nlohmann::raspa_map> &parsed_data)
+{
+  for (auto& [key, _] : parsed_data.items())
+  {
+    if(!generalOptions.contains(key))
+    {
+      throw std::runtime_error(std::format("Error: Unknown input '{}'\n", key));
+    }
+  }
+
+  if (parsed_data.contains("Systems"))
+  {
+    for (auto& [_, value] : parsed_data["Systems"].items())
+    {
+      for (auto& [key, _] : value.items())
+      {
+        if(!systemOptions.contains(key))
+        {
+          throw std::runtime_error(std::format("Error: Unknown system input '{}'\n", key));
+        }
+      }
+    }
+  }
+
+  if (parsed_data.contains("Components"))
+  {
+    for (auto& [_, value] : parsed_data["Components"].items())
+    {
+      for (auto& [key, _] : value.items())
+      {
+        if(!componentOptions.contains(key))
+        {
+          throw std::runtime_error(std::format("Error: Unknown component input '{}'\n", key));
         }
       }
     }

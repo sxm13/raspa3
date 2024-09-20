@@ -14,7 +14,7 @@
       "ExternalTemperature": 200.0,
       "ChargeMethod": "None",
       "ParallelTemperingSwapProbability": 0.01,
-      "Movies": true
+      "OutputPDBMovie": true
     },
     {
       "Type": "Box",

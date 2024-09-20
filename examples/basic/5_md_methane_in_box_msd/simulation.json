@@ -24,7 +24,7 @@
     {
       "Name" : "methane",
       "TranslationProbability" : 0.5,
-      "ReinsrtionProbability" : 0.5,
+      "ReinsertionProbability" : 0.5,
       "CreateNumberOfMolecules" : 100
     }
   ]
