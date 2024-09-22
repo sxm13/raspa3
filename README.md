@@ -55,6 +55,33 @@ cd examples/basic/1_mc_methane_in_box<br>
 - llvm-18 or higher<br>
 - python3 and pybind11<br>
 - blas and lapack (64-bit integers)
+- hfd5
+
+# implemented so far
+- rigid molecules and rigid framework
+- multiple systems, box or framework
+- grand canonical ensemble (CBMC, CFCMC, and CB/CFCMC)
+- Gibbs ensemble (CBMC, CFCMC, and CB/CFCMC)
+- Monte Carlo NPT ensemble
+- Molecular Dynamics NVT ensemble (Nose-Hoover thermostat)
+- binary restart
+- blocking pockets
+- PDB-movies, energy histograms, number of molecule histograms
+- RDF, MSD-order-N, density grids (cube files)
+
+# todo-list
+- tail-corrections for CFCMC
+- MC/MD hybrid move
+- grids for rigid frameworks
+- charge equilibration
+- flexible molecules
+- reaction ensemble
+- identity change
+- polarization
+- cell-lists for rigid frameworks
+- partial molar volumes
+- zeo++-type calculations
+- partial molar enthalpies/volumes-
 
 
 # Installation Guide
@@ -75,8 +102,10 @@ cmake --list-presets<br>
 Available configure presets:<br>
 > "macos-x64"<br>
 > "macos-x64-debug"<br>
+> "macos-x64-profile"<br>
 > "macos-apple-silicon"<br>
 > "macos-apple-silicon-debug"<br>
+> "macos-apple-silicon-profile"<br>
 > "windows-x64"<br>
 > "windows-arm64"<br>
 > "linux"<br>
